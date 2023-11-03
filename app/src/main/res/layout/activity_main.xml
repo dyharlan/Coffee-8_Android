@@ -67,6 +67,14 @@
                 android:onClick="openLoadROMIntent"
                 android:text="Load ROM" />
 
+            <Button
+                android:id="@+id/cycleButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:onClick="showCyclesButton"
+                android:text="Set Cycles" />
+
         </LinearLayout>
 
         <TableLayout

@@ -1,10 +1,12 @@
 package com.dyharlan.coffee_8
 
+import android.app.Dialog
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Rect
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -13,10 +15,13 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.view.WindowManager
 import android.view.WindowMetrics
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TableRow
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -76,7 +81,7 @@ class MainActivity : AppCompatActivity() {
         val chip8Surface = findViewById<SurfaceView>(R.id.chip8Surface)
 
         chip8Cycle = Chip8Cycle(applicationContext, planeColors, chip8Surface)
-        chip8Cycle.getChip8SOC().cycles = 25000
+        chip8Cycle.getChip8SOC().cycles = 200
         val keyRow1 = findViewById<TableRow>(R.id.keyRow1)
             keyRow1.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
         val keyRow2 = findViewById<TableRow>(R.id.keyRow2)
@@ -138,6 +143,43 @@ class MainActivity : AppCompatActivity() {
             }
         }
         println("density: "+applicationContext.getResources().getDisplayMetrics().density)
+    }
+    fun showCyclesButton(view: View){
+        if(chip8Cycle != null && chip8Cycle.getChip8SOC() != null){
+            showCyclesDialog(chip8Cycle.getChip8SOC())
+        }
+    }
+    private fun showCyclesDialog(chip8SOC: Chip8SOC) {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.custom_dialog)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val dialogTitle = dialog.findViewById<TextView>(R.id.dialogTitle)
+        dialogTitle.text = "Set the number of Cycles done by the emulator"
+        val editText = dialog.findViewById<EditText>(R.id.newCycles)
+        val btnYes = dialog.findViewById<Button>(R.id.btnYes)
+        val btnNo = dialog.findViewById<Button>(R.id.btnNo)
+
+        btnYes.setOnClickListener {
+            if(chip8SOC != null){
+                var newCycles = editText.text.toString().toInt()
+                if(newCycles >= 0){
+                    chip8SOC.cycles = newCycles
+                    Toast.makeText(this, "Cycles: $newCycles", Toast.LENGTH_LONG).show()
+                }
+                else{
+                    Toast.makeText(this, "Please enter a positive value and try again!", Toast.LENGTH_LONG).show()
+                }
+
+            }
+            dialog.dismiss()
+        }
+        btnNo.setOnClickListener {
+            Toast.makeText(this, "Cycles: ${chip8SOC.cycles}", Toast.LENGTH_LONG).show()
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
 //    var REQUEST_CODE: Int = 1
@@ -429,7 +471,7 @@ class MainActivity : AppCompatActivity() {
         }
         override fun run() {
 
-            cpuCycleThread!!.priority = Thread.NORM_PRIORITY
+            cpuCycleThread!!.priority = Thread.MAX_PRIORITY
             val frameTime = (1000 / 60).toDouble()
             var elapsedTimeFromEpoch = System.currentTimeMillis()
             var origin = elapsedTimeFromEpoch + frameTime / 2
@@ -457,7 +499,7 @@ class MainActivity : AppCompatActivity() {
                         i++
                     }
                     try {
-                        Thread.sleep(frameTime.toInt().toLong())
+                        Thread.sleep(frameTime.toLong())
                     } catch (ex: InterruptedException) {
                         ex.printStackTrace()
                     }
