@@ -12,7 +12,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import android.util.Log
-import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -48,7 +47,6 @@ internal class LastFrame(arr2D: Array<IntArray>, hires: Boolean, colorArr: Array
 }
 class MainActivity : AppCompatActivity() {
     private lateinit var planeColors: Array<Color>
-    private lateinit var chip8SOC: Chip8SOC
     private lateinit var chip8Cycle: Chip8Cycle
     private companion object{
         //PERMISSION request constant, assign any value
@@ -57,36 +55,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        planeColors = arrayOf(
-        Color.valueOf(Color.parseColor("#FF996600")),
-        Color.valueOf(Color.parseColor("#FFFFCC00")),
-        Color.valueOf(Color.parseColor("#FFFF6600")),
-        Color.valueOf(Color.parseColor("#FF662200")),
-        Color.valueOf(0xBF2AED),
-        Color.valueOf(Color.MAGENTA),
-        Color.valueOf(Color.YELLOW),
-        Color.valueOf(Color.GREEN),
-        Color.valueOf(Color.GRAY),
-        Color.valueOf(0x4B0082), //INDIGO
-
-        Color.valueOf(0xEE82EE), //VIOLET
-
-        Color.valueOf(0xAA5500),
-        Color.valueOf(Color.BLACK),
-        Color.valueOf(Color.WHITE),
-        Color.valueOf(Color.BLUE),
-        Color.valueOf(Color.RED)
-        )
-
-
-
-
         super.onCreate(savedInstanceState)
+        planeColors = arrayOf(
+            Color.valueOf(Color.parseColor("#FF996600")),
+            Color.valueOf(Color.parseColor("#FFFFCC00")),
+            Color.valueOf(Color.parseColor("#FFFF6600")),
+            Color.valueOf(Color.parseColor("#FF662200")),
+            Color.valueOf(0xBF2AED),
+            Color.valueOf(Color.MAGENTA),
+            Color.valueOf(Color.YELLOW),
+            Color.valueOf(Color.GREEN),
+            Color.valueOf(Color.GRAY),
+            Color.valueOf(0x4B0082), //INDIGO
+
+            Color.valueOf(0xEE82EE), //VIOLET
+
+            Color.valueOf(0xAA5500),
+            Color.valueOf(Color.BLACK),
+            Color.valueOf(Color.WHITE),
+            Color.valueOf(Color.BLUE),
+            Color.valueOf(Color.RED)
+        )
         setContentView(R.layout.activity_main)
-        chip8SOC = Chip8SOC(true, MachineType.XO_CHIP)
-        chip8SOC.enableSound()
+
+
         val chip8Surface = findViewById<SurfaceView>(R.id.chip8Surface)
-        chip8Cycle = Chip8Cycle(chip8SOC, planeColors, chip8Surface)
+        chip8Cycle = Chip8Cycle(planeColors, chip8Surface)
         val keyPad: Array<Button> = arrayOf(
             findViewById(R.id.keyPad0),
             findViewById(R.id.keyPad1),
@@ -114,282 +108,49 @@ class MainActivity : AppCompatActivity() {
         for((currentKey, key) in keyPad.withIndex()){
             key.text = keyLabels[currentKey]
             key.setOnTouchListener { v, event ->
-                if (chip8SOC.keyPad == null) {
+                if (chip8Cycle.getChip8SOC().keyPad == null) {
                     false
                 }
                 if (event.getAction() === MotionEvent.ACTION_DOWN) {
-                    chip8SOC.keyPad[currentKey] = true
+                    chip8Cycle.getChip8SOC().keyPad[currentKey] = true
                 } else if (event.getAction() === MotionEvent.ACTION_CANCEL) {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(currentKey)
+                    if (chip8Cycle.getChip8SOC().waitState) {
+                        chip8Cycle.getChip8SOC().waitState = false
+                        chip8Cycle.getChip8SOC().sendKeyStroke(currentKey)
                     }
-                    chip8SOC.keyPad[currentKey] = false
+                    chip8Cycle.getChip8SOC().keyPad[currentKey] = false
                 } else if (event.getAction() === MotionEvent.ACTION_UP) {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(currentKey)
+                    if (chip8Cycle.getChip8SOC().waitState) {
+                        chip8Cycle.getChip8SOC().waitState = false
+                        chip8Cycle.getChip8SOC().sendKeyStroke(currentKey)
                     }
-                    chip8SOC.keyPad[currentKey] = false
+                    chip8Cycle.getChip8SOC().keyPad[currentKey] = false
                 }
 
                 false
             }
         }
-
-
-
     }
-
-    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-
-        if(event.action == KeyEvent.ACTION_DOWN){
-            println("pressed a key")
-            return when (event.keyCode) {
-                KeyEvent.KEYCODE_X -> {
-                    chip8SOC.keyPad[0] = true
-                    true
-                }
-
-                KeyEvent.KEYCODE_1 -> {
-                    chip8SOC.keyPad[1] = true
-                    true
-                }
-
-                KeyEvent.KEYCODE_2 -> {
-                    chip8SOC.keyPad[2] = true
-                    true
-                }
-
-                KeyEvent.KEYCODE_3 -> {
-                    chip8SOC.keyPad[3] = true
-                    true
-                }
-
-                KeyEvent.KEYCODE_Q -> {
-                    chip8SOC.keyPad[4] = true
-                    true
-                }
-
-                KeyEvent.KEYCODE_W -> {
-                    chip8SOC.keyPad[5] = true
-                    true
-                }
-
-                KeyEvent.KEYCODE_E -> {
-                    chip8SOC.keyPad[6] = true
-                    true
-                }
-
-                KeyEvent.KEYCODE_A -> {
-                    chip8SOC.keyPad[7] = true
-                    true
-                }
-
-                KeyEvent.KEYCODE_S -> {
-                    chip8SOC.keyPad[8] = true
-                    true
-                }
-
-                KeyEvent.KEYCODE_D -> {
-                    chip8SOC.keyPad[9] = true
-                    true
-                }
-
-                KeyEvent.KEYCODE_Z -> {
-                    chip8SOC.keyPad[10] = true
-                    true
-                }
-
-                KeyEvent.KEYCODE_C -> {
-                    chip8SOC.keyPad[11] = true
-                    true
-                }
-
-                KeyEvent.KEYCODE_4 -> {
-                    chip8SOC.keyPad[12] = true
-                    true
-                }
-
-                KeyEvent.KEYCODE_R -> {
-                    chip8SOC.keyPad[13] = true
-                    true
-                }
-
-                KeyEvent.KEYCODE_F -> {
-                    chip8SOC.keyPad[14] = true
-                    true
-                }
-
-                KeyEvent.KEYCODE_V -> {
-                    chip8SOC.keyPad[15] = true
-                    true
-                }
-
-                else -> super.dispatchKeyEvent(event)
-            }
-        }else if(event.action == KeyEvent.ACTION_DOWN){
-            println("released a key")
-            return when (event.keyCode) {
-                KeyEvent.KEYCODE_X -> {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(0)
-                    }
-                    chip8SOC.keyPad[0] = false
-                    true
-                }
-
-                KeyEvent.KEYCODE_1 -> {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(1)
-                    }
-                    chip8SOC.keyPad[1] = false
-                    true
-                }
-
-                KeyEvent.KEYCODE_2 -> {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(2)
-                    }
-                    chip8SOC.keyPad[2] = false
-                    true
-                }
-
-                KeyEvent.KEYCODE_3 -> {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(3)
-                    }
-                    chip8SOC.keyPad[3] = false
-                    true
-                }
-
-                KeyEvent.KEYCODE_Q -> {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(4)
-                    }
-                    chip8SOC.keyPad[4] = false
-                    true
-                }
-
-                KeyEvent.KEYCODE_W -> {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(5)
-                    }
-                    chip8SOC.keyPad[5] = false
-                    true
-                }
-
-                KeyEvent.KEYCODE_E -> {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(6)
-                    }
-                    chip8SOC.keyPad[6] = false
-                    true
-                }
-
-                KeyEvent.KEYCODE_A -> {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(7)
-                    }
-                    chip8SOC.keyPad[7] = false
-                    true
-                }
-
-                KeyEvent.KEYCODE_S -> {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(8)
-                    }
-                    chip8SOC.keyPad[8] = false
-                    true
-                }
-
-                KeyEvent.KEYCODE_D -> {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(9)
-                    }
-                    chip8SOC.keyPad[9] = false
-                    true
-                }
-
-                KeyEvent.KEYCODE_Z -> {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(10)
-                    }
-                    chip8SOC.keyPad[10] = false
-                    true
-                }
-
-                KeyEvent.KEYCODE_C -> {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(11)
-                    }
-                    chip8SOC.keyPad[11] = false
-                    true
-                }
-
-                KeyEvent.KEYCODE_4 -> {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(12)
-                    }
-                    chip8SOC.keyPad[12] = false
-                    true
-                }
-
-                KeyEvent.KEYCODE_R -> {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(13)
-                    }
-                    chip8SOC.keyPad[13] = false
-                    true
-                }
-
-                KeyEvent.KEYCODE_F -> {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(14)
-                    }
-                    chip8SOC.keyPad[14] = false
-                    true
-                }
-
-                KeyEvent.KEYCODE_V -> {
-                    if (chip8SOC.waitState) {
-                        chip8SOC.waitState = false
-                        chip8SOC.sendKeyStroke(15)
-                    }
-                    chip8SOC.keyPad[15] = false
-                    true
-                }
-
-                else -> super.dispatchKeyEvent(event)
-            }
+    override fun onResume() {
+        super.onResume()
+        if(chip8Cycle.getRomStatus()){
+            chip8Cycle.startEmulation()
         }
-        return super.dispatchKeyEvent(event)
+    }
+    override fun onPause() {
+        super.onPause()
+        chip8Cycle.stopEmulation()
     }
 
-
-
-
-
+    override fun onStop() {
+        super.onStop()
+        chip8Cycle.getChip8SOC().closeSound();
+    }
 
     fun openLoadROMIntent(view: View){
         if (checkPermission()){
             Log.d(TAG, "onCreate: Permission already granted, create folder")
-            val file = File(Environment.getExternalStorageDirectory(), "superneatboy.xo8")
+            val file = File(Environment.getExternalStorageDirectory(), "6-keypad.ch8")
             chip8Cycle.loadROM(file)
         }
         else{
@@ -494,9 +255,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     class Chip8Cycle: Runnable {
-
+        private val BITMAP_WIDTH = 128
+        private val BITMAP_HEIGHT = 64
         private var isRunning: Boolean = false
-        private var romStatus: Boolean = false;
+        private var romStatus: Boolean = false
         private var chip8SOC: Chip8SOC
         private var planeColors: Array<Color>
         //private var chip8Canvas: Chip8Canvas
@@ -505,18 +267,29 @@ class MainActivity : AppCompatActivity() {
         private var bitmap: Bitmap
         private var chip8Surface: SurfaceView
         private var chip8SurfaceHolder: SurfaceHolder
-        private var rect: Rect
+        private var lowResRect: Rect
+        private var hiResRect: Rect
+
         //private var
 
         private lateinit var rom: File
-        constructor(chip8SOC: Chip8SOC, planeColors: Array<Color>, chip8Surface: SurfaceView){
-            this.chip8SOC = chip8SOC
+        constructor(planeColors: Array<Color>, chip8Surface: SurfaceView){
+            this.chip8SOC = Chip8SOC(true, MachineType.XO_CHIP)
+            chip8SOC.enableSound()
             this.planeColors = planeColors
             //this.chip8Canvas = chip8Canvas
             this.chip8Surface = chip8Surface
             this.chip8SurfaceHolder = chip8Surface.holder
-            rect = Rect(0,0,128*5,64*5)
-            bitmap = Bitmap.createBitmap(128,64, Bitmap.Config.RGB_565)
+            var LOWRES_SCALE_FACTOR = 10
+            var HIRES_SCALE_FACTOR = LOWRES_SCALE_FACTOR/2
+            var hiResViewWidth = BITMAP_WIDTH * HIRES_SCALE_FACTOR
+            var hiResViewHeight = BITMAP_HEIGHT * HIRES_SCALE_FACTOR
+            var lowResViewWidth = BITMAP_WIDTH * LOWRES_SCALE_FACTOR
+            var lowResViewHeight = BITMAP_HEIGHT * LOWRES_SCALE_FACTOR
+
+            lowResRect = Rect(0,0,lowResViewWidth,lowResViewHeight)
+            hiResRect = Rect(0,0,hiResViewWidth,hiResViewHeight)
+            bitmap = Bitmap.createBitmap(BITMAP_WIDTH,BITMAP_HEIGHT, Bitmap.Config.RGB_565)
         }
 
         fun loadROM(rom: File) {
@@ -687,38 +460,26 @@ class MainActivity : AppCompatActivity() {
         private fun updateSurface(holder: SurfaceHolder,bitmap: Bitmap){
             if(holder.surface.isValid){
                 var canvas: Canvas = holder.lockHardwareCanvas()
-                canvas.drawBitmap(bitmap, null, rect, null)
+                if(chip8SOC.hiRes){
+                    canvas.drawBitmap(bitmap, null, hiResRect, null)
+                }else if(!chip8SOC.hiRes){
+                    canvas.drawBitmap(bitmap, null, lowResRect, null)
+                }
+
                 holder.unlockCanvasAndPost(canvas)
             }
 
         }
+
+        public fun getRomStatus() : Boolean{
+            return romStatus
+        }
+
+        public fun getChip8SOC(): Chip8SOC{
+            return chip8SOC
+        }
     }
 
-//    class Chip8Canvas  @JvmOverloads constructor(context: Context,
-//                                  attrs: AttributeSet? = null, defStyleAttr: Int = 0)
-//        : View(context, attrs, defStyleAttr) {
-//
-//        //private var partialUpdate: Boolean = false
-//
-////        private var xCoord: Float = 0.0f
-////        private var yCoord: Float = 0.0f
-//        private lateinit var bitmap: Bitmap
-//
-//        private var rect: Rect = Rect(0,0,128*5,64*5)
-//        init {
-//            setWillNotDraw(false) // Enable onDraw in this view group
-//        }
-//        fun loadBitmap(bitmap: Bitmap){
-//            this.bitmap = bitmap
-//        }
-//
-//        // Called when the view should render its content.
-//        override fun onDraw(canvas: Canvas) {
-//            super.onDraw(canvas)
-//
-//
-//        }
-//    }
 
 
 }
