@@ -69,12 +69,8 @@ public class WaveGenerator {
                         .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
 
                         .build())
-                //.setBufferSizeInBytes(systemFreq/2)
                 .setBufferSizeInBytes(AudioTrack.getMinBufferSize(systemFreq,AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_8BIT))
                 .build();
-                //
-
-
         isEnabled = sound;
         setPitch(pitch);
         setBuffer(pattern);
