@@ -1,6 +1,5 @@
 package com.dyharlan.coffee_8
 
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -12,10 +11,13 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
-import android.util.AttributeSet
 import android.util.Log
 import android.view.KeyEvent
+import android.view.MotionEvent
+import android.view.SurfaceHolder
+import android.view.SurfaceView
 import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -83,254 +85,302 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         chip8SOC = Chip8SOC(true, MachineType.XO_CHIP)
         chip8SOC.enableSound()
-        val chip8Canvas = findViewById<Chip8Canvas>(R.id.chip8Canvas)
-        chip8Cycle = Chip8Cycle(chip8SOC, planeColors, chip8Canvas)
-        chip8Canvas.loadBitmap(chip8Cycle.getBitmap())
+        val chip8Surface = findViewById<SurfaceView>(R.id.chip8Surface)
+        chip8Cycle = Chip8Cycle(chip8SOC, planeColors, chip8Surface)
+        val keyPad: Array<Button> = arrayOf(
+            findViewById(R.id.keyPad0),
+            findViewById(R.id.keyPad1),
+            findViewById(R.id.keyPad2),
+            findViewById(R.id.keyPad3),
+            findViewById(R.id.keyPad4),
+            findViewById(R.id.keyPad5),
+            findViewById(R.id.keyPad6),
+            findViewById(R.id.keyPad7),
+            findViewById(R.id.keyPad8),
+            findViewById(R.id.keyPad9),
+            findViewById(R.id.keyPadA),
+            findViewById(R.id.keyPadB),
+            findViewById(R.id.keyPadC),
+            findViewById(R.id.keyPadD),
+            findViewById(R.id.keyPadE),
+            findViewById(R.id.keyPadF),
+        )
+        val keyLabels: Array<String> = arrayOf(
+            "0","1","2","3",
+            "4","5","6","7",
+            "8","9","A","B",
+            "C","D","E","F"
+        )
+        for((currentKey, key) in keyPad.withIndex()){
+            key.text = keyLabels[currentKey]
+            key.setOnTouchListener { v, event ->
+                if (chip8SOC.keyPad == null) {
+                    false
+                }
+                if (event.getAction() === MotionEvent.ACTION_DOWN) {
+                    chip8SOC.keyPad[currentKey] = true
+                } else if (event.getAction() === MotionEvent.ACTION_CANCEL) {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(currentKey)
+                    }
+                    chip8SOC.keyPad[currentKey] = false
+                } else if (event.getAction() === MotionEvent.ACTION_UP) {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(currentKey)
+                    }
+                    chip8SOC.keyPad[currentKey] = false
+                }
+
+                false
+            }
+        }
+
 
 
     }
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        if (chip8SOC.keyPad == null) {
-            return super.onKeyDown(keyCode, event)
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+
+        if(event.action == KeyEvent.ACTION_DOWN){
+            println("pressed a key")
+            return when (event.keyCode) {
+                KeyEvent.KEYCODE_X -> {
+                    chip8SOC.keyPad[0] = true
+                    true
+                }
+
+                KeyEvent.KEYCODE_1 -> {
+                    chip8SOC.keyPad[1] = true
+                    true
+                }
+
+                KeyEvent.KEYCODE_2 -> {
+                    chip8SOC.keyPad[2] = true
+                    true
+                }
+
+                KeyEvent.KEYCODE_3 -> {
+                    chip8SOC.keyPad[3] = true
+                    true
+                }
+
+                KeyEvent.KEYCODE_Q -> {
+                    chip8SOC.keyPad[4] = true
+                    true
+                }
+
+                KeyEvent.KEYCODE_W -> {
+                    chip8SOC.keyPad[5] = true
+                    true
+                }
+
+                KeyEvent.KEYCODE_E -> {
+                    chip8SOC.keyPad[6] = true
+                    true
+                }
+
+                KeyEvent.KEYCODE_A -> {
+                    chip8SOC.keyPad[7] = true
+                    true
+                }
+
+                KeyEvent.KEYCODE_S -> {
+                    chip8SOC.keyPad[8] = true
+                    true
+                }
+
+                KeyEvent.KEYCODE_D -> {
+                    chip8SOC.keyPad[9] = true
+                    true
+                }
+
+                KeyEvent.KEYCODE_Z -> {
+                    chip8SOC.keyPad[10] = true
+                    true
+                }
+
+                KeyEvent.KEYCODE_C -> {
+                    chip8SOC.keyPad[11] = true
+                    true
+                }
+
+                KeyEvent.KEYCODE_4 -> {
+                    chip8SOC.keyPad[12] = true
+                    true
+                }
+
+                KeyEvent.KEYCODE_R -> {
+                    chip8SOC.keyPad[13] = true
+                    true
+                }
+
+                KeyEvent.KEYCODE_F -> {
+                    chip8SOC.keyPad[14] = true
+                    true
+                }
+
+                KeyEvent.KEYCODE_V -> {
+                    chip8SOC.keyPad[15] = true
+                    true
+                }
+
+                else -> super.dispatchKeyEvent(event)
+            }
+        }else if(event.action == KeyEvent.ACTION_DOWN){
+            println("released a key")
+            return when (event.keyCode) {
+                KeyEvent.KEYCODE_X -> {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(0)
+                    }
+                    chip8SOC.keyPad[0] = false
+                    true
+                }
+
+                KeyEvent.KEYCODE_1 -> {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(1)
+                    }
+                    chip8SOC.keyPad[1] = false
+                    true
+                }
+
+                KeyEvent.KEYCODE_2 -> {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(2)
+                    }
+                    chip8SOC.keyPad[2] = false
+                    true
+                }
+
+                KeyEvent.KEYCODE_3 -> {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(3)
+                    }
+                    chip8SOC.keyPad[3] = false
+                    true
+                }
+
+                KeyEvent.KEYCODE_Q -> {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(4)
+                    }
+                    chip8SOC.keyPad[4] = false
+                    true
+                }
+
+                KeyEvent.KEYCODE_W -> {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(5)
+                    }
+                    chip8SOC.keyPad[5] = false
+                    true
+                }
+
+                KeyEvent.KEYCODE_E -> {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(6)
+                    }
+                    chip8SOC.keyPad[6] = false
+                    true
+                }
+
+                KeyEvent.KEYCODE_A -> {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(7)
+                    }
+                    chip8SOC.keyPad[7] = false
+                    true
+                }
+
+                KeyEvent.KEYCODE_S -> {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(8)
+                    }
+                    chip8SOC.keyPad[8] = false
+                    true
+                }
+
+                KeyEvent.KEYCODE_D -> {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(9)
+                    }
+                    chip8SOC.keyPad[9] = false
+                    true
+                }
+
+                KeyEvent.KEYCODE_Z -> {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(10)
+                    }
+                    chip8SOC.keyPad[10] = false
+                    true
+                }
+
+                KeyEvent.KEYCODE_C -> {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(11)
+                    }
+                    chip8SOC.keyPad[11] = false
+                    true
+                }
+
+                KeyEvent.KEYCODE_4 -> {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(12)
+                    }
+                    chip8SOC.keyPad[12] = false
+                    true
+                }
+
+                KeyEvent.KEYCODE_R -> {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(13)
+                    }
+                    chip8SOC.keyPad[13] = false
+                    true
+                }
+
+                KeyEvent.KEYCODE_F -> {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(14)
+                    }
+                    chip8SOC.keyPad[14] = false
+                    true
+                }
+
+                KeyEvent.KEYCODE_V -> {
+                    if (chip8SOC.waitState) {
+                        chip8SOC.waitState = false
+                        chip8SOC.sendKeyStroke(15)
+                    }
+                    chip8SOC.keyPad[15] = false
+                    true
+                }
+
+                else -> super.dispatchKeyEvent(event)
+            }
         }
-        return when (keyCode) {
-            KeyEvent.KEYCODE_X -> {
-                chip8SOC.keyPad[0] = true
-                true
-            }
-
-            KeyEvent.KEYCODE_1 -> {
-                chip8SOC.keyPad[1] = true
-                true
-            }
-
-            KeyEvent.KEYCODE_2 -> {
-                chip8SOC.keyPad[2] = true
-                true
-            }
-
-            KeyEvent.KEYCODE_3 -> {
-                chip8SOC.keyPad[3] = true
-                true
-            }
-
-            KeyEvent.KEYCODE_Q -> {
-                chip8SOC.keyPad[4] = true
-                true
-            }
-
-            KeyEvent.KEYCODE_W -> {
-                chip8SOC.keyPad[5] = true
-                true
-            }
-
-            KeyEvent.KEYCODE_E -> {
-                chip8SOC.keyPad[6] = true
-                true
-            }
-
-            KeyEvent.KEYCODE_A -> {
-                chip8SOC.keyPad[7] = true
-                true
-            }
-
-            KeyEvent.KEYCODE_S -> {
-                chip8SOC.keyPad[8] = true
-                true
-            }
-
-            KeyEvent.KEYCODE_D -> {
-                chip8SOC.keyPad[9] = true
-                true
-            }
-
-            KeyEvent.KEYCODE_Z -> {
-                chip8SOC.keyPad[10] = true
-                true
-            }
-
-            KeyEvent.KEYCODE_C -> {
-                chip8SOC.keyPad[11] = true
-                true
-            }
-
-            KeyEvent.KEYCODE_4 -> {
-                chip8SOC.keyPad[12] = true
-                true
-            }
-
-            KeyEvent.KEYCODE_R -> {
-                chip8SOC.keyPad[13] = true
-                true
-            }
-
-            KeyEvent.KEYCODE_F -> {
-                chip8SOC.keyPad[14] = true
-                true
-            }
-
-            KeyEvent.KEYCODE_V -> {
-                chip8SOC.keyPad[15] = true
-                true
-            }
-
-            else -> super.onKeyDown(keyCode, event)
-        }
+        return super.dispatchKeyEvent(event)
     }
 
-    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        if (chip8SOC.keyPad == null) {
-            return super.onKeyDown(keyCode, event)
-        }
-        return when (keyCode) {
-            KeyEvent.KEYCODE_X -> {
-                if (chip8SOC.waitState) {
-                    chip8SOC.waitState = false
-                    chip8SOC.sendKeyStroke(0)
-                }
-                chip8SOC.keyPad[0] = false
-                true
-            }
-
-            KeyEvent.KEYCODE_1 -> {
-                if (chip8SOC.waitState) {
-                    chip8SOC.waitState = false
-                    chip8SOC.sendKeyStroke(1)
-                }
-                chip8SOC.keyPad[1] = false
-                true
-            }
-
-            KeyEvent.KEYCODE_2 -> {
-                if (chip8SOC.waitState) {
-                    chip8SOC.waitState = false
-                    chip8SOC.sendKeyStroke(2)
-                }
-                chip8SOC.keyPad[2] = false
-                true
-            }
-
-            KeyEvent.KEYCODE_3 -> {
-                if (chip8SOC.waitState) {
-                    chip8SOC.waitState = false
-                    chip8SOC.sendKeyStroke(3)
-                }
-                chip8SOC.keyPad[3] = false
-                true
-            }
-
-            KeyEvent.KEYCODE_Q -> {
-                if (chip8SOC.waitState) {
-                    chip8SOC.waitState = false
-                    chip8SOC.sendKeyStroke(4)
-                }
-                chip8SOC.keyPad[4] = false
-                true
-            }
-
-            KeyEvent.KEYCODE_W -> {
-                if (chip8SOC.waitState) {
-                    chip8SOC.waitState = false
-                    chip8SOC.sendKeyStroke(5)
-                }
-                chip8SOC.keyPad[5] = false
-                true
-            }
-
-            KeyEvent.KEYCODE_E -> {
-                if (chip8SOC.waitState) {
-                    chip8SOC.waitState = false
-                    chip8SOC.sendKeyStroke(6)
-                }
-                chip8SOC.keyPad[6] = false
-                true
-            }
-
-            KeyEvent.KEYCODE_A -> {
-                if (chip8SOC.waitState) {
-                    chip8SOC.waitState = false
-                    chip8SOC.sendKeyStroke(7)
-                }
-                chip8SOC.keyPad[7] = false
-                true
-            }
-
-            KeyEvent.KEYCODE_S -> {
-                if (chip8SOC.waitState) {
-                    chip8SOC.waitState = false
-                    chip8SOC.sendKeyStroke(8)
-                }
-                chip8SOC.keyPad[8] = false
-                true
-            }
-
-            KeyEvent.KEYCODE_D -> {
-                if (chip8SOC.waitState) {
-                    chip8SOC.waitState = false
-                    chip8SOC.sendKeyStroke(9)
-                }
-                chip8SOC.keyPad[9] = false
-                true
-            }
-
-            KeyEvent.KEYCODE_Z -> {
-                if (chip8SOC.waitState) {
-                    chip8SOC.waitState = false
-                    chip8SOC.sendKeyStroke(10)
-                }
-                chip8SOC.keyPad[10] = false
-                true
-            }
-
-            KeyEvent.KEYCODE_C -> {
-                if (chip8SOC.waitState) {
-                    chip8SOC.waitState = false
-                    chip8SOC.sendKeyStroke(11)
-                }
-                chip8SOC.keyPad[11] = false
-                true
-            }
-
-            KeyEvent.KEYCODE_4 -> {
-                if (chip8SOC.waitState) {
-                    chip8SOC.waitState = false
-                    chip8SOC.sendKeyStroke(12)
-                }
-                chip8SOC.keyPad[12] = false
-                true
-            }
-
-            KeyEvent.KEYCODE_R -> {
-                if (chip8SOC.waitState) {
-                    chip8SOC.waitState = false
-                    chip8SOC.sendKeyStroke(13)
-                }
-                chip8SOC.keyPad[13] = false
-                true
-            }
-
-            KeyEvent.KEYCODE_F -> {
-                if (chip8SOC.waitState) {
-                    chip8SOC.waitState = false
-                    chip8SOC.sendKeyStroke(14)
-                }
-                chip8SOC.keyPad[14] = false
-                true
-            }
-
-            KeyEvent.KEYCODE_V -> {
-                if (chip8SOC.waitState) {
-                    chip8SOC.waitState = false
-                    chip8SOC.sendKeyStroke(15)
-                }
-                chip8SOC.keyPad[15] = false
-                true
-            }
-
-            else -> super.onKeyUp(keyCode, event)
-        }
-    }
 
 
 
@@ -339,7 +389,7 @@ class MainActivity : AppCompatActivity() {
     fun openLoadROMIntent(view: View){
         if (checkPermission()){
             Log.d(TAG, "onCreate: Permission already granted, create folder")
-            val file = File(Environment.getExternalStorageDirectory(), "6-keypad.ch8")
+            val file = File(Environment.getExternalStorageDirectory(), "superneatboy.xo8")
             chip8Cycle.loadROM(file)
         }
         else{
@@ -449,16 +499,23 @@ class MainActivity : AppCompatActivity() {
         private var romStatus: Boolean = false;
         private var chip8SOC: Chip8SOC
         private var planeColors: Array<Color>
-        private var chip8Canvas: Chip8Canvas
+        //private var chip8Canvas: Chip8Canvas
         private var cpuCycleThread: Thread? = null
         private var last: LastFrame? = null
         private var bitmap: Bitmap
+        private var chip8Surface: SurfaceView
+        private var chip8SurfaceHolder: SurfaceHolder
+        private var rect: Rect
+        //private var
 
         private lateinit var rom: File
-        constructor(chip8SOC: Chip8SOC, planeColors: Array<Color>, chip8Canvas: Chip8Canvas){
+        constructor(chip8SOC: Chip8SOC, planeColors: Array<Color>, chip8Surface: SurfaceView){
             this.chip8SOC = chip8SOC
             this.planeColors = planeColors
-            this.chip8Canvas = chip8Canvas
+            //this.chip8Canvas = chip8Canvas
+            this.chip8Surface = chip8Surface
+            this.chip8SurfaceHolder = chip8Surface.holder
+            rect = Rect(0,0,128*5,64*5)
             bitmap = Bitmap.createBitmap(128,64, Bitmap.Config.RGB_565)
         }
 
@@ -621,37 +678,47 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
-                chip8Canvas.postInvalidate()
+                //chip8Canvas.postInvalidate()
+                updateSurface(chip8SurfaceHolder, bitmap)
                 last = LastFrame(chip8SOC.graphics, chip8SOC.getHiRes(), planeColors)
             }
         }
-    }
 
-    class Chip8Canvas  @JvmOverloads constructor(context: Context,
-                                  attrs: AttributeSet? = null, defStyleAttr: Int = 0)
-        : View(context, attrs, defStyleAttr) {
-
-        //private var partialUpdate: Boolean = false
-
-//        private var xCoord: Float = 0.0f
-//        private var yCoord: Float = 0.0f
-        private lateinit var bitmap: Bitmap
-
-        private var rect: Rect = Rect(0,0,128*5,64*5)
-        init {
-            setWillNotDraw(false) // Enable onDraw in this view group
-        }
-        fun loadBitmap(bitmap: Bitmap){
-            this.bitmap = bitmap
-        }
-
-        // Called when the view should render its content.
-        override fun onDraw(canvas: Canvas) {
-            super.onDraw(canvas)
-            canvas.drawBitmap(bitmap, null, rect, null)
+        private fun updateSurface(holder: SurfaceHolder,bitmap: Bitmap){
+            if(holder.surface.isValid){
+                var canvas: Canvas = holder.lockHardwareCanvas()
+                canvas.drawBitmap(bitmap, null, rect, null)
+                holder.unlockCanvasAndPost(canvas)
+            }
 
         }
     }
+
+//    class Chip8Canvas  @JvmOverloads constructor(context: Context,
+//                                  attrs: AttributeSet? = null, defStyleAttr: Int = 0)
+//        : View(context, attrs, defStyleAttr) {
+//
+//        //private var partialUpdate: Boolean = false
+//
+////        private var xCoord: Float = 0.0f
+////        private var yCoord: Float = 0.0f
+//        private lateinit var bitmap: Bitmap
+//
+//        private var rect: Rect = Rect(0,0,128*5,64*5)
+//        init {
+//            setWillNotDraw(false) // Enable onDraw in this view group
+//        }
+//        fun loadBitmap(bitmap: Bitmap){
+//            this.bitmap = bitmap
+//        }
+//
+//        // Called when the view should render its content.
+//        override fun onDraw(canvas: Canvas) {
+//            super.onDraw(canvas)
+//
+//
+//        }
+//    }
 
 
 }
