@@ -332,10 +332,17 @@ public class Chip8SOC{
         waitReg = -1;
         waitState = false;
     }
-    
-    public boolean loadROM(File rom) throws IOException, FileNotFoundException{
+    public boolean loadROM(File rom){
+        try{
+           return loadROM(new FileInputStream(rom));
+        }catch(Exception ex){
+            System.out.println(ex);
+            return false;
+        }
+    }
+    public boolean loadROM(InputStream stream) throws IOException, FileNotFoundException{
         Boolean romStatus = false;
-        try (DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(rom)))){ 
+        try (DataInputStream in = new DataInputStream(new BufferedInputStream(stream))){
             int offset = 0x0;
             int currByte = 0;
             chip8Init();
