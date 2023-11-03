@@ -149,23 +149,8 @@ public class WaveGenerator {
             bufferpos = (bufferpos + rate) % buffer.length;
         }
 
+        int written = audio.write(scaledBuffer, 0, scaledBuffer.length, AudioTrack.WRITE_NON_BLOCKING);
 
-
-        
-        //int avail = sourceDataLine.available()-(sourceDataLine.getBufferSize()-bufferCap);
-        int bytesPerFrame = 1; // for PCM 8-bit mono
-        int currentBufferSizeInBytes = audio.getBufferSizeInFrames() * bytesPerFrame;
-        int bufferCapacityInBytes = audio.getBufferCapacityInFrames() * bytesPerFrame;
-        int avail = currentBufferSizeInBytes-(bufferCapacityInBytes-bufferCap);
-        if(avail <= 0){
-             //sourceDataLine.write(scaledBuffer, 0, Math.min(((avail % scaledBuffer.length) + scaledBuffer.length) % scaledBuffer.length,scaledBuffer.length) );
-            int written = audio.write(scaledBuffer, 0, Math.min(((avail % scaledBuffer.length) + scaledBuffer.length) % scaledBuffer.length,scaledBuffer.length), AudioTrack.WRITE_NON_BLOCKING);
-            //System.out.println(avail);
-        }else{
-            int written = audio.write(scaledBuffer, 0, Math.min(avail,scaledBuffer.length), AudioTrack.WRITE_NON_BLOCKING);
-            //System.out.println(avail);
-        }
-       
         
     }
     
