@@ -12,9 +12,11 @@ import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.WindowMetrics
 import android.widget.Button
+import android.widget.TableRow
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +24,7 @@ import com.dyharlan.coffee_8.Backend.Chip8SOC
 import com.dyharlan.coffee_8.Backend.MachineType
 import java.io.IOException
 import java.io.InputStream
+import java.security.AccessController.getContext
 
 
 internal class LastFrame(arr2D: Array<IntArray>, hires: Boolean, colorArr: Array<Color>) {
@@ -73,7 +76,15 @@ class MainActivity : AppCompatActivity() {
         val chip8Surface = findViewById<SurfaceView>(R.id.chip8Surface)
 
         chip8Cycle = Chip8Cycle(applicationContext, planeColors, chip8Surface)
-        chip8Cycle.getChip8SOC().cycles = 200
+        chip8Cycle.getChip8SOC().cycles = 25000
+        val keyRow1 = findViewById<TableRow>(R.id.keyRow1)
+            keyRow1.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
+        val keyRow2 = findViewById<TableRow>(R.id.keyRow2)
+            keyRow2.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
+        val keyRow3 = findViewById<TableRow>(R.id.keyRow3)
+            keyRow3.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
+        val keyRow4 = findViewById<TableRow>(R.id.keyRow4)
+            keyRow4.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
         val keyPad: Array<Button> = arrayOf(
             findViewById(R.id.keyPad0),
             findViewById(R.id.keyPad1),
@@ -100,27 +111,30 @@ class MainActivity : AppCompatActivity() {
         )
         for((currentKey, key) in keyPad.withIndex()){
             key.text = keyLabels[currentKey]
+            key.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1f)
             key.setOnTouchListener { v, event ->
                 if (chip8Cycle.getChip8SOC().keyPad == null) {
                     false
-                }
-                if (event.getAction() === MotionEvent.ACTION_DOWN) {
+                }else if (event.getAction() === MotionEvent.ACTION_DOWN) {
                     chip8Cycle.getChip8SOC().keyPad[currentKey] = true
+                    true
                 } else if (event.getAction() === MotionEvent.ACTION_CANCEL) {
                     if (chip8Cycle.getChip8SOC().waitState) {
                         chip8Cycle.getChip8SOC().waitState = false
                         chip8Cycle.getChip8SOC().sendKeyStroke(currentKey)
                     }
                     chip8Cycle.getChip8SOC().keyPad[currentKey] = false
+                    true
                 } else if (event.getAction() === MotionEvent.ACTION_UP) {
                     if (chip8Cycle.getChip8SOC().waitState) {
                         chip8Cycle.getChip8SOC().waitState = false
                         chip8Cycle.getChip8SOC().sendKeyStroke(currentKey)
                     }
                     chip8Cycle.getChip8SOC().keyPad[currentKey] = false
+                    true
                 }
 
-                false
+                else false
             }
         }
         println("density: "+applicationContext.getResources().getDisplayMetrics().density)
