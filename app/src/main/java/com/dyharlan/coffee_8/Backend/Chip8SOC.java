@@ -366,7 +366,6 @@ public class Chip8SOC{
     
     
     public void updateTimers(){
- 
         if(dT > 0){
             dT--;
         }
@@ -384,6 +383,11 @@ public class Chip8SOC{
                 tg.setBufferPos(0);
             }
         }             
+    }
+    public void closeSound(){
+        if(tg != null){
+            tg.close();
+        }
     }
     
     public Boolean getHiRes(){

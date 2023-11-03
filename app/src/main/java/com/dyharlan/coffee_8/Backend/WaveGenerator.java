@@ -153,13 +153,18 @@ public class WaveGenerator {
 
         
     }
-    
+    public void play(){
+        audio.play();
+    }
+    public void pause(){
+        audio.pause();
+    }
     public void flush(){
         audio.flush();
     }
-//    public void close(){
-//        sourceDataLine.close();
-//    }
+    public void close(){
+        audio.release();
+    }
 //    public int getAvailable(){
 //        return sourceDataLine.available();
 //    }
