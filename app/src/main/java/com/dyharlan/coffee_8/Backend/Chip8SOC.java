@@ -26,6 +26,9 @@ package com.dyharlan.coffee_8.Backend;
  *
  * @author dyharlan
  */
+import android.os.Environment;
+
+import java.nio.file.Files;
 import java.util.*;
 import java.io.*;
 import java.util.zip.CRC32;
@@ -47,7 +50,7 @@ interface Instruction {
 
     public void execute();
 }
-public class Chip8SOC{
+public abstract class Chip8SOC{
     private int DISPLAY_WIDTH;
     private int DISPLAY_HEIGHT;
     private long crc32Checksum;
@@ -197,7 +200,7 @@ public class Chip8SOC{
        _0x0Instructions[0xCD] = () -> C8INST_00CN();
        _0x0Instructions[0xCE] = () -> C8INST_00CN();
        _0x0Instructions[0xCF] = () -> C8INST_00CN();
-       
+
         _0x0Instructions[0xD0] = () -> C8INST_00DN();
         _0x0Instructions[0xD1] = () -> C8INST_00DN();
         _0x0Instructions[0xD2] = () -> C8INST_00DN();
@@ -214,21 +217,21 @@ public class Chip8SOC{
         _0x0Instructions[0xDD] = () -> C8INST_00DN();
         _0x0Instructions[0xDE] = () -> C8INST_00DN();
         _0x0Instructions[0xDF] = () -> C8INST_00DN();
-       
+
        _0x0Instructions[0xE0] = () -> C8INST_00E0();
-       _0x0Instructions[0xEE] = () -> C8INST_00EE(); 
-       _0x0Instructions[0xFB] = () -> C8INST_00FB(); 
-       _0x0Instructions[0xFC] = () -> C8INST_00FC(); 
-       _0x0Instructions[0xFD] = () -> C8INST_00FD(); 
-       _0x0Instructions[0xFE] = () -> C8INST_00FE(); 
-       _0x0Instructions[0xFF] = () -> C8INST_00FF(); 
+       _0x0Instructions[0xEE] = () -> C8INST_00EE();
+       _0x0Instructions[0xFB] = () -> C8INST_00FB();
+       _0x0Instructions[0xFC] = () -> C8INST_00FC();
+       _0x0Instructions[0xFD] = () -> C8INST_00FD();
+       _0x0Instructions[0xFE] = () -> C8INST_00FE();
+       _0x0Instructions[0xFF] = () -> C8INST_00FF();
 
        _0x5Instructions = new Instruction[0x4];
        _0x5Instructions[0x0] = () -> C8INST_5XY0();
        _0x5Instructions[0x1] = () -> C8INST_UNKNOWN();
        _0x5Instructions[0x2] = () -> C8INST_5XY2();
        _0x5Instructions[0x3] = () -> C8INST_5XY3();
-       
+
        _0x8Instructions = new Instruction[0xF];
        for(i = 0; i < _0x8Instructions.length ;i++){
           _0x8Instructions[i] = () -> C8INST_UNKNOWN();
@@ -242,20 +245,20 @@ public class Chip8SOC{
        _0x8Instructions[0x6] = () -> C8INST_8XY6();
        _0x8Instructions[0x7] = () -> C8INST_8XY7();
        _0x8Instructions[0xE] = () -> C8INST_8XYE();
-       
+
        _0xDInstructions = new Instruction[0x10];
        for(i = 0x0; i < _0xDInstructions.length ;i++){
           _0xDInstructions[i] = () -> C8INST_DXYN();
        }
-              
+
        _0xEInstructions = new Instruction[0xF];
        for(i = 0; i < _0xEInstructions.length ;i++){
           _0xEInstructions[i] = () -> C8INST_UNKNOWN();
        }
-       
+
        _0xEInstructions[0x1] = () -> C8INST_EXA1();
        _0xEInstructions[0xE] = () -> C8INST_EX9E();
-       
+
        _0xFInstructions = new Instruction[0x86];
        for(i = 0; i < _0xFInstructions.length ;i++){
           _0xFInstructions[i] = () -> C8INST_UNKNOWN();
@@ -276,9 +279,9 @@ public class Chip8SOC{
        _0xFInstructions[0x65] = () -> C8INST_FX65();
        _0xFInstructions[0x75] = () -> C8INST_FX75();
        _0xFInstructions[0x85] = () -> C8INST_FX85();
-       
-       
-       
+
+
+
     }
     //Initial state of the machine
     public void chip8Init(){
@@ -1063,53 +1066,55 @@ public class Chip8SOC{
         }
     }
     //FX75: Store V0..VX in RPL user flags (X <= 7)
-    private void C8INST_FX75(){
-//        for(int n = 0;(n < X) || (n <= 7);n++){
-//            flags[n] = v[n];
+    public abstract void C8INST_FX75();
+//    private void C8INST_FX75(){
+////        for(int n = 0;(n < X) || (n <= 7);n++){
+////            flags[n] = v[n];
+////        }
+//        File f = new File(Environment.getExternalStorageDirectory(),"SavedFlags/" + crc32Checksum + ".scflag");
+//
+//        try{
+//            if (!f.exists()) {
+//                f.getParentFile().mkdirs();
+//                f.createNewFile();
+//            }
+//            try ( DataOutputStream out = new DataOutputStream(new BufferedOutputStream(Files.newOutputStream(f.toPath())))) {
+//
+//                for (int n = 0; (n <= X); n++) {
+//                    out.writeInt(v[n] & 0xFF);
+//                }
+//                out.flush();
+//                out.close();
+//            }catch(IOException ioe){
+//                throw ioe;
+//            }
+//        }catch(IOException ioe){
+//            ioe.printStackTrace();
 //        }
-        File f = new File("SavedFlags/" + crc32Checksum + ".scflag");
-        
-        try{
-            if (!f.exists()) {
-                f.getParentFile().mkdirs();
-                f.createNewFile();
-            }
-            try ( DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(f)))) {
-
-                for (int n = 0; (n <= X); n++) {
-                    out.writeInt(v[n] & 0xFF);
-                }
-                out.flush();
-                out.close();
-            }catch(IOException ioe){
-                throw ioe;
-            }
-        }catch(IOException ioe){
-            ioe.printStackTrace();
-        }
-    }
+//    }
     //FX85: Read V0..VX from RPL user flags (X <= 7)
-    private void C8INST_FX85(){
-        File f = new File("SavedFlags/" + crc32Checksum + ".scflag");
-        
-        if (f.exists()) {
-            //copy the flags first to a temporary array before writing it to memory.
-            ArrayList<Integer> temp = new ArrayList<>();
-            try (DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(f)))) {
-                for (int n = 0;in.available() > 0; n++) {
-                   temp.add(in.readInt() & 0xFF);
-                }
-                for(int i = 0; i < temp.size(); i++){
-                    v[i] = temp.get(i) & 0xFF;
-                }
-                in.close();
-            }catch(EOFException eofe){
-                System.err.println("Invalid/broken flags file. It will not be loaded into memory.");
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
-        }
-    }
+    public abstract void C8INST_FX85();
+//    private void C8INST_FX85(){
+//        File f = new File(Environment.getExternalStorageDirectory(),"SavedFlags/" + crc32Checksum + ".scflag");
+//
+//        if (f.exists()) {
+//            //copy the flags first to a temporary array before writing it to memory.
+//            ArrayList<Integer> temp = new ArrayList<>();
+//            try (DataInputStream in = new DataInputStream(new BufferedInputStream(Files.newInputStream(f.toPath())))) {
+//                for (int n = 0;in.available() > 0; n++) {
+//                   temp.add(in.readInt() & 0xFF);
+//                }
+//                for(int i = 0; i < temp.size(); i++){
+//                    v[i] = temp.get(i) & 0xFF;
+//                }
+//                in.close();
+//            }catch(EOFException eofe){
+//                System.err.println("Invalid/broken flags file. It will not be loaded into memory.");
+//            } catch (IOException ioe) {
+//                ioe.printStackTrace();
+//            }
+//        }
+//    }
     
     public int getSoundTimer(){
         return sT;

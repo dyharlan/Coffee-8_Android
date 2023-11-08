@@ -16,12 +16,12 @@ import com.dyharlan.coffee_8.Backend.MachineType
 import java.io.IOException
 import java.io.InputStream
 
-    class Chip8Cycle: Runnable {
+    class Chip8Cycle: Chip8SOC, Runnable {
         private val BITMAP_WIDTH = 128
         private val BITMAP_HEIGHT = 64
         private var isRunning: Boolean = false
         private var romStatus: Boolean = false
-        private var chip8SOC: Chip8SOC
+        //private var chip8SOC: Chip8SOC
         private var planeColors: Array<Color>
         private var cpuCycleThread: Thread? = null
         private var last: LastFrame? = null
@@ -34,10 +34,11 @@ import java.io.InputStream
 
 
         private lateinit var rom: InputStream
-        constructor(applicationContext: Context, planeColors: Array<Color>, chip8Surface: SurfaceView){
+        constructor(applicationContext: Context, planeColors: Array<Color>, chip8Surface: SurfaceView): super(true, MachineType.XO_CHIP){
             this.applicationContext = applicationContext
-            this.chip8SOC = Chip8SOC(true, MachineType.XO_CHIP)
-            chip8SOC.enableSound()
+            //this.chip8SOC =
+
+            super.enableSound()
             this.planeColors = planeColors
             this.chip8Surface = chip8Surface
             this.chip8SurfaceHolder = chip8Surface.holder
@@ -80,10 +81,10 @@ import java.io.InputStream
             bitmap = Bitmap.createBitmap(BITMAP_WIDTH,BITMAP_HEIGHT, Bitmap.Config.RGB_565)
         }
 
-        fun loadROM(rom: InputStream) {
+        fun openROM(rom: InputStream) {
             try {
-                synchronized(chip8SOC) {
-                    romStatus = chip8SOC.loadROM(rom)
+                synchronized(this) {
+                    romStatus = super.loadROM(rom)
                     println("rom status: $romStatus")
                 }
                 if (romStatus) {
@@ -152,15 +153,15 @@ import java.io.InputStream
             while (isRunning) {
                 //println("running...")
                 //println( cpuCycleThread!!.isAlive)
-                synchronized(chip8SOC) {
+                synchronized(this) {
                     val diff = System.currentTimeMillis() - elapsedTimeFromEpoch
                     elapsedTimeFromEpoch += diff
                     var i: Long = 0
                     while (origin < elapsedTimeFromEpoch - frameTime && i < 2) {
                         var j = 0
-                        while (j < chip8SOC.cycles && !chip8SOC.waitState) {
+                        while (j < this.cycles && !this.waitState) {
                             try {
-                                chip8SOC.cpuExec()
+                                super.cpuExec()
                             } catch (ex: Exception) {
                                 stopEmulation()
                                 ex.printStackTrace()
@@ -168,7 +169,7 @@ import java.io.InputStream
                             }
                             j++
                         }
-                        chip8SOC.updateTimers()
+                        super.updateTimers()
                         origin += frameTime
                         i++
                     }
@@ -177,41 +178,41 @@ import java.io.InputStream
                     } catch (ex: InterruptedException) {
                         ex.printStackTrace()
                     }
-                    if (chip8SOC.vbLankInterrupt == 1) {
-                        chip8SOC.vbLankInterrupt = 2
+                    if (this.vbLankInterrupt == 1) {
+                        this.vbLankInterrupt = 2
                     }
                 }
                 //if there is a last frame
                 if(last != null){
                     //check if the previous frame and the previous palette is the same as the current frame in both planes.
-                    if(arrayEqual(last!!.prevFrame[0], chip8SOC.graphics[0]) && arrayEqual(last!!.prevFrame[1], chip8SOC.graphics[1])  && arrayEqual(
-                            last!!.prevFrame[2], chip8SOC.graphics[2])  && arrayEqual(last!!.prevFrame[3], chip8SOC.graphics[3]) && arrayEqual(
+                    if(arrayEqual(last!!.prevFrame[0], this.graphics[0]) && arrayEqual(last!!.prevFrame[1], this.graphics[1])  && arrayEqual(
+                            last!!.prevFrame[2], this.graphics[2])  && arrayEqual(last!!.prevFrame[3], this.graphics[3]) && arrayEqual(
                             last!!.prevColors,planeColors)){
                         //exit early if it is the same.
                         continue;
                     }
                     //clear last frame if we've switched from hi res to lowres or vice versa. Also clear it if the color palette has changed
-                    if (last!!.hires != chip8SOC.getHiRes() || !arrayEqual(last!!.prevColors,planeColors))
+                    if (last!!.hires != this.getHiRes() || !arrayEqual(last!!.prevColors,planeColors))
                         last = null;
                 }
                 var lastPixels: Array<IntArray> =
                     if (last != null) last!!.prevFrame else Array<IntArray>(4) {
                         IntArray(
-                            chip8SOC.machineWidth * chip8SOC.machineHeight
+                            this.machineWidth * this.machineHeight
                         )
                     }
 
-                if (chip8SOC.graphics != null) {
-                    for (y in 0 until chip8SOC.machineHeight) {
-                        for (x in 0 until chip8SOC.machineWidth) {
+                if (this.graphics != null) {
+                    for (y in 0 until this.machineHeight) {
+                        for (x in 0 until this.machineWidth) {
                             //int newPlane = (chip8SOC.graphics[1][(x) + ((y) * chip8SOC.getMachineWidth())] << 1 | chip8SOC.graphics[0][(x) + ((y) * chip8SOC.getMachineWidth())]) & 0x3;
-                            val newPlane: Int = chip8SOC.graphics[3][x + y * chip8SOC.machineWidth] shl 3 or (chip8SOC.graphics[2][x + y * chip8SOC.machineWidth] shl 2) or (chip8SOC.graphics[1][x + y * chip8SOC.machineWidth] shl 1) or chip8SOC.graphics[0][x + y * chip8SOC.machineWidth] and 0xF
+                            val newPlane: Int = this.graphics[3][x + y * this.machineWidth] shl 3 or (this.graphics[2][x + y * this.machineWidth] shl 2) or (this.graphics[1][x + y * this.machineWidth] shl 1) or this.graphics[0][x + y * this.machineWidth] and 0xF
                             //System.out.println(newPlane);
                             //selectively update each pixel if the last frame exists
                             if (last != null) {
                                 //int oldPlane = (lastPixels[1][(x) + ((y) * chip8SOC.getMachineWidth())] << 1 | lastPixels[0][(x) + ((y) * chip8SOC.getMachineWidth())]) & 0x3;
                                 val oldPlane =
-                                    (lastPixels[3][x + y * chip8SOC.machineWidth] shl 3) or (lastPixels[2][x + y * chip8SOC.machineWidth] shl 2) or (lastPixels[1][x + y * chip8SOC.machineWidth] shl 1) or lastPixels[0][x + y * chip8SOC.machineWidth] and 0xF
+                                    (lastPixels[3][x + y * this.machineWidth] shl 3) or (lastPixels[2][x + y * this.machineWidth] shl 2) or (lastPixels[1][x + y * this.machineWidth] shl 1) or lastPixels[0][x + y * this.machineWidth] and 0xF
                                 if (oldPlane != newPlane) {
                                     bitmap.setPixel(x,y,planeColors[newPlane].toArgb())
 
@@ -225,16 +226,16 @@ import java.io.InputStream
                 }
                 //chip8Canvas.postInvalidate()
                 updateSurface(chip8SurfaceHolder, bitmap)
-                last = LastFrame(chip8SOC.graphics, chip8SOC.getHiRes(), planeColors)
+                last = LastFrame(this.graphics, this.getHiRes(), planeColors)
             }
         }
 
         private fun updateSurface(holder: SurfaceHolder, bitmap: Bitmap){
             if(holder.surface.isValid){
                 var canvas: Canvas = holder.lockHardwareCanvas()
-                if(chip8SOC.hiRes){
+                if(this.hiRes){
                     canvas.drawBitmap(bitmap, null, hiResRect, null)
-                }else if(!chip8SOC.hiRes){
+                }else if(!this.hiRes){
                     canvas.drawBitmap(bitmap, null, lowResRect, null)
                 }
 
@@ -247,11 +248,15 @@ import java.io.InputStream
             return romStatus
         }
 
-        public fun getChip8SOC(): Chip8SOC {
-            return chip8SOC
-        }
+
 
         public fun getIsRunning(): Boolean{
             return isRunning
+        }
+
+        override fun C8INST_FX75() {
+        }
+
+        override fun C8INST_FX85() {
         }
     }

@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
         val chip8Surface = findViewById<SurfaceView>(R.id.chip8Surface)
 
         chip8Cycle = Chip8Cycle(applicationContext, planeColors, chip8Surface)
-        chip8Cycle.getChip8SOC().cycles = 200
+        chip8Cycle.cycles = 200
         val keyRow1 = findViewById<TableRow>(R.id.keyRow1)
             keyRow1.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
         val keyRow2 = findViewById<TableRow>(R.id.keyRow2)
@@ -106,24 +106,24 @@ class MainActivity : AppCompatActivity() {
             key.text = keyLabels[currentKey]
             key.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1f)
             key.setOnTouchListener { v, event ->
-                if (chip8Cycle.getChip8SOC().keyPad == null) {
+                if (chip8Cycle.keyPad == null) {
                     false
                 }else if (event.getAction() === MotionEvent.ACTION_DOWN) {
-                    chip8Cycle.getChip8SOC().keyPad[currentKey] = true
+                    chip8Cycle.keyPad[currentKey] = true
                     true
                 } else if (event.getAction() === MotionEvent.ACTION_CANCEL) {
-                    if (chip8Cycle.getChip8SOC().waitState) {
-                        chip8Cycle.getChip8SOC().waitState = false
-                        chip8Cycle.getChip8SOC().sendKeyStroke(currentKey)
+                    if (chip8Cycle.waitState) {
+                        chip8Cycle.waitState = false
+                        chip8Cycle.sendKeyStroke(currentKey)
                     }
-                    chip8Cycle.getChip8SOC().keyPad[currentKey] = false
+                    chip8Cycle.keyPad[currentKey] = false
                     true
                 } else if (event.getAction() === MotionEvent.ACTION_UP) {
-                    if (chip8Cycle.getChip8SOC().waitState) {
-                        chip8Cycle.getChip8SOC().waitState = false
-                        chip8Cycle.getChip8SOC().sendKeyStroke(currentKey)
+                    if (chip8Cycle.waitState) {
+                        chip8Cycle.waitState = false
+                        chip8Cycle.sendKeyStroke(currentKey)
                     }
-                    chip8Cycle.getChip8SOC().keyPad[currentKey] = false
+                    chip8Cycle.keyPad[currentKey] = false
                     true
                 }
 
@@ -133,8 +133,8 @@ class MainActivity : AppCompatActivity() {
         println("density: "+applicationContext.getResources().getDisplayMetrics().density)
     }
     fun showCyclesButton(view: View){
-        if(chip8Cycle != null && chip8Cycle.getChip8SOC() != null){
-            showCyclesDialog(chip8Cycle.getChip8SOC())
+        if(chip8Cycle != null && chip8Cycle != null){
+            showCyclesDialog(chip8Cycle)
         }
     }
     private fun showCyclesDialog(chip8SOC: Chip8SOC) {
@@ -195,7 +195,7 @@ class MainActivity : AppCompatActivity() {
             //Toast.makeText(applicationContext, uri.path, Toast.LENGTH_LONG).show()
             val inputStream = contentResolver.openInputStream(uri)
             if (inputStream != null) {
-                chip8Cycle.loadROM(inputStream)
+                chip8Cycle.openROM(inputStream)
             }
         }
 
@@ -216,7 +216,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         chip8Cycle.stopEmulation()
-        chip8Cycle.getChip8SOC().closeSound()
+        chip8Cycle.closeSound()
     }
 
     fun openLoadROMIntent(view: View){
