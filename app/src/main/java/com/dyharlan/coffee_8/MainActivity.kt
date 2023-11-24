@@ -1,6 +1,9 @@
 package com.dyharlan.coffee_8
 
+import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -41,10 +44,12 @@ internal class LastFrame(arr2D: Array<IntArray>, hires: Boolean, colorArr: Array
 class MainActivity : AppCompatActivity() {
     private lateinit var planeColors: Array<Color>
     private lateinit var chip8Cycle: Chip8Cycle
-
-
+    private val sharedPrefFile = "prefFile"
+    var sharedPreferences: SharedPreferences? = null
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        sharedPreferences = getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
         planeColors = arrayOf(
             Color.valueOf(Color.parseColor("#FF996600")),
             Color.valueOf(Color.parseColor("#FFFFCC00")),
@@ -69,7 +74,15 @@ class MainActivity : AppCompatActivity() {
         val chip8Surface = findViewById<SurfaceView>(R.id.chip8Surface)
 
         chip8Cycle = Chip8Cycle(applicationContext, planeColors, chip8Surface)
-        chip8Cycle.cycles = 200
+
+        if (sharedPreferences != null) {
+            val cycleCount: Int = sharedPreferences!!.getInt("cycles", 200)
+            if(cycleCount.equals(200)){
+                chip8Cycle.cycles = 200
+            }else{
+                chip8Cycle.cycles = cycleCount
+            }
+        }
         val keyRow1 = findViewById<TableRow>(R.id.keyRow1)
             keyRow1.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
         val keyRow2 = findViewById<TableRow>(R.id.keyRow2)
@@ -133,8 +146,13 @@ class MainActivity : AppCompatActivity() {
         println("density: "+applicationContext.getResources().getDisplayMetrics().density)
     }
     fun showCyclesButton(view: View){
-        if(chip8Cycle != null && chip8Cycle != null){
+        if(chip8Cycle != null){
             showCyclesDialog(chip8Cycle)
+        }
+    }
+    fun resetButton(view: View){
+        if(chip8Cycle != null){
+            chip8Cycle.resetROM()
         }
     }
     private fun showCyclesDialog(chip8SOC: Chip8SOC) {
@@ -144,17 +162,21 @@ class MainActivity : AppCompatActivity() {
         dialog.setContentView(R.layout.custom_dialog)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         val dialogTitle = dialog.findViewById<TextView>(R.id.dialogTitle)
-        dialogTitle.text = "Set the number of Cycles done by the emulator"
+        dialogTitle.text = "Set the number of Cycles done by the emulator. Higher values might slow down performance."
         val editText = dialog.findViewById<EditText>(R.id.newCycles)
         val btnYes = dialog.findViewById<Button>(R.id.btnYes)
         val btnNo = dialog.findViewById<Button>(R.id.btnNo)
 
         btnYes.setOnClickListener {
-            if(chip8SOC != null){
+            if(chip8SOC != null && sharedPreferences != null){
                 var newCycles = editText.text.toString().toInt()
                 if(newCycles >= 0){
                     chip8SOC.cycles = newCycles
                     Toast.makeText(this, "Cycles: $newCycles", Toast.LENGTH_LONG).show()
+                    val editor: SharedPreferences.Editor = sharedPreferences!!.edit()
+                    editor.putInt("cycles", newCycles)
+                    editor.apply()
+                    editor.commit()
                 }
                 else{
                     Toast.makeText(this, "Please enter a positive value and try again!", Toast.LENGTH_LONG).show()
@@ -170,26 +192,6 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-//    var REQUEST_CODE: Int = 1
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//        if(requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK){
-//            if(data == null){
-//                return
-//            }
-//            //var context: Context = applicationContext
-//            val uri: Uri? = data.data
-//            if (uri != null) {
-//                Toast.makeText(applicationContext, uri.path, Toast.LENGTH_LONG).show()
-//            }
-//        }
-//    }
-//
-//    fun openFileChooser(){
-//        val intent: Intent = Intent(Intent.ACTION_GET_CONTENT)
-//        intent.type = "*/*"
-//        startActivityFor
-//    }
     private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
             //Toast.makeText(applicationContext, uri.path, Toast.LENGTH_LONG).show()
@@ -220,15 +222,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun openLoadROMIntent(view: View){
-//        if (checkPermission()){
-//            Log.d(TAG, "onCreate: Permission already granted, create folder")
-//            val file = File(Environment.getExternalStorageDirectory(), "nyancat (1).ch8")
-//            chip8Cycle.loadROM(file)
-//        }
-//        else{
-//            Log.d(TAG, "onCreate: Permission was not granted, request")
-//            requestPermission()
-//        }
         getContent.launch("*/*")
     }
     fun pauseEmulation(view: View){
@@ -239,113 +232,5 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-//    private fun checkPermission(): Boolean{
-//        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-//            //Android is 11(R) or above
-//            Environment.isExternalStorageManager()
-//        }
-//        else{
-//            //Android is below 11(R)
-//            val write = ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//            val read = ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE)
-//            write == PackageManager.PERMISSION_GRANTED && read == PackageManager.PERMISSION_GRANTED
-//        }
-//    }
 
-//    private fun requestPermission(){
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-//            //Android is 11(R) or above
-//            try {
-//                Log.d(TAG, "requestPermission: try")
-//                val intent = Intent()
-//                intent.action = Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
-//                val uri = Uri.fromParts("package", this.packageName, null)
-//                intent.data = uri
-//                storageActivityResultLauncher.launch(intent)
-//            }
-//            catch (e: Exception){
-//                Log.e(TAG, "requestPermission: ", e)
-//                val intent = Intent()
-//                intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
-//                storageActivityResultLauncher.launch(intent)
-//            }
-//        }
-//        else{
-//            //Android is below 11(R)
-//            ActivityCompat.requestPermissions(this,
-//                arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE),
-//                STORAGE_PERMISSION_CODE
-//            )
-//        }
-//    }
-
-//    private val storageActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-//        Log.d(TAG, "storageActivityResultLauncher: ")
-//        //here we will handle the result of our intent
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-//            //Android is 11(R) or above
-//            if (Environment.isExternalStorageManager()){
-//                //Manage External Storage Permission is granted
-//                Log.d(TAG, "storageActivityResultLauncher: Manage External Storage Permission is granted")
-//                //createFolder()
-//            }
-//            else{
-//                //Manage External Storage Permission is denied....
-//                Log.d(TAG, "storageActivityResultLauncher: Manage External Storage Permission is denied....")
-//                toast("Manage External Storage Permission is denied....")
-//            }
-//        }
-//        else{
-//            //Android is below 11(R)
-//        }
-//    }
-
-//    override fun onRequestPermissionsResult(
-//        requestCode: Int,
-//        permissions: Array<out String>,
-//        grantResults: IntArray
-//    ) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        if (requestCode == STORAGE_PERMISSION_CODE){
-//            if (grantResults.isNotEmpty()){
-//                //check each permission if granted or not
-//                val write = grantResults[0] == PackageManager.PERMISSION_GRANTED
-//                val read = grantResults[1] == PackageManager.PERMISSION_GRANTED
-//                if (write && read){
-//                    //External Storage Permission granted
-//                    Log.d(TAG, "onRequestPermissionsResult: External Storage Permission granted")
-//                    //createFolder()
-//                }
-//                else{
-//                    //External Storage Permission denied...
-//                    Log.d(TAG, "onRequestPermissionsResult: External Storage Permission denied...")
-//                    toast("External Storage Permission denied...")
-//                }
-//            }
-//        }
-//    }
-
-
-//    private fun toast(message: String){
-//        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-//    }
-
-
-
-
-
-//    class Chip8SurfaceCallBack: SurfaceHolder.Callback{
-//
-//        override fun surfaceCreated(holder: SurfaceHolder) {
-//        }
-//
-//        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-//
-//        }
-//
-//
-//        override fun surfaceDestroyed(holder: SurfaceHolder) {
-//        }
-//
-//    }
 }

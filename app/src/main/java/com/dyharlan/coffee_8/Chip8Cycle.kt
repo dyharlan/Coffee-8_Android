@@ -13,6 +13,10 @@ import android.view.WindowMetrics
 import android.widget.Toast
 import com.dyharlan.coffee_8.Backend.Chip8SOC
 import com.dyharlan.coffee_8.Backend.MachineType
+import java.io.BufferedInputStream
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.DataInputStream
 import java.io.IOException
 import java.io.InputStream
 
@@ -33,7 +37,8 @@ import java.io.InputStream
         private var applicationContext: Context
 
 
-        private lateinit var rom: InputStream
+        //private lateinit var rom: InputStream
+        private var romArray: ByteArray? = null
         constructor(applicationContext: Context, planeColors: Array<Color>, chip8Surface: SurfaceView): super(true, MachineType.XO_CHIP){
             this.applicationContext = applicationContext
             //this.chip8SOC =
@@ -80,27 +85,40 @@ import java.io.InputStream
 
             bitmap = Bitmap.createBitmap(BITMAP_WIDTH,BITMAP_HEIGHT, Bitmap.Config.RGB_565)
         }
-
+        fun resetROM(){
+            if(romArray != null){
+                this.openROM(ByteArrayInputStream(romArray))
+            }
+        }
         fun openROM(rom: InputStream) {
             try {
+                val romIn = DataInputStream(BufferedInputStream(rom))
+                val baos = ByteArrayOutputStream()
+                var currByte = 0
+                while(currByte != -1){
+                    currByte = romIn.read()
+                    baos.write(currByte)
+                }
+                val tempRomArray:ByteArray = baos.toByteArray()
                 synchronized(this) {
-                    romStatus = super.loadROM(rom)
+                    romStatus = super.loadROM(ByteArrayInputStream(tempRomArray))
                     println("rom status: $romStatus")
                 }
                 if (romStatus) {
-                    this.rom = rom
+                    if(!(romArray!= null && arrayEqual(romArray,tempRomArray))){
+                        this.romArray = tempRomArray
+                    }
                     //clear the last frame each time a new rom is loaded.
                     last = null
                     startEmulation()
 
                 } else {
                     romStatus = false
-
                     Toast.makeText(applicationContext,"No ROM has been loaded into the emulator! Please load a ROM and try again.", Toast.LENGTH_LONG).show()
                 }
             } catch (ioe: IOException) {
                 romStatus = false
-                Toast.makeText(applicationContext,"There was a problem loading the ROM file:$ioe",
+                Toast.makeText(applicationContext,"There was a problem loading the ROM file: $ioe",
                     Toast.LENGTH_LONG).show()
             }
         }
@@ -113,6 +131,18 @@ import java.io.InputStream
         }
         private fun arrayEqual(a: IntArray, b: IntArray): Boolean {
             val length = a.size
+            if (length != b.size) {
+                return false
+            }
+            for (i in 0 until length) {
+                if (a[i] != b[i]) {
+                    return false
+                }
+            }
+            return true
+        }
+        private fun arrayEqual(a: ByteArray?, b: ByteArray): Boolean {
+            val length = a?.size
             if (length != b.size) {
                 return false
             }
