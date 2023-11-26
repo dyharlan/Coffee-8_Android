@@ -99,11 +99,11 @@ import java.io.InputStream
             if(fileDescriptor == null){
                 return false
             }
-            if (currentMachine === MachineType.COSMAC_VIP && fileDescriptor.length > 3232L) {
+            if ((currentMachine === MachineType.COSMAC_VIP) && (fileDescriptor.length > 3232L)) {
                 rightSize = false
-            } else if (currentMachine === MachineType.SUPERCHIP_1_1 && fileDescriptor.length > 3583L) {
+            } else if ((currentMachine === MachineType.SUPERCHIP_1_1) && (fileDescriptor.length > 3583L)) {
                 rightSize = false
-            } else if (currentMachine === MachineType.XO_CHIP && fileDescriptor.length > 65024L) {
+            } else if ((currentMachine === MachineType.XO_CHIP) && (fileDescriptor.length > 65024L)) {
                 rightSize = false
             }
             return rightSize
@@ -276,7 +276,7 @@ import java.io.InputStream
                 }
                 //chip8Canvas.postInvalidate()
                 updateSurface(chip8SurfaceHolder, bitmap)
-                last = LastFrame(this.graphics, this.getHiRes(), planeColors)
+                last = LastFrame(this.graphics, this.hiRes, planeColors)
             }
         }
 
