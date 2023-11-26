@@ -305,6 +305,8 @@ class MainActivity : AppCompatActivity() {
             chip8Cycle.stopEmulation()
         }else if(chip8Cycle.getRomStatus() && !chip8Cycle.getIsRunning()){
             chip8Cycle.startEmulation()
+        }else if(!chip8Cycle.getRomStatus() && !chip8Cycle.getIsRunning()){
+            Toast.makeText(this, "Machine is not running!", Toast.LENGTH_SHORT).show()
         }
     }
 

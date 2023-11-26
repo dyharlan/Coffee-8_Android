@@ -83,11 +83,15 @@ import java.io.InputStream
             dbHandler = DatabaseHandler(applicationContext)
         }
         fun resetROM(){
-            synchronized(this){
-                super.reset()
-            }
-            last = null
-            startEmulation()
+           if(romStatus){
+               synchronized(this){
+                   super.reset()
+               }
+               last = null
+               startEmulation()
+           }else{
+               Toast.makeText(applicationContext, "Machine is not running!", Toast.LENGTH_SHORT).show()
+           }
         }
         fun openROM(rom: InputStream) {
             try {
