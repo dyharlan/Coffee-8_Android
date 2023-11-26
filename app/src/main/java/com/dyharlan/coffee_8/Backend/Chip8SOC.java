@@ -570,7 +570,8 @@ public abstract class Chip8SOC{
     
     //this is called if the opcode executed is either unknown or unimplemented
     private void C8INST_UNKNOWN(){
-        throw new IllegalInstructionException("Unknown Opcode: " + Integer.toHexString(opcode));
+        System.err.println("Unknown Opcode: " + Integer.toHexString(opcode));
+        //throw new IllegalInstructionException();
         //System.err.println();
     }
     //execute instructions that have 0x0 as their prefix
@@ -1060,6 +1061,11 @@ public abstract class Chip8SOC{
     private void C8INST_FX30(){
         I = ((v[X]*10) +  0xA0);
     }
+
+    public int getRomSize() {
+        return romArray.size();
+    }
+
     //FX33: Get number from vX and
     //store hundreds digit in memory point by I
     //store tens digit in memory point by I+1

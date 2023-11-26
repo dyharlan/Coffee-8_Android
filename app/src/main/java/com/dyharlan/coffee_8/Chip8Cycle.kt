@@ -1,6 +1,7 @@
 package com.dyharlan.coffee_8
 
 import android.content.Context
+import android.content.res.AssetFileDescriptor
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -84,6 +85,7 @@ import java.io.InputStream
         }
         fun resetROM(){
            if(romStatus){
+
                synchronized(this){
                    super.reset()
                }
@@ -92,6 +94,33 @@ import java.io.InputStream
            }else{
                Toast.makeText(applicationContext, "Machine is not running!", Toast.LENGTH_SHORT).show()
            }
+        }
+        fun checkROMSize(fileDescriptor: AssetFileDescriptor?): Boolean {
+            var rightSize = true
+            if(fileDescriptor == null){
+                return false
+            }
+            if (currentMachine === MachineType.COSMAC_VIP && fileDescriptor.length > 3232L) {
+                rightSize = false
+            } else if (currentMachine === MachineType.SUPERCHIP_1_1 && fileDescriptor.length > 3583L) {
+                rightSize = false
+            } else if (currentMachine === MachineType.XO_CHIP && fileDescriptor.length > 65024L) {
+                rightSize = false
+            }
+            return rightSize
+        }
+
+        fun checkROMSize(size: Int, newMachine: MachineType): Boolean {
+            var rightSize = true
+
+            if (newMachine === MachineType.COSMAC_VIP && size > 3232L) {
+                rightSize = false
+            } else if (newMachine === MachineType.SUPERCHIP_1_1 && size > 3583L) {
+                rightSize = false
+            } else if (newMachine === MachineType.XO_CHIP && size > 65024L) {
+                rightSize = false
+            }
+            return rightSize
         }
         fun openROM(rom: InputStream) {
             try {
@@ -182,13 +211,13 @@ import java.io.InputStream
                     while (origin < elapsedTimeFromEpoch - frameTime && i < 2) {
                         var j = 0
                         while (j < this.cycles && !this.waitState) {
-                            try {
+                            //try {
                                 super.cpuExec()
-                            } catch (ex: Exception) {
-                                stopEmulation()
-                                ex.printStackTrace()
-                                break
-                            }
+                            //} catch (ex: Exception) {
+                            //    stopEmulation()
+                            //    ex.printStackTrace()
+                            //    break
+                            //}
                             j++
                         }
                         super.updateTimers()
