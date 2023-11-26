@@ -52,8 +52,8 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context, DATABASE_NAME
         val cursor: Cursor = writableDb.query(false,TABLE_FLAGS, Array<String>(1){KEY_ID},"$KEY_ID=?",Array<String>(1){checksum.toString()},null,null,null,null)
         val contentValues = ContentValues()
 
-        for((index, x) in flags.withIndex()){
-            contentValues.put("flag${index}", flags[x] and 0xFF)
+        for(index in flags.indices){
+            contentValues.put("flag${index}", flags[index] and 0xFF)
         }
         if(cursor.moveToFirst()){
             writableDb.update(TABLE_FLAGS, contentValues, "$KEY_ID = ?", Array<String>(1){checksum.toString()})

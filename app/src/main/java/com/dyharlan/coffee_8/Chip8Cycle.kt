@@ -270,7 +270,7 @@ import java.io.InputStream
 
         override fun C8INST_FX75() {
             var flags = ArrayList<Int>()
-            for(n in 0..(if (super.X > 7) 7 else super.X)){
+            for(n in 0..(if (super.X > 0x7) 0x7 else super.X)){
                 flags.add(super.v[n] and 0xFF)
             }
             dbHandler.saveFlags(super.crc32Checksum, flags.toTypedArray())
@@ -278,7 +278,7 @@ import java.io.InputStream
 
         override fun C8INST_FX85() {
             val flags = dbHandler.loadFlags(super.crc32Checksum)
-            for(n in 0..(if (super.X > 7) 7 else super.X)){
+            for(n in 0..(if (super.X > 0x7) 0x7 else super.X)){
                 super.v[n] = flags[n] and 0xFF
             }
         }
