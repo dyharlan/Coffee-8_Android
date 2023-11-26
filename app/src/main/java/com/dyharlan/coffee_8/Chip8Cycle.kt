@@ -83,7 +83,11 @@ import java.io.InputStream
             dbHandler = DatabaseHandler(applicationContext)
         }
         fun resetROM(){
+            synchronized(this){
                 super.reset()
+            }
+            last = null
+            startEmulation()
         }
         fun openROM(rom: InputStream) {
             try {

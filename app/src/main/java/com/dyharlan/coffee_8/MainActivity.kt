@@ -197,6 +197,7 @@ class MainActivity : AppCompatActivity() {
             //Toast.makeText(applicationContext, uri.path, Toast.LENGTH_LONG).show()
             val inputStream = contentResolver.openInputStream(uri)
             if (inputStream != null) {
+
                 chip8Cycle.openROM(inputStream)
             }
         }
