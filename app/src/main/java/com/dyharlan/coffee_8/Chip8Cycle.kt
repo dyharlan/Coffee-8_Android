@@ -14,10 +14,6 @@ import android.view.WindowMetrics
 import android.widget.Toast
 import com.dyharlan.coffee_8.Backend.Chip8SOC
 import com.dyharlan.coffee_8.Backend.MachineType
-import java.io.BufferedInputStream
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.DataInputStream
 import java.io.IOException
 import java.io.InputStream
 
