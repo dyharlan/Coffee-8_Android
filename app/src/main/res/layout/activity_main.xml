@@ -48,11 +48,6 @@
 
         </LinearLayout>
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_weight="0" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -89,6 +84,21 @@
                 android:onClick="showCyclesButton"
                 android:text="Set Cycles" />
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/machineTypeButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:onClick="showMachineTypeButton"
+                android:text="Change Machine Type" />
         </LinearLayout>
 
         <TableLayout

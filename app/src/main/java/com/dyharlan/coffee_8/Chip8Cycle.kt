@@ -20,7 +20,7 @@ import java.io.DataInputStream
 import java.io.IOException
 import java.io.InputStream
 
-    class Chip8Cycle(applicationContext: Context, planeColors: Array<Color>, chip8Surface: SurfaceView): Chip8SOC(true, MachineType.XO_CHIP), Runnable {
+    class Chip8Cycle(applicationContext: Context, planeColors: Array<Color>, chip8Surface: SurfaceView, machineType: MachineType): Chip8SOC(true, machineType), Runnable {
         private val BITMAP_WIDTH = 128
         private val BITMAP_HEIGHT = 64
         private var isRunning: Boolean = false

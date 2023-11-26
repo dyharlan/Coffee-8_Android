@@ -15,12 +15,15 @@ import android.view.Window
 
 import android.widget.Button
 import android.widget.EditText
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.dyharlan.coffee_8.Backend.Chip8SOC
+import com.dyharlan.coffee_8.Backend.MachineType
 
 
 internal class LastFrame(arr2D: Array<IntArray>, hires: Boolean, colorArr: Array<Color>) {
@@ -46,6 +49,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var chip8Cycle: Chip8Cycle
     private val sharedPrefFile = "prefFile"
     var sharedPreferences: SharedPreferences? = null
+    var currentMachine: MachineType? = null
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,15 +77,26 @@ class MainActivity : AppCompatActivity() {
 
         val chip8Surface = findViewById<SurfaceView>(R.id.chip8Surface)
 
-        chip8Cycle = Chip8Cycle(applicationContext, planeColors, chip8Surface)
 
         if (sharedPreferences != null) {
             val cycleCount: Int = sharedPreferences!!.getInt("cycles", 200)
-            if(cycleCount.equals(200)){
+            val machineType: String? = sharedPreferences!!.getString("machineType", MachineType.XO_CHIP.machineName)
+
+            currentMachine = if(machineType?.equals(MachineType.COSMAC_VIP.machineName) == true){
+                MachineType.COSMAC_VIP
+            }else if(machineType?.equals(MachineType.SUPERCHIP_1_1.machineName) == true){
+                MachineType.SUPERCHIP_1_1
+            }else{
+                MachineType.XO_CHIP
+            }
+            chip8Cycle = Chip8Cycle(applicationContext, planeColors, chip8Surface, currentMachine!!)
+
+            if(cycleCount == 200){
                 chip8Cycle.cycles = 200
             }else{
                 chip8Cycle.cycles = cycleCount
             }
+
         }
         val keyRow1 = findViewById<TableRow>(R.id.keyRow1)
             keyRow1.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
@@ -150,6 +165,11 @@ class MainActivity : AppCompatActivity() {
             showCyclesDialog(chip8Cycle)
         }
     }
+    fun showMachineTypeButton(view: View){
+        if(chip8Cycle != null){
+            showMachineTypeSelectorDialog(chip8Cycle)
+        }
+    }
     fun resetButton(view: View){
         if(chip8Cycle != null){
             chip8Cycle.resetROM()
@@ -159,7 +179,7 @@ class MainActivity : AppCompatActivity() {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
-        dialog.setContentView(R.layout.custom_dialog)
+        dialog.setContentView(R.layout.cycles_dialog)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         val dialogTitle = dialog.findViewById<TextView>(R.id.dialogTitle)
         dialogTitle.text = "Set the number of Cycles done by the emulator. Higher values might slow down performance."
@@ -172,7 +192,7 @@ class MainActivity : AppCompatActivity() {
                 var newCycles = editText.text.toString().toInt()
                 if(newCycles >= 0){
                     chip8SOC.cycles = newCycles
-                    Toast.makeText(this, "Cycles: $newCycles", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Cycles: $newCycles", Toast.LENGTH_SHORT).show()
                     val editor: SharedPreferences.Editor = sharedPreferences!!.edit()
                     editor.putInt("cycles", newCycles)
                     editor.apply()
@@ -186,7 +206,7 @@ class MainActivity : AppCompatActivity() {
             dialog.dismiss()
         }
         btnNo.setOnClickListener {
-            Toast.makeText(this, "Cycles: ${chip8SOC.cycles}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Cycles: ${chip8SOC.cycles}", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
         dialog.show()
@@ -202,6 +222,61 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    fun showMachineTypeSelectorDialog(chip8Cycle: Chip8Cycle){
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.machinetype_dialog)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val dialogTitle = dialog.findViewById<TextView>(R.id.dialogTitle)
+        dialogTitle.text = "Select the Chip-8 Variant to emulate."
+
+
+        val btnYes = dialog.findViewById<Button>(R.id.btnYes)
+        val btnNo = dialog.findViewById<Button>(R.id.btnNo)
+        val machineRgp = dialog.findViewById<RadioGroup>(R.id.machineGroup)
+        btnYes.setOnClickListener {
+            val selectedId: Int = machineRgp.checkedRadioButtonId
+            println("selected: $selectedId")
+            // find the radiobutton by returned id
+            if(selectedId == R.id.COSMACradioButton){
+                currentMachine = MachineType.COSMAC_VIP
+            }else if(selectedId == R.id.SCHIPradioButton){
+                currentMachine = MachineType.SUPERCHIP_1_1
+            }else if(selectedId == R.id.XOCHIPradioButton){
+                currentMachine = MachineType.XO_CHIP
+            }
+            chip8Cycle.currentMachine = currentMachine
+
+            val editor: SharedPreferences.Editor = sharedPreferences!!.edit()
+            editor.putString("machineType", currentMachine?.machineName)
+            editor.apply()
+            editor.commit()
+
+            if(chip8Cycle.getRomStatus()){
+                chip8Cycle.resetROM()
+            }
+            Toast.makeText(this, "Machine: ${currentMachine?.machineName}", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+
+        btnNo.setOnClickListener {
+            Toast.makeText(this, "Machine: ${currentMachine?.machineName}", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+        dialog.show()
+        if(currentMachine == MachineType.COSMAC_VIP){
+            val btn = dialog.findViewById<RadioButton>(R.id.COSMACradioButton)
+            btn.isChecked = true
+        }else if(currentMachine == MachineType.SUPERCHIP_1_1){
+            val btn = dialog.findViewById<RadioButton>(R.id.SCHIPradioButton)
+            btn.isChecked = true
+        }else if(currentMachine == MachineType.XO_CHIP){
+            val btn = dialog.findViewById<RadioButton>(R.id.XOCHIPradioButton)
+            btn.isChecked = true
+        }
     }
 
 
