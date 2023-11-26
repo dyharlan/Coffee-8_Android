@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var planeColors: Array<Color>
     private lateinit var chip8Cycle: Chip8Cycle
     private val sharedPrefFile = "prefFile"
-    var sharedPreferences: SharedPreferences? = null
+    private var sharedPreferences: SharedPreferences? = null
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,20 +137,20 @@ class MainActivity : AppCompatActivity() {
         for((currentKey, key) in keyPad.withIndex()){
             key.text = keyLabels[currentKey]
             key.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1f)
-            key.setOnTouchListener { v, event ->
+            key.setOnTouchListener { _, event ->
                 if (chip8Cycle.keyPad == null) {
                     false
-                }else if (event.getAction() === MotionEvent.ACTION_DOWN) {
+                }else if (event.action == MotionEvent.ACTION_DOWN) {
                     chip8Cycle.keyPad[currentKey] = true
                     true
-                } else if (event.getAction() === MotionEvent.ACTION_CANCEL) {
+                } else if (event.action == MotionEvent.ACTION_CANCEL) {
                     if (chip8Cycle.waitState) {
                         chip8Cycle.waitState = false
                         chip8Cycle.sendKeyStroke(currentKey)
                     }
                     chip8Cycle.keyPad[currentKey] = false
                     true
-                } else if (event.getAction() === MotionEvent.ACTION_UP) {
+                } else if (event.action == MotionEvent.ACTION_UP) {
                     if (chip8Cycle.waitState) {
                         chip8Cycle.waitState = false
                         chip8Cycle.sendKeyStroke(currentKey)
@@ -165,19 +165,13 @@ class MainActivity : AppCompatActivity() {
         Log.i("onCreate","density: "+applicationContext.getResources().getDisplayMetrics().density)
     }
     fun showCyclesButton(view: View){
-        if(chip8Cycle != null){
-            showCyclesDialog(chip8Cycle)
-        }
+        showCyclesDialog(chip8Cycle)
     }
     fun showMachineTypeButton(view: View){
-        if(chip8Cycle != null){
-            showMachineTypeSelectorDialog(chip8Cycle)
-        }
+        showMachineTypeSelectorDialog(chip8Cycle)
     }
     fun resetButton(view: View){
-        if(chip8Cycle != null){
-            chip8Cycle.resetROM()
-        }
+        chip8Cycle.resetROM()
     }
     private fun showCyclesDialog(chip8SOC: Chip8SOC) {
         val dialog = Dialog(this)
@@ -192,8 +186,8 @@ class MainActivity : AppCompatActivity() {
         val btnNo = dialog.findViewById<Button>(R.id.btnNo)
 
         btnYes.setOnClickListener {
-            if(chip8SOC != null && sharedPreferences != null){
-                var newCycles = editText.text.toString().toInt()
+            if(sharedPreferences != null){
+                val newCycles = editText.text.toString().toInt()
                 if(newCycles >= 0){
                     chip8SOC.cycles = newCycles
                     Toast.makeText(this, "Cycles: $newCycles", Toast.LENGTH_SHORT).show()
@@ -234,7 +228,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    fun showMachineTypeSelectorDialog(chip8Cycle: Chip8Cycle){
+    private fun showMachineTypeSelectorDialog(chip8Cycle: Chip8Cycle){
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)

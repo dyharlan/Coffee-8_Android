@@ -38,7 +38,6 @@ import java.io.InputStream
         private var applicationContext: Context
         private var dbHandler: DatabaseHandler
 
-        //private lateinit var rom: InputStream
         init{
             this.applicationContext = applicationContext
             super.enableSound()
@@ -69,12 +68,12 @@ import java.io.InputStream
             println("width: $screenWidth")
             println("height: $screenHeight")
             println("new scaling factor $scalingFactor")
-            var LOWRES_SCALE_FACTOR = scalingFactor
-            var HIRES_SCALE_FACTOR = LOWRES_SCALE_FACTOR/2
-            var hiResViewWidth = BITMAP_WIDTH * HIRES_SCALE_FACTOR
-            var hiResViewHeight = BITMAP_HEIGHT * HIRES_SCALE_FACTOR
-            var lowResViewWidth = BITMAP_WIDTH * LOWRES_SCALE_FACTOR
-            var lowResViewHeight = BITMAP_HEIGHT * LOWRES_SCALE_FACTOR
+            val LOWRES_SCALE_FACTOR = scalingFactor
+            val HIRES_SCALE_FACTOR = LOWRES_SCALE_FACTOR/2
+            val hiResViewWidth = BITMAP_WIDTH * HIRES_SCALE_FACTOR
+            val hiResViewHeight = BITMAP_HEIGHT * HIRES_SCALE_FACTOR
+            val lowResViewWidth = BITMAP_WIDTH * LOWRES_SCALE_FACTOR
+            val lowResViewHeight = BITMAP_HEIGHT * LOWRES_SCALE_FACTOR
             lowResRect = Rect(0,0,lowResViewWidth,lowResViewHeight)
             hiResRect = Rect(0,0,hiResViewWidth,hiResViewHeight)
             val layoutParams = chip8Surface.layoutParams
@@ -246,7 +245,7 @@ import java.io.InputStream
                     if (last!!.hires != this.getHiRes() || !arrayEqual(last!!.prevColors,planeColors))
                         last = null;
                 }
-                var lastPixels: Array<IntArray> =
+                val lastPixels: Array<IntArray> =
                     if (last != null) last!!.prevFrame else Array<IntArray>(4) {
                         IntArray(
                             this.machineWidth * this.machineHeight
@@ -283,7 +282,7 @@ import java.io.InputStream
 
         private fun updateSurface(holder: SurfaceHolder, bitmap: Bitmap){
             if(holder.surface.isValid){
-                var canvas: Canvas = holder.lockHardwareCanvas()
+                val canvas: Canvas = holder.lockHardwareCanvas()
                 if(this.hiRes){
                     canvas.drawBitmap(bitmap, null, hiResRect, null)
                 }else if(!this.hiRes){
