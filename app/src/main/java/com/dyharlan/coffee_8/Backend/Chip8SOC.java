@@ -53,7 +53,7 @@ interface Instruction {
 public abstract class Chip8SOC{
     private int DISPLAY_WIDTH;
     private int DISPLAY_HEIGHT;
-    private long crc32Checksum;
+    protected long crc32Checksum;
     private Boolean vfOrderQuirks;
     private Boolean shiftQuirks;
     private Boolean logicQuirks;
@@ -70,7 +70,7 @@ public abstract class Chip8SOC{
     private int opcode;
     private int dT; //8-bit delay timer
     public int sT; //sound timer
-    private int[] v; //cpu registers
+    protected int[] v; //cpu registers
     public int[][] graphics; //screen grid??
     public boolean[] keyPad; 
     private int interruptState;
@@ -109,8 +109,8 @@ public abstract class Chip8SOC{
     final int[] defaultPattern = {0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00}; //pitch: 103
     final int[] mutePattern = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; //pitch: 103
     public int[] pattern; //what sound should we play?
-    int X; //operand X
-    int Y; //operand Y
+    protected int X; //operand X
+    protected int Y; //operand Y
     private pStack cst; //16-bit stack
     public Boolean playSound; //should we play sound?
     private Boolean hires; //is our computer in hires mode?
@@ -130,6 +130,8 @@ public abstract class Chip8SOC{
     private Instruction[] _0xDInstructions;
     private Instruction[] _0xEInstructions;
     private Instruction[] _0xFInstructions;
+
+    protected ArrayList<Integer> romArray;
     //pitch register
     public float pitch;
     //Default machine is XO-Chip
@@ -140,6 +142,7 @@ public abstract class Chip8SOC{
         setCurrentMachine(m);
         fillInstructionTable();
         crc32 = new CRC32();
+        romArray = new ArrayList<>();
     }
     
     public void setCurrentMachine(MachineType m){
@@ -292,7 +295,7 @@ public abstract class Chip8SOC{
         for(int i = 0; i < pattern.length && i < defaultPattern.length;i++){
             pattern[i] = defaultPattern[i];
         }
-        crc32Checksum = 0;
+
         hires = false;
         if(v == null){
             v = new int[16];
@@ -343,6 +346,24 @@ public abstract class Chip8SOC{
             return false;
         }
     }
+
+    public void reset(){
+        if(romArray.isEmpty()){
+            return;
+        }
+        int offset = 0x0;
+        chip8Init();
+        crc32.reset();
+        crc32Checksum = 0;
+        for (int i = 0; i < romArray.size(); i++) {
+            crc32.update(romArray.get(i) & 0xFF);
+            mem[0x200 + offset] = romArray.get(i) & 0xFF;
+            offset += 0x1;
+        }
+        crc32Checksum = crc32.getValue();
+        System.out.println(" Checksum: "+crc32Checksum);
+
+    }
     public boolean loadROM(InputStream stream) throws IOException, FileNotFoundException{
         Boolean romStatus = false;
         try (DataInputStream in = new DataInputStream(new BufferedInputStream(stream))){
@@ -350,10 +371,13 @@ public abstract class Chip8SOC{
             int currByte = 0;
             chip8Init();
             crc32.reset();
+            crc32Checksum = 0;
+            romArray.clear();
             while (currByte != -1) {
                 currByte = in.read();
                 crc32.update(currByte & 0xFF);
                 mem[0x200 + offset] = currByte & 0xFF;
+                romArray.add(currByte & 0xFF);
                 offset += 0x1;
             }
             crc32Checksum = crc32.getValue();
@@ -365,6 +389,7 @@ public abstract class Chip8SOC{
 //                System.out.print(Integer.toHexString(mem[0x195 + i]) + "\t");
 //            }
             in.close();
+            System.out.println(" Checksum: "+crc32Checksum);
             romStatus = true;
         }catch(FileNotFoundException fnfe){
             throw fnfe;

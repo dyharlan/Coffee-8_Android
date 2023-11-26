@@ -20,7 +20,7 @@ import java.io.DataInputStream
 import java.io.IOException
 import java.io.InputStream
 
-    class Chip8Cycle: Chip8SOC, Runnable {
+    class Chip8Cycle(applicationContext: Context, planeColors: Array<Color>, chip8Surface: SurfaceView): Chip8SOC(true, MachineType.XO_CHIP), Runnable {
         private val BITMAP_WIDTH = 128
         private val BITMAP_HEIGHT = 64
         private var isRunning: Boolean = false
@@ -35,14 +35,11 @@ import java.io.InputStream
         private var lowResRect: Rect
         private var hiResRect: Rect
         private var applicationContext: Context
-
+        private var dbHandler: DatabaseHandler
 
         //private lateinit var rom: InputStream
-        private var romArray: ByteArray? = null
-        constructor(applicationContext: Context, planeColors: Array<Color>, chip8Surface: SurfaceView): super(true, MachineType.XO_CHIP){
+        init{
             this.applicationContext = applicationContext
-            //this.chip8SOC =
-
             super.enableSound()
             this.planeColors = planeColors
             this.chip8Surface = chip8Surface
@@ -82,32 +79,19 @@ import java.io.InputStream
             val layoutParams = chip8Surface.layoutParams
             layoutParams.width = hiResViewWidth
             layoutParams.height = hiResViewHeight
-
             bitmap = Bitmap.createBitmap(BITMAP_WIDTH,BITMAP_HEIGHT, Bitmap.Config.RGB_565)
+            dbHandler = DatabaseHandler(applicationContext)
         }
         fun resetROM(){
-            if(romArray != null){
-                this.openROM(ByteArrayInputStream(romArray))
-            }
+                super.reset()
         }
         fun openROM(rom: InputStream) {
             try {
-                val romIn = DataInputStream(BufferedInputStream(rom))
-                val baos = ByteArrayOutputStream()
-                var currByte = 0
-                while(currByte != -1){
-                    currByte = romIn.read()
-                    baos.write(currByte)
-                }
-                val tempRomArray:ByteArray = baos.toByteArray()
                 synchronized(this) {
-                    romStatus = super.loadROM(ByteArrayInputStream(tempRomArray))
+                    romStatus = super.loadROM(rom)
                     println("rom status: $romStatus")
                 }
                 if (romStatus) {
-                    if(!(romArray!= null && arrayEqual(romArray,tempRomArray))){
-                        this.romArray = tempRomArray
-                    }
                     //clear the last frame each time a new rom is loaded.
                     last = null
                     startEmulation()
@@ -285,8 +269,17 @@ import java.io.InputStream
         }
 
         override fun C8INST_FX75() {
+            var flags = ArrayList<Int>()
+            for(n in 0..(if (super.X > 7) 7 else super.X)){
+                flags.add(super.v[n] and 0xFF)
+            }
+            dbHandler.saveFlags(super.crc32Checksum, flags.toTypedArray())
         }
 
         override fun C8INST_FX85() {
+            val flags = dbHandler.loadFlags(super.crc32Checksum)
+            for(n in 0..(if (super.X > 7) 7 else super.X)){
+                super.v[n] = flags[n] and 0xFF
+            }
         }
     }
