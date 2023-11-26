@@ -55,22 +55,22 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         sharedPreferences = getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
         planeColors = arrayOf(
-            Color.valueOf(Color.parseColor("#FF996600")),
-            Color.valueOf(Color.parseColor("#FFFFCC00")),
-            Color.valueOf(Color.parseColor("#FFFF6600")),
-            Color.valueOf(Color.parseColor("#FF662200")),
-            Color.valueOf(0xBF2AED),
-            Color.valueOf(Color.MAGENTA),
-            Color.valueOf(Color.YELLOW),
-            Color.valueOf(Color.GREEN),
-            Color.valueOf(Color.GRAY),
-            Color.valueOf(0x4B0082), //INDIGO
-            Color.valueOf(0xEE82EE), //VIOLET
+            Color.valueOf(0x000000),
+            Color.valueOf(0x0000AA),
+            Color.valueOf(0x00AA00),
+            Color.valueOf(0x00AAAA),
+            Color.valueOf(0xAA0000),
+            Color.valueOf(0xAA00AA),
             Color.valueOf(0xAA5500),
-            Color.valueOf(Color.BLACK),
-            Color.valueOf(Color.WHITE),
-            Color.valueOf(Color.BLUE),
-            Color.valueOf(Color.RED)
+            Color.valueOf(0xAAAAAA),
+            Color.valueOf(0x555555),
+            Color.valueOf(0x5555FF),
+            Color.valueOf(0x55FF55),
+            Color.valueOf(0x55FFFF),
+            Color.valueOf(0xFF5555),
+            Color.valueOf(0xFF55FF),
+            Color.valueOf(0xFFFF55),
+            Color.valueOf(0xFFFFFF)
         )
         setContentView(R.layout.activity_main)
 
