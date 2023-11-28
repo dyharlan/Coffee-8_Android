@@ -41,6 +41,8 @@ internal class LastFrame(arr2D: Array<IntArray>, hires: Boolean, colorArr: Array
         prevColors = Array(16) { Color.valueOf(0xFFFFFF) }
         System.arraycopy(colorArr, 0, prevColors, 0, prevColors.size)
     }
+
+
 }
 
 //Extends Chip8SOC and adds additional functions that help in running the emulator
@@ -57,7 +59,7 @@ class Chip8Cycle(
 
     private var romStatus: Boolean = false      //is there a rom loaded?
 
-
+    private var nullifyLastFrame: Boolean = false
     private var planeColors: Array<Color>       //color palette
     private var cpuCycleThread: Thread? = null  //separate thread for the cpu cycle
     private var last: LastFrame? = null         //last frame of th display
@@ -122,19 +124,14 @@ class Chip8Cycle(
     //reset the emulator
     fun resetROM() {
         if (romStatus) {
+
             synchronized(this) {
                 super.reset()
-            }
-
-            last?.let {
-                synchronized(it){
-                    last = null
-                }
+                nullifyLastFrame = true
+                startEmulation()
             }
 
 
-
-            startEmulation()
         } else {
             Toast.makeText(applicationContext, "Machine is not running!", Toast.LENGTH_SHORT).show()
         }
@@ -177,11 +174,7 @@ class Chip8Cycle(
             }
             if (romStatus) {
                 //clear the last frame each time a new rom is loaded.
-                last?.let {
-                    synchronized(it){
-                        last = null
-                    }
-                }
+                nullifyLastFrame = true
                 startEmulation()
 
             } else {
@@ -192,6 +185,7 @@ class Chip8Cycle(
                     Toast.LENGTH_LONG
                 ).show()
             }
+
         } catch (ioe: IOException) {
             romStatus = false
             Toast.makeText(
@@ -261,7 +255,13 @@ class Chip8Cycle(
                     var j = 0
                     while (j < this.cycles && !this.waitState) {
                         //try {
-                        super.cpuExec()
+                        if(!isCpuHalted)
+                            super.cpuExec()
+                        else{
+                            stopEmulation()
+                            Toast.makeText(applicationContext,causeOfHalt,Toast.LENGTH_SHORT).show()
+                            break
+                        }
                         //} catch (ex: Exception) {
                         //    stopEmulation()
                         //    ex.printStackTrace()
@@ -298,8 +298,13 @@ class Chip8Cycle(
                     continue;
                 }
                 //clear last frame if we've switched from hi res to lowres or vice versa. Also clear it if the color palette has changed
-                if (last?.hires != super.getHiRes() || !arrayEqual(last?.prevColors, planeColors))
+                if (last?.hires != super.getHiRes() || nullifyLastFrame || !arrayEqual(last?.prevColors, planeColors)){
                     last = null;
+                    if(nullifyLastFrame){
+                        nullifyLastFrame = false
+                    }
+                }
+
             }
             val lastPixels: Array<IntArray> =
                 if (last != null) last!!.prevFrame else Array<IntArray>(4) {
