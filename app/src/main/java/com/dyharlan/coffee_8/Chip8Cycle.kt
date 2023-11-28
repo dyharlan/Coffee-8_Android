@@ -125,7 +125,15 @@ class Chip8Cycle(
             synchronized(this) {
                 super.reset()
             }
-            last = null
+
+            last?.let {
+                synchronized(it){
+                    last = null
+                }
+            }
+
+
+
             startEmulation()
         } else {
             Toast.makeText(applicationContext, "Machine is not running!", Toast.LENGTH_SHORT).show()
@@ -169,7 +177,11 @@ class Chip8Cycle(
             }
             if (romStatus) {
                 //clear the last frame each time a new rom is loaded.
-                last = null
+                last?.let {
+                    synchronized(it){
+                        last = null
+                    }
+                }
                 startEmulation()
 
             } else {
@@ -190,27 +202,14 @@ class Chip8Cycle(
     }
 
     fun startEmulation() {
-        if (cpuCycleThread == null) {
+        if (cpuCycleThread == null && !isRunning) {
             isRunning = true
             cpuCycleThread = Thread(this)
-            cpuCycleThread!!.start()
+            cpuCycleThread?.start()
         }
     }
 
-    private fun arrayEqual(a: IntArray, b: IntArray): Boolean {
-        val length = a.size
-        if (length != b.size) {
-            return false
-        }
-        for (i in 0 until length) {
-            if (a[i] != b[i]) {
-                return false
-            }
-        }
-        return true
-    }
-
-    private fun arrayEqual(a: ByteArray?, b: ByteArray): Boolean {
+    private fun arrayEqual(a: IntArray?, b: IntArray): Boolean {
         val length = a?.size
         if (length != b.size) {
             return false
@@ -223,8 +222,8 @@ class Chip8Cycle(
         return true
     }
 
-    private fun arrayEqual(a: Array<Color>, b: Array<Color>): Boolean {
-        val length = a.size
+    private fun arrayEqual(a: Array<Color>?, b: Array<Color>): Boolean {
+        val length = a?.size
         if (length != b.size) {
             return false
         }
@@ -247,7 +246,7 @@ class Chip8Cycle(
     }
 
     override fun run() {
-        cpuCycleThread!!.priority = Thread.MAX_PRIORITY
+        cpuCycleThread?.priority = Thread.MAX_PRIORITY
         val frameTime = (1000 / 60).toDouble()
         var elapsedTimeFromEpoch = System.currentTimeMillis()
         var origin = elapsedTimeFromEpoch + frameTime / 2
@@ -287,19 +286,19 @@ class Chip8Cycle(
             if (last != null) {
                 //check if the previous frame and the previous palette is the same as the current frame in both planes.
                 if (arrayEqual(
-                        last!!.prevFrame[0],
+                        last?.prevFrame?.get(0),
                         super.graphics[0]
-                    ) && arrayEqual(last!!.prevFrame[1], super.graphics[1]) && arrayEqual(
-                        last!!.prevFrame[2], super.graphics[2]
-                    ) && arrayEqual(last!!.prevFrame[3], super.graphics[3]) && arrayEqual(
-                        last!!.prevColors, planeColors
+                    ) && arrayEqual(last?.prevFrame?.get(1), super.graphics[1]) && arrayEqual(
+                        last?.prevFrame?.get(2), super.graphics[2]
+                    ) && arrayEqual(last?.prevFrame?.get(3), super.graphics[3]) && arrayEqual(
+                        last?.prevColors, planeColors
                     )
                 ) {
                     //exit early if it is the same.
                     continue;
                 }
                 //clear last frame if we've switched from hi res to lowres or vice versa. Also clear it if the color palette has changed
-                if (last!!.hires != super.getHiRes() || !arrayEqual(last!!.prevColors, planeColors))
+                if (last?.hires != super.getHiRes() || !arrayEqual(last?.prevColors, planeColors))
                     last = null;
             }
             val lastPixels: Array<IntArray> =
