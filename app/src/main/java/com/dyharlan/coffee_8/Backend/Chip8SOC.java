@@ -1098,54 +1098,10 @@ public abstract class Chip8SOC{
     }
     //FX75: Store V0..VX in RPL user flags (X <= 7)
     public abstract void C8INST_FX75();
-//    private void C8INST_FX75(){
-////        for(int n = 0;(n < X) || (n <= 7);n++){
-////            flags[n] = v[n];
-////        }
-//        File f = new File(Environment.getExternalStorageDirectory(),"SavedFlags/" + crc32Checksum + ".scflag");
-//
-//        try{
-//            if (!f.exists()) {
-//                f.getParentFile().mkdirs();
-//                f.createNewFile();
-//            }
-//            try ( DataOutputStream out = new DataOutputStream(new BufferedOutputStream(Files.newOutputStream(f.toPath())))) {
-//
-//                for (int n = 0; (n <= X); n++) {
-//                    out.writeInt(v[n] & 0xFF);
-//                }
-//                out.flush();
-//                out.close();
-//            }catch(IOException ioe){
-//                throw ioe;
-//            }
-//        }catch(IOException ioe){
-//            ioe.printStackTrace();
-//        }
-//    }
+
     //FX85: Read V0..VX from RPL user flags (X <= 7)
     public abstract void C8INST_FX85();
-//    private void C8INST_FX85(){
-//        File f = new File(Environment.getExternalStorageDirectory(),"SavedFlags/" + crc32Checksum + ".scflag");
-//
-//        if (f.exists()) {
-//            //copy the flags first to a temporary array before writing it to memory.
-//            ArrayList<Integer> temp = new ArrayList<>();
-//            try (DataInputStream in = new DataInputStream(new BufferedInputStream(Files.newInputStream(f.toPath())))) {
-//                for (int n = 0;in.available() > 0; n++) {
-//                   temp.add(in.readInt() & 0xFF);
-//                }
-//                for(int i = 0; i < temp.size(); i++){
-//                    v[i] = temp.get(i) & 0xFF;
-//                }
-//                in.close();
-//            }catch(EOFException eofe){
-//                System.err.println("Invalid/broken flags file. It will not be loaded into memory.");
-//            } catch (IOException ioe) {
-//                ioe.printStackTrace();
-//            }
-//        }
-//    }
+
     
     public int getSoundTimer(){
         return sT;

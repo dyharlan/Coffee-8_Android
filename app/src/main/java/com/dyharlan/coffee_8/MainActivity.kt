@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.res.AssetFileDescriptor
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -25,35 +24,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.dyharlan.coffee_8.Backend.Chip8SOC
 import com.dyharlan.coffee_8.Backend.MachineType
-import java.io.File
+import com.google.android.material.appbar.MaterialToolbar
 
 
 
 
 
-internal class LastFrame(arr2D: Array<IntArray>, hires: Boolean, colorArr: Array<Color>) {
-    var prevFrame: Array<IntArray>
-    var hires: Boolean
-    var prevColors: Array<Color>
-
-    //constructor
-    init {
-        prevFrame = arrayOf(
-            arr2D[0].clone(),
-            arr2D[1].clone(),
-            arr2D[2].clone(),
-            arr2D[3].clone()
-        )
-        this.hires = hires
-        prevColors = Array(16){ Color.valueOf(0xFFFFFF)}
-        System.arraycopy(colorArr, 0, prevColors, 0, prevColors.size)
-    }
-}
 class MainActivity : AppCompatActivity() {
+    //global variables representing the color palette, backend cpu, shared preferences
     private lateinit var planeColors: Array<Color>
     private lateinit var chip8Cycle: Chip8Cycle
     private val sharedPrefFile = "prefFile"
-    private var sharedPreferences: SharedPreferences? = null
+    private lateinit var sharedPreferences: SharedPreferences
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,28 +62,37 @@ class MainActivity : AppCompatActivity() {
 
 
         val chip8Surface = findViewById<SurfaceView>(R.id.chip8Surface)
+        //setup toolbar?
+        val toolbar = findViewById<MaterialToolbar>(R.id.materialToolbar)
+        setSupportActionBar(toolbar)
 
+        //set cycle count to 200 as a default
+        val cycleCount: Int = sharedPreferences.getInt("cycles", 200)
 
-        if (sharedPreferences != null) {
-            val cycleCount: Int = sharedPreferences!!.getInt("cycles", 200)
-            val machineType: String? = sharedPreferences!!.getString("machineType", MachineType.XO_CHIP.machineName)
+        //set machine type to XO-CHIP as a default
+        val machineType: String? = sharedPreferences.getString("machineType", MachineType.XO_CHIP.machineName)
 
-            val currentMachine = if(machineType?.equals(MachineType.COSMAC_VIP.machineName) == true){
-                MachineType.COSMAC_VIP
-            }else if(machineType?.equals(MachineType.SUPERCHIP_1_1.machineName) == true){
-                MachineType.SUPERCHIP_1_1
-            }else{
-                MachineType.XO_CHIP
-            }
-            chip8Cycle = Chip8Cycle(applicationContext, planeColors, chip8Surface, currentMachine)
-
-            if(cycleCount == 200){
-                chip8Cycle.cycles = 200
-            }else{
-                chip8Cycle.cycles = cycleCount
-            }
-
+        //Otherwise, set to cosmac vip or super-chip if the setting exists in the shared preferences.
+        val currentMachine = if(machineType?.equals(MachineType.COSMAC_VIP.machineName) == true){
+            MachineType.COSMAC_VIP
+        }else if(machineType?.equals(MachineType.SUPERCHIP_1_1.machineName) == true){
+            MachineType.SUPERCHIP_1_1
+        }else{
+            MachineType.XO_CHIP
         }
+
+        //instantiate cpu
+        chip8Cycle = Chip8Cycle(applicationContext, planeColors, chip8Surface, currentMachine)
+
+        //apply cycle count
+        if(cycleCount == 200){
+            chip8Cycle.cycles = 200
+        }else{
+            chip8Cycle.cycles = cycleCount
+        }
+        /*
+        * Programmatically setup the keypad dimensions and the event handling
+         */
         val keyRow1 = findViewById<TableRow>(R.id.keyRow1)
             keyRow1.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
         val keyRow2 = findViewById<TableRow>(R.id.keyRow2)
@@ -134,6 +125,7 @@ class MainActivity : AppCompatActivity() {
             "8","9","A","B",
             "C","D","E","F"
         )
+        //setup event handler by looping over all buttons
         for((currentKey, key) in keyPad.withIndex()){
             key.text = keyLabels[currentKey]
             key.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1f)
@@ -162,8 +154,10 @@ class MainActivity : AppCompatActivity() {
                 else false
             }
         }
-        Log.i("onCreate","density: "+applicationContext.getResources().getDisplayMetrics().density)
+        //Log.i("onCreate","density: "+applicationContext.getResources().getDisplayMetrics().density)
     }
+
+    //helper functions for various settings related to the emulated machine
     fun showCyclesButton(view: View){
         showCyclesDialog(chip8Cycle)
     }
@@ -173,6 +167,9 @@ class MainActivity : AppCompatActivity() {
     fun resetButton(view: View){
         chip8Cycle.resetROM()
     }
+    /*
+     * show a dialog that allows the user to change machine cycle count
+     */
     private fun showCyclesDialog(chip8SOC: Chip8SOC) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -186,30 +183,31 @@ class MainActivity : AppCompatActivity() {
         val btnNo = dialog.findViewById<Button>(R.id.btnNo)
 
         btnYes.setOnClickListener {
-            if(sharedPreferences != null){
-                val newCycles = editText.text.toString().toInt()
-                if(newCycles >= 0){
-                    chip8SOC.cycles = newCycles
-                    Toast.makeText(this, "Cycles: $newCycles", Toast.LENGTH_SHORT).show()
-                    val editor: SharedPreferences.Editor = sharedPreferences!!.edit()
-                    editor.putInt("cycles", newCycles)
-                    editor.apply()
-                    editor.commit()
-                }
-                else{
-                    Toast.makeText(this, "Please enter a positive value and try again!", Toast.LENGTH_LONG).show()
-                }
-
+            //retrieve value from the text box
+            val newCycles = editText.text.toString().toInt()
+            //re-set the cycle count if entered value is positive
+            if(newCycles >= 0){
+                chip8SOC.cycles = newCycles
+                Toast.makeText(this, "Cycles: $newCycles", Toast.LENGTH_SHORT).show()
+                val editor: SharedPreferences.Editor = sharedPreferences!!.edit()
+                editor.putInt("cycles", newCycles)
+                editor.apply()
+                editor.commit()
             }
+            else{
+                Toast.makeText(this, "Please enter a positive value and try again!", Toast.LENGTH_LONG).show()
+            }
+
             dialog.dismiss()
         }
+        //exit from dialog
         btnNo.setOnClickListener {
             Toast.makeText(this, "Cycles: ${chip8SOC.cycles}", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
         dialog.show()
     }
-
+    //Sets up an activity contract for loading the rom using SAF
     private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
             val inputStream = contentResolver.openInputStream(uri)
@@ -225,7 +223,9 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-
+    fun openLoadROMIntent(view: View){
+        getContent.launch("*/*")
+    }
 
 
     private fun showMachineTypeSelectorDialog(chip8Cycle: Chip8Cycle){
@@ -326,9 +326,7 @@ class MainActivity : AppCompatActivity() {
         chip8Cycle.stopEmulation()
         chip8Cycle.closeSound()
     }
-    fun openLoadROMIntent(view: View){
-        getContent.launch("*/*")
-    }
+
     fun pauseEmulation(view: View){
         if(chip8Cycle.getRomStatus() && chip8Cycle.getIsRunning()){
             chip8Cycle.stopEmulation()
