@@ -9,6 +9,8 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.InputDevice
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.SurfaceView
 import android.view.View
@@ -130,32 +132,45 @@ class MainActivity : AppCompatActivity() {
             key.text = keyLabels[currentKey]
             key.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1f)
             key.setOnTouchListener { _, event ->
-                if (chip8Cycle.keyPad == null) {
-                    false
-                }else if (event.action == MotionEvent.ACTION_DOWN) {
-                    chip8Cycle.keyPad[currentKey] = true
-                    true
-                } else if (event.action == MotionEvent.ACTION_CANCEL) {
-                    if (chip8Cycle.waitState) {
-                        chip8Cycle.waitState = false
-                        chip8Cycle.sendKeyStroke(currentKey)
+//                if (event.action == MotionEvent.ACTION_DOWN) {
+//                    chip8Cycle.keyPress(currentKey)
+//                    true
+//                } else if (event.action == MotionEvent.ACTION_CANCEL) {
+//                    chip8Cycle.keyRelease(currentKey)
+//
+//                    true
+//                } else if (event.action == MotionEvent.ACTION_UP) {
+//                    chip8Cycle.keyRelease(currentKey)
+//                    true
+//                }
+//                else false
+
+                when(event.action){
+                    MotionEvent.ACTION_DOWN -> {
+                        chip8Cycle.keyPress(currentKey)
+                        true}
+                    MotionEvent.ACTION_CANCEL -> {
+                        chip8Cycle.keyRelease(currentKey)
+                        true
                     }
-                    chip8Cycle.keyPad[currentKey] = false
-                    true
-                } else if (event.action == MotionEvent.ACTION_UP) {
-                    if (chip8Cycle.waitState) {
-                        chip8Cycle.waitState = false
-                        chip8Cycle.sendKeyStroke(currentKey)
+                    MotionEvent.ACTION_UP -> {
+                        chip8Cycle.keyRelease(currentKey)
+                        true
                     }
-                    chip8Cycle.keyPad[currentKey] = false
-                    true
+                    else -> false
                 }
 
-                else false
             }
+
+
         }
         //Log.i("onCreate","density: "+applicationContext.getResources().getDisplayMetrics().density)
     }
+
+
+
+
+
 
     //helper functions for various settings related to the emulated machine
     fun showCyclesButton(view: View){

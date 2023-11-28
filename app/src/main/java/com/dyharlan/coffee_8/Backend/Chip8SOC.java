@@ -1033,9 +1033,9 @@ public abstract class Chip8SOC{
     * These are a public methods that frontends need to use to get input on keyUp during FX0A
     */
     
-    public void sendKeyStroke(int keyValue){
-        v[waitReg] = keyValue;
-    }
+    //public void sendKeyStroke(int keyValue){
+    //    v[waitReg] = keyValue;
+    //}
      
     public int getWaitReg() {
         return waitReg;
@@ -1045,13 +1045,13 @@ public abstract class Chip8SOC{
         return waitState;
     }
 
-    public void setWaitReg(int waitReg) {
-        this.waitReg = waitReg;
-    }
+    //public void setWaitReg(int waitReg) {
+    //    this.waitReg = waitReg;
+    //}
 
-    public void setWaitState(Boolean waitState) {
-        this.waitState = waitState;
-    }
+    //public void setWaitState(Boolean waitState) {
+    //    this.waitState = waitState;
+    //}
     
     //FX29: Point index register to font in memory
     private void C8INST_FX29(){
@@ -1094,6 +1094,22 @@ public abstract class Chip8SOC{
         }
         if (!loadStoreQuirks) {
             I = (I + X + 1) & 0xFFFF;
+        }
+    }
+
+    public void keyPress(int key){
+        if(keyPad!= null && key <= 0xF){
+            keyPad[key] = true;
+        }
+    }
+
+    public void keyRelease(int key){
+        if(keyPad!= null && key <= 0xF){
+            if (waitState) {
+                waitState = false;
+                v[waitReg] = key;
+            }
+            keyPad[key] = false;
         }
     }
     //FX75: Store V0..VX in RPL user flags (X <= 7)
