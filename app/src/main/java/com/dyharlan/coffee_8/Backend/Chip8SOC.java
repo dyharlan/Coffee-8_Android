@@ -53,6 +53,9 @@ interface Instruction {
 public abstract class Chip8SOC{
     private int DISPLAY_WIDTH;
     private int DISPLAY_HEIGHT;
+    private boolean cpuHalted;
+
+    private String causeOfHalt;
     protected long crc32Checksum;
     private Boolean vfOrderQuirks;
     private Boolean shiftQuirks;
@@ -138,6 +141,7 @@ public abstract class Chip8SOC{
     public Chip8SOC(Boolean sound, MachineType m) { 
         rand = new Random();
         playSound = sound;
+        causeOfHalt = "";
         hires = false;
         setCurrentMachine(m);
         fillInstructionTable();
@@ -288,6 +292,10 @@ public abstract class Chip8SOC{
     }
     //Initial state of the machine
     public void chip8Init(){
+        if(!causeOfHalt.trim().equals("")){
+            causeOfHalt = "";
+        }
+        cpuHalted = false;
         pitch = 64;
         if(pattern == null){
             pattern = new int[16];
@@ -300,9 +308,7 @@ public abstract class Chip8SOC{
         if(v == null){
             v = new int[16];
         }else{
-            for(int i = 0;i < v.length;i++){
-                v[i] = 0;
-            }
+            Arrays.fill(v, 0);
         }
         if(currentMachine == MachineType.XO_CHIP){
             mem = new int[0x100000]; //64KB of RAM
@@ -315,8 +321,11 @@ public abstract class Chip8SOC{
         }else{
             setHiRes(false);
         }
-        
-        keyPad = new boolean[16];
+        if(keyPad == null){
+            keyPad = new boolean[16];
+        }else{
+            Arrays.fill(keyPad, false);
+        }
         for(int c = 0;c<charSet.length;c++){
             mem[0x50+c] = (short) charSet[c];
         }
@@ -548,8 +557,14 @@ public abstract class Chip8SOC{
         pc+=2;
         //decode and execute
         //get 4th nibble, shift 3 nibbles to the right and use as index in the interface array
-        c8Instructions[(opcode & 0xF000) >> 12].execute();
-        
+
+        int inst = (opcode & 0xF000) >> 12;
+
+        if(inst > c8Instructions.length){
+            C8INST_UNKNOWN();
+        } else {
+            c8Instructions[inst].execute();
+        }
         
     }
     //A universal function for all skip instructions
@@ -570,13 +585,32 @@ public abstract class Chip8SOC{
     
     //this is called if the opcode executed is either unknown or unimplemented
     private void C8INST_UNKNOWN(){
-        System.err.println("Unknown Opcode: " + Integer.toHexString(opcode));
+        cpuHalted = true;
+        causeOfHalt = "Unknown Opcode: " + Integer.toHexString(opcode);
+        System.err.println(causeOfHalt);
         //throw new IllegalInstructionException();
         //System.err.println();
     }
+
+    public String getCauseOfHalt() {
+        if(cpuHalted)
+            return causeOfHalt;
+        else
+            return "";
+    }
+
+    public void setCauseOfHalt(String causeOfHalt) {
+        this.causeOfHalt = causeOfHalt;
+    }
+
     //execute instructions that have 0x0 as their prefix
     private void C8INSTSET_0000(){
-        _0x0Instructions[(opcode & 0xFF)].execute();
+        int inst = (opcode & 0xFF);
+        if (inst > _0x0Instructions.length){
+            C8INST_UNKNOWN();
+        } else {
+            _0x0Instructions[inst].execute();
+        }
     }
     //00CN: Scroll display N pixels down; in low resolution mode, N/2 pixels
     private void C8INST_00CN(){
@@ -618,7 +652,14 @@ public abstract class Chip8SOC{
     }
     //00EE: Returns from a subroutine on top of the stack. 
     private void C8INST_00EE(){
-        pc = cst.pop();
+        int addr = cst.pop();
+        if(addr != -1){
+            pc = addr;
+        } else {
+            cpuHalted = true;
+            causeOfHalt = "Stack Underflow";
+        }
+
     }
     //00FB: Scroll right by 4 pixels; in low resolution mode, 2 pixels
     private void C8INST_00FB() {
@@ -681,7 +722,12 @@ public abstract class Chip8SOC{
         } 
     }
     private void C8INSTSET_5000(){
-        _0x5Instructions[(opcode & 0xF)].execute();
+        int inst = (opcode & 0xF);
+        if(inst > _0x5Instructions.length){
+            C8INST_UNKNOWN();
+        }else{
+            _0x5Instructions[inst].execute();
+        }
     }
     //0x5XY0 skip next instruction if VX == VY
     private void C8INST_5XY0(){
@@ -731,7 +777,12 @@ public abstract class Chip8SOC{
     }
     //Execute instructions that have 0x8 as their prefix
     private void C8INSTSET_8000(){
-        _0x8Instructions[(opcode & 0xF)].execute();
+        int inst = (opcode & 0xF);
+        if(inst > _0x8Instructions.length){
+            C8INST_UNKNOWN();
+        }else{
+            _0x8Instructions[inst].execute();
+        }
     }
     //0x8XY0 set the value of Vx to Vy
     private void C8INST_8XY0(){
@@ -816,7 +867,12 @@ public abstract class Chip8SOC{
     }
     //Only reason why this is an instruction subset is because of superchip.
     private void C8INSTSET_DXY(){
-        _0xDInstructions[(opcode & 0xF)].execute();
+        int inst = (opcode & 0xF);
+        if(inst > _0xDInstructions.length){
+            C8INST_UNKNOWN();
+        }else {
+            _0xDInstructions[inst].execute();
+        }
     } 
 
 //    private void C8INST_DXY0(){
@@ -934,8 +990,13 @@ public abstract class Chip8SOC{
     }
     //Execute instructions that start with 0xE as their prefix
     private void C8INSTSET_E000(){
-        _0xEInstructions[(opcode & 0xF)].execute();
-    } 
+         int inst = (opcode & 0xF);
+         if(inst > _0xEInstructions.length)
+             C8INST_UNKNOWN();
+         else
+             _0xEInstructions[inst].execute();
+
+    }
     //EX9E Skip one instruction when key is pressed. But since pc is incremented here, we skip two.
     private void C8INST_EX9E(){
         if (keyPad[v[X] & 0xF]) {
@@ -950,7 +1011,13 @@ public abstract class Chip8SOC{
     }
     //Execute instructions that start with 0xF as their prefix
     private void C8INSTSET_F000(){
-        _0xFInstructions[(opcode & 0xFF)].execute();
+         int inst = (opcode & 0xFF);
+         if(inst > _0xFInstructions.length){
+             C8INST_UNKNOWN();
+         }else{
+             _0xFInstructions[inst].execute();
+
+         }
     }
     //F000 NNNN Load the index register I with a 16-bit address
     private void C8INST_F000_NNNN(){
@@ -1118,7 +1185,9 @@ public abstract class Chip8SOC{
     //FX85: Read V0..VX from RPL user flags (X <= 7)
     public abstract void C8INST_FX85();
 
-    
+    public boolean isCpuHalted() {
+        return cpuHalted;
+    }
     public int getSoundTimer(){
         return sT;
     }
