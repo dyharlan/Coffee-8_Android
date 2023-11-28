@@ -7,6 +7,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.WindowManager
@@ -259,7 +261,9 @@ class Chip8Cycle(
                             super.cpuExec()
                         else{
                             stopEmulation()
-                            Toast.makeText(applicationContext,causeOfHalt,Toast.LENGTH_SHORT).show()
+                            Handler(Looper.getMainLooper()).post {
+                                Toast.makeText(applicationContext,"An error occurred during execution and the machine has been halted: $causeOfHalt",Toast.LENGTH_SHORT).show()
+                            }
                             break
                         }
                         //} catch (ex: Exception) {
