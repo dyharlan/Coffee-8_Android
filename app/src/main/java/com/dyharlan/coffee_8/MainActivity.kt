@@ -44,18 +44,18 @@ class MainActivity : AppCompatActivity() {
         sharedPreferences = getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
         planeColors = arrayOf(
             Color.valueOf(0x000000),
-            Color.valueOf(0x0000AA),
-            Color.valueOf(0x00AA00),
-            Color.valueOf(0x00AAAA),
             Color.valueOf(0xAA0000),
+            Color.valueOf(0x00AA00),
+            Color.valueOf(0x0000AA),
+            Color.valueOf(0x00AAAA),
             Color.valueOf(0xAA00AA),
             Color.valueOf(0xAA5500),
             Color.valueOf(0xAAAAAA),
             Color.valueOf(0x555555),
-            Color.valueOf(0x5555FF),
-            Color.valueOf(0x55FF55),
-            Color.valueOf(0x55FFFF),
-            Color.valueOf(0xFF5555),
+            Color.valueOf(0xFF5555), //LR
+            Color.valueOf(0x55FF55), //LG
+            Color.valueOf(0x5555FF), //LB
+            Color.valueOf(0x55FFFF), //LC
             Color.valueOf(0xFF55FF),
             Color.valueOf(0xFFFF55),
             Color.valueOf(0xFFFFFF)
