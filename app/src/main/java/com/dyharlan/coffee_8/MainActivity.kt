@@ -511,6 +511,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun pauseEmulation(chip8Cycle: Chip8Cycle){
+        var status = menu?.findItem(R.id.menuPause)
         if(chip8Cycle.getRomStatus() && chip8Cycle.getIsRunning()){
             chip8Cycle.stopEmulation()
             status?.setTitle("Resume")
