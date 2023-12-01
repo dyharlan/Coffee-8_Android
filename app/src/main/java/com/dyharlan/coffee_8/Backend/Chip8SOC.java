@@ -56,7 +56,7 @@ public abstract class Chip8SOC{
     private boolean cpuHalted;
 
     private String causeOfHalt;
-    protected long crc32Checksum;
+    //protected long crc32Checksum;
     private Boolean vfOrderQuirks;
     private Boolean shiftQuirks;
     private Boolean logicQuirks;
@@ -121,7 +121,7 @@ public abstract class Chip8SOC{
     //public XOAudio xo;
     Random rand; //random number generator
     MachineType currentMachine; //current machine config
-    CRC32 crc32;
+    //CRC32 crc32;
     int amount;
     /*
     * Arrays containing instruction sets
@@ -145,13 +145,12 @@ public abstract class Chip8SOC{
         hires = false;
         setCurrentMachine(m);
         fillInstructionTable();
-        crc32 = new CRC32();
+        //crc32 = new CRC32();
         romArray = new ArrayList<>();
     }
     
     public void setCurrentMachine(MachineType m){
         currentMachine = m;
-        cycles = m.getCycles();
         DISPLAY_WIDTH = m.getDisplayWidth();
         DISPLAY_HEIGHT = m.getDisplayHeight();       
         vfOrderQuirks = m.getQuirks(0);
@@ -291,7 +290,7 @@ public abstract class Chip8SOC{
 
     }
     //Initial state of the machine
-    public void chip8Init(){
+    protected void chip8Init(){
         if(!causeOfHalt.trim().equals("")){
             causeOfHalt = "";
         }
@@ -347,67 +346,71 @@ public abstract class Chip8SOC{
         waitReg = -1;
         waitState = false;
     }
-    public boolean loadROM(File rom){
-        try{
-           return loadROM(new FileInputStream(rom));
-        }catch(Exception ex){
-            System.out.println(ex);
-            return false;
-        }
-    }
-
-    public void reset(){
+//    public boolean loadROM(File rom){
+//        try{
+//           return loadROM(new FileInputStream(rom));
+//        }catch(Exception ex){
+//            System.out.println(ex);
+//            return false;
+//        }
+//    }
+//
+    protected void reset(){
         if(romArray.isEmpty()){
             return;
         }
         int offset = 0x0;
         chip8Init();
-        crc32.reset();
-        crc32Checksum = 0;
+        //crc32.reset();
+        //crc32Checksum = 0;
         for (int i = 0; i < romArray.size(); i++) {
-            crc32.update(romArray.get(i) & 0xFF);
+            //crc32.update(romArray.get(i) & 0xFF);
             mem[0x200 + offset] = romArray.get(i) & 0xFF;
             offset += 0x1;
         }
-        crc32Checksum = crc32.getValue();
-        System.out.println(" Checksum: "+crc32Checksum);
+        //crc32Checksum = crc32.getValue();
+        //System.out.println(" Checksum: "+crc32Checksum);
 
     }
-    public boolean loadROM(InputStream stream) throws IOException, FileNotFoundException{
-        Boolean romStatus = false;
-        try (DataInputStream in = new DataInputStream(new BufferedInputStream(stream))){
-            int offset = 0x0;
-            int currByte = 0;
-            chip8Init();
-            crc32.reset();
-            crc32Checksum = 0;
-            romArray.clear();
-            while (currByte != -1) {
-                currByte = in.read();
-                crc32.update(currByte & 0xFF);
-                mem[0x200 + offset] = currByte & 0xFF;
-                romArray.add(currByte & 0xFF);
-                offset += 0x1;
-            }
-            crc32Checksum = crc32.getValue();
-//            for (int i = 0; i < 0x900; i++) {
-//                if (i % 10 == 0 && i != 0) {
-//                    System.out.println(Integer.toHexString(0x195 + i).toUpperCase());
-//                   System.out.print("\n");
-//                }
-//                System.out.print(Integer.toHexString(mem[0x195 + i]) + "\t");
+//    public boolean loadROM(InputStream stream) throws IOException{
+//        Boolean romStatus = false;
+//        try (DataInputStream in = new DataInputStream(new BufferedInputStream(stream))){
+//            //int offset = 0x0;
+//            int currByte = 0;
+//            //chip8Init();
+//            crc32.reset();
+//            crc32Checksum = 0;
+//            romArray.clear();
+//            while (currByte != -1) {
+//                currByte = in.read();
+//                crc32.update(currByte & 0xFF);
+//                //mem[0x200 + offset] = currByte & 0xFF;
+//                romArray.add(currByte & 0xFF);
+//                //offset += 0x1;
 //            }
-            in.close();
-            System.out.println(" Checksum: "+crc32Checksum);
-            romStatus = true;
-        }catch(FileNotFoundException fnfe){
-            throw fnfe;
-        }catch(IOException ioe){
-            throw ioe;
+//            crc32Checksum = crc32.getValue();
+//
+//            in.close();
+//            System.out.println(" Checksum: "+crc32Checksum);
+//            romStatus = true;
+//        } catch(IOException ioe){
+//            throw ioe;
+//        }
+//        return romStatus;
+//    }
+    protected boolean loadROM(ArrayList<Integer> rom){
+        boolean status = true;
+        try{
+            romArray.clear();
+            for(int i = 0; i < rom.size(); i++){
+                romArray.add(rom.get(i));
+            }
+        }catch(Exception ex){
+            ex.printStackTrace();
+            status = false;
         }
-        return romStatus;
+        return status;
     }
-    
     
     public void updateTimers(){
         if(dT > 0){

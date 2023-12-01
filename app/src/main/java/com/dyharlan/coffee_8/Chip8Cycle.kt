@@ -72,6 +72,7 @@ class Chip8Cycle(
     private var hiResRect: Rect
     private var applicationContext: Context
     private var dbHandler: DatabaseHandler      //database handler for the DB that will store the contents of the RPL Flags from apps that will use it
+    private var checksum: Long = 0
 
     //primary constructor
     init {
@@ -126,13 +127,11 @@ class Chip8Cycle(
     //reset the emulator
     fun resetROM() {
         if (romStatus) {
-
             synchronized(this) {
                 super.reset()
                 nullifyLastFrame = true
                 startEmulation()
             }
-
 
         } else {
             Toast.makeText(applicationContext, "Machine is not running!", Toast.LENGTH_SHORT).show()
@@ -167,34 +166,45 @@ class Chip8Cycle(
         }
         return rightSize
     }
-
-    fun openROM(rom: InputStream) {
+    fun closeROM(): Boolean {
+        var status = true
         try {
-            synchronized(this) {
+            romArray.clear()
+            romStatus = false
+            chip8Init()
+        } catch (ex: Exception) {
+            status = false
+        }
+
+        return status
+    }
+    fun openROM(rom: ArrayList<Int>, checksum: Long) {
+        //try {
+            //synchronized(this) {
                 romStatus = super.loadROM(rom)
                 println("rom status: $romStatus")
-            }
-            if (romStatus) {
-                //clear the last frame each time a new rom is loaded.
-                nullifyLastFrame = true
-                startEmulation()
-
-            } else {
-                romStatus = false
-                Toast.makeText(
-                    applicationContext,
-                    "No ROM has been loaded into the emulator! Please load a ROM and try again.",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-
-        } catch (ioe: IOException) {
-            romStatus = false
-            Toast.makeText(
-                applicationContext, "There was a problem loading the ROM file: $ioe",
-                Toast.LENGTH_LONG
-            ).show()
-        }
+                this.checksum = checksum
+            //}
+//            if (romStatus) {
+//                //clear the last frame each time a new rom is loaded.
+//                nullifyLastFrame = true
+//                startEmulation()
+//
+//            } else {
+//                romStatus = false
+//                Toast.makeText(
+//                    applicationContext,
+//                    "No ROM has been loaded into the emulator! Please load a ROM and try again.",
+//                    Toast.LENGTH_LONG
+//                ).show()
+//            }
+//        } catch (ioe: IOException) {
+//            romStatus = false
+//            Toast.makeText(
+//                applicationContext, "There was a problem loading the ROM file: $ioe",
+//                Toast.LENGTH_LONG
+//            ).show()
+//        }
     }
 
     fun startEmulation() {
@@ -372,11 +382,11 @@ class Chip8Cycle(
         for (n in 0..(if (super.X > 0x7) 0x7 else super.X)) {
             flags.add(super.v[n] and 0xFF)
         }
-        dbHandler.saveFlags(super.crc32Checksum, flags.toTypedArray())
+        dbHandler.saveFlags(checksum, flags.toTypedArray())
     }
 
     override fun C8INST_FX85() {
-        val flags = dbHandler.loadFlags(super.crc32Checksum)
+        val flags = dbHandler.loadFlags(checksum)
         for (n in 0..(if (super.X > 0x7) 0x7 else super.X)) {
             super.v[n] = flags[n] and 0xFF
         }
