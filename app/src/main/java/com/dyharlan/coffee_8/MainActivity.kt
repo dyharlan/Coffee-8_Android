@@ -33,11 +33,9 @@ import com.dyharlan.coffee_8.Backend.MachineType
 import com.google.android.material.appbar.MaterialToolbar
 
 
-
-
-
 class MainActivity : AppCompatActivity() {
     //global variables representing the color palette, backend cpu, shared preferences
+    private var menu: Menu? = null
     private lateinit var planeColors: Array<Color>
     private lateinit var chip8Cycle: Chip8Cycle
     private val sharedPrefFile = "prefFile"
@@ -174,6 +172,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activitybar, menu)
+        this.menu = menu;
         return true
     }
 
@@ -185,6 +184,7 @@ class MainActivity : AppCompatActivity() {
             R.id.menuSet -> showCyclesButton()
             R.id.menuChange -> showMachineTypeButton()
         }
+        this.menu = menu;
         return super.onOptionsItemSelected(item)
     }
 
@@ -359,12 +359,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun pauseEmulation(){
+        var status = menu?.findItem(R.id.menuPause)
         if(chip8Cycle.getRomStatus() && chip8Cycle.getIsRunning()){
             chip8Cycle.stopEmulation()
+            status?.setTitle("Resume")
         }else if(chip8Cycle.getRomStatus() && !chip8Cycle.getIsRunning()){
             chip8Cycle.startEmulation()
+            status?.setTitle("Pause")
         }else if(!chip8Cycle.getRomStatus() && !chip8Cycle.getIsRunning()){
             Toast.makeText(this, "Machine is not running!", Toast.LENGTH_SHORT).show()
+            status?.setTitle("Pause")
         }
     }
 
