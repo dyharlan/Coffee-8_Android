@@ -60,7 +60,9 @@ public enum MachineType {
 //     vBlankQuirks = false;
 //     IOverflowQuirks = false;
 //     jumpQuirks = false;
-    XO_CHIP("XO-Chip",64,32, 200,new boolean[]{false,false,false,false,false,false,false,false});
+    XO_CHIP("XO-Chip",64,32, 200,new boolean[]{false,false,false,false,false,false,false,false}),
+
+    NONE("None",64,32, -1,new boolean[]{false,false,false,false,false,false,false,false});
     private final String MACHINE_NAME;
     private final int DISPLAY_WIDTH;
     private final int DISPLAY_HEIGHT;
