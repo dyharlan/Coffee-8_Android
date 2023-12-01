@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:title="Reset"
+        android:id="@+id/menuReset"
+        app:showAsAction="never" />
+
+    <item
+        android:title="Pause"
+        android:id="@+id/menuPause"
+        app:showAsAction="never"/>
+    <item
+        android:title="Load Rom"
+        android:id="@+id/menuLoad"
+        app:showAsAction="never"/>
+    <item
+        android:title="Set Cycles"
+        android:id="@+id/menuSet"
+        app:showAsAction="never"/>
+    <item
+        android:title="Change Machine Type"
+        android:id="@+id/menuChange"
+        app:showAsAction="never"/>
+</menu>

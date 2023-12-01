@@ -11,6 +11,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.InputDevice
 import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.SurfaceView
 import android.view.View
@@ -19,6 +22,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import android.widget.Switch
 import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
@@ -39,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     private val sharedPrefFile = "prefFile"
     private lateinit var sharedPreferences: SharedPreferences
     @SuppressLint("ClickableViewAccessibility")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sharedPreferences = getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
@@ -167,19 +172,30 @@ class MainActivity : AppCompatActivity() {
         //Log.i("onCreate","density: "+applicationContext.getResources().getDisplayMetrics().density)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.activitybar, menu)
+        return true
+    }
 
-
-
-
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.menuReset -> resetButton()
+            R.id.menuPause -> pauseEmulation()
+            R.id.menuLoad -> openLoadROMIntent()
+            R.id.menuSet -> showCyclesButton()
+            R.id.menuChange -> showMachineTypeButton()
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
     //helper functions for various settings related to the emulated machine
-    fun showCyclesButton(view: View){
+    fun showCyclesButton(){
         showCyclesDialog(chip8Cycle)
     }
-    fun showMachineTypeButton(view: View){
+    fun showMachineTypeButton(){
         showMachineTypeSelectorDialog(chip8Cycle)
     }
-    fun resetButton(view: View){
+    fun resetButton(){
         chip8Cycle.resetROM()
     }
     /*
@@ -238,7 +254,7 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-    fun openLoadROMIntent(view: View){
+    fun openLoadROMIntent(){
         getContent.launch("*/*")
     }
 
@@ -342,7 +358,7 @@ class MainActivity : AppCompatActivity() {
         chip8Cycle.closeSound()
     }
 
-    fun pauseEmulation(view: View){
+    fun pauseEmulation(){
         if(chip8Cycle.getRomStatus() && chip8Cycle.getIsRunning()){
             chip8Cycle.stopEmulation()
         }else if(chip8Cycle.getRomStatus() && !chip8Cycle.getIsRunning()){

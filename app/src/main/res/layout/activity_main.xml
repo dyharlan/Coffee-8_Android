@@ -51,54 +51,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/resetButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:onClick="resetButton"
-                android:text="Reset" />
-
-            <Button
-                android:id="@+id/pauseBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="pauseEmulation"
-                android:text="Pause" />
-
-            <Button
-                android:id="@+id/romLoadBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="openLoadROMIntent"
-                android:text="Load ROM" />
-
-            <Button
-                android:id="@+id/cycleButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:onClick="showCyclesButton"
-                android:text="Set Cycles" />
-
-        </LinearLayout>
+            android:orientation="horizontal"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/machineTypeButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:onClick="showMachineTypeButton"
-                android:text="Change Machine Type" />
-        </LinearLayout>
+            android:orientation="horizontal"/>
 
         <TableLayout
             android:id="@+id/keyPad"
