@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Coffee-8</string>
+    <string name="cycles_dialog_title_text_en">Set the number of Cycles done by the emulator. Higher values might slow down performance.</string>
+    <string name="machine_type_dialog_title_text_en">Select the Chip-8 Variant to emulate.</string>
+    <string-array name="machine_types">
+        <item>COSMAC VIP</item>
+        <item>SuperChip 1.1</item>
+        <item>XO-CHIP</item>
+    </string-array>
 </resources>
