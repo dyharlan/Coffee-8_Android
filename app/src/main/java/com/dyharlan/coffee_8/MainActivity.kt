@@ -36,7 +36,8 @@ import java.util.zip.CRC32
 
 class MainActivity : AppCompatActivity() {
     //global variables representing the color palette, backend cpu, shared preferences
-    private var planeColors: Array<Color>
+    private var menu: Menu? = null
+    private lateinit var planeColors: Array<Color>
     private lateinit var chip8Cycle: Chip8Cycle
     private val sharedPrefFile = "prefFile"
     private lateinit var sharedPreferences: SharedPreferences
@@ -163,6 +164,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activitybar, menu)
+        this.menu = menu;
         return true
     }
 
@@ -174,6 +176,7 @@ class MainActivity : AppCompatActivity() {
             R.id.menuSet -> showCyclesButton(chip8Cycle)
             R.id.menuChange -> showMachineTypeButton(chip8Cycle)
         }
+        this.menu = menu;
         return super.onOptionsItemSelected(item)
     }
 
@@ -510,10 +513,13 @@ class MainActivity : AppCompatActivity() {
     fun pauseEmulation(chip8Cycle: Chip8Cycle){
         if(chip8Cycle.getRomStatus() && chip8Cycle.getIsRunning()){
             chip8Cycle.stopEmulation()
+            status?.setTitle("Resume")
         }else if(chip8Cycle.getRomStatus() && !chip8Cycle.getIsRunning()){
             chip8Cycle.startEmulation()
+            status?.setTitle("Pause")
         }else if(!chip8Cycle.getRomStatus() && !chip8Cycle.getIsRunning()){
             Toast.makeText(this, "Machine is not running!", Toast.LENGTH_SHORT).show()
+            status?.setTitle("Pause")
         }
     }
 
