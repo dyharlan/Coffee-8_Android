@@ -253,7 +253,9 @@ class MainActivity : AppCompatActivity() {
             if (inputStream != null) {
                 val fileDescriptor = contentResolver.openAssetFileDescriptor(uri, "r")
                 if (fileDescriptor != null) {
-                    if(fileDescriptor.length > 65024L){
+                    Log.i("","size: ${fileDescriptor.length}")
+                    if(fileDescriptor.length <= 65024L){
+
                         var currByte = 0
                         crc32.reset()
                         val romArray = ArrayList<Int>()
