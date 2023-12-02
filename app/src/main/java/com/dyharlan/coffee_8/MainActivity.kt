@@ -252,46 +252,42 @@ class MainActivity : AppCompatActivity() {
             val inputStream = contentResolver.openInputStream(uri)
             if (inputStream != null) {
                 val fileDescriptor = contentResolver.openAssetFileDescriptor(uri, "r")
-                if(chip8Cycle.checkROMSize(fileDescriptor)){
-                    var currByte = 0
-                    crc32.reset()
-                    val romArray = ArrayList<Int>()
-                    try{
-                        val input = DataInputStream(BufferedInputStream(inputStream))
-                        while(currByte != -1){
-                            currByte = input.read()
-                            if(currByte!= -1){
-                                crc32.update(currByte and 0xFF)
-                                romArray.add(currByte)
+                if (fileDescriptor != null) {
+                    if(fileDescriptor.length > 65024L){
+                        var currByte = 0
+                        crc32.reset()
+                        val romArray = ArrayList<Int>()
+                        try{
+                            val input = DataInputStream(BufferedInputStream(inputStream))
+                            while(currByte != -1){
+                                currByte = input.read()
+                                if(currByte!= -1){
+                                    crc32.update(currByte and 0xFF)
+                                    romArray.add(currByte)
+                                }
                             }
+                            input.close()
+                            inputStream.close()
+                        }catch(ioe: IOException){
+                            Toast.makeText(this, "An error occurred while loading the ROM: ${ioe.toString()}", Toast.LENGTH_SHORT).show()
+                            Log.e("initialSetupDialog", "An error occurred while loading the ROM: ${ioe.toString()}")
+                            return@registerForActivityResult
                         }
-                        input.close()
-                        inputStream.close()
-                    }catch(ioe: IOException){
-                        Toast.makeText(this, "An error occurred while loading the ROM: ${ioe.toString()}", Toast.LENGTH_SHORT).show()
-                        Log.e("initialSetupDialog", "An error occurred while loading the ROM: ${ioe.toString()}")
-                        return@registerForActivityResult
-                    }
-                    val dbHandler = DatabaseHandler(this)
-                    val romConfig = dbHandler.loadConfigs(crc32.value)
-                    dbHandler.close()
-                    if(romConfig.machineType == MachineType.NONE && romConfig.cycles < 0){
-                        showInitialSetupDialog(romArray)
+                        val dbHandler = DatabaseHandler(this)
+                        val romConfig = dbHandler.loadConfigs(crc32.value)
+                        dbHandler.close()
+                        if(romConfig.machineType == MachineType.NONE && romConfig.cycles < 0){
+                            showInitialSetupDialog(romArray)
+                        }else{
+                            chip8Cycle.cycles = romConfig.cycles
+                            chip8Cycle.currentMachine = romConfig.machineType
+                            chip8Cycle.openROM(romArray,crc32.value)
+                            chip8Cycle.resetROM()
+
+                        }
                     }else{
-                        println(romConfig.cycles)
-                        println(romConfig.machineType)
-                        chip8Cycle.cycles = romConfig.cycles
-                        chip8Cycle.currentMachine = romConfig.machineType
-                        chip8Cycle.openROM(romArray,crc32.value)
-                        chip8Cycle.resetROM()
-
+                        Toast.makeText(this,"Rom is too large for the emulator! Roms must be 65024 bytes or less.",Toast.LENGTH_LONG).show()
                     }
-
-
-
-
-                }else{
-                    Toast.makeText(this,"Rom is too large for the emulator!",Toast.LENGTH_LONG).show()
                 }
                 inputStream.close()
             }
