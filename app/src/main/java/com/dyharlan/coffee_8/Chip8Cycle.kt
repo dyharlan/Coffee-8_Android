@@ -51,8 +51,7 @@ class Chip8Cycle(
     applicationContext: Context,
     planeColors: Array<Color>,
     chip8Surface: SurfaceView,
-    machineType: MachineType
-) : Chip8SOC(true, machineType), Runnable {
+) : Chip8SOC(true), Runnable {
     //height of the chip 8 screen
     private val BITMAP_WIDTH = 128
     private val BITMAP_HEIGHT = 64

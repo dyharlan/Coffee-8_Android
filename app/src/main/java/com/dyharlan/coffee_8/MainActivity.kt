@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
 //        }
 
         //instantiate cpu
-        chip8Cycle = Chip8Cycle(applicationContext, planeColors, chip8Surface, MachineType.NONE)
+        chip8Cycle = Chip8Cycle(applicationContext, planeColors, chip8Surface)
 
         //apply cycle count
 //        if(cycleCount == 200){
