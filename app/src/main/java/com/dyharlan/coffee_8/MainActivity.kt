@@ -283,8 +283,8 @@ class MainActivity : AppCompatActivity() {
                         }else{
                             chip8Cycle.cycles = romConfig.cycles
                             chip8Cycle.currentMachine = romConfig.machineType
-                            if(chip8Cycle.getRomStatus())
-                                chip8Cycle.closeROM()
+//                            if(chip8Cycle.getRomStatus())
+//                                chip8Cycle.closeROM()
                             chip8Cycle.openROM(romArray,crc32.value)
                             chip8Cycle.resetROM()
 
@@ -370,8 +370,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 println("status: $status")
                 if(status){
-                    if(chip8Cycle.getRomStatus())
-                        chip8Cycle.closeROM()
+//                    if(chip8Cycle.getRomStatus())
+//                        chip8Cycle.closeROM()
                     chip8Cycle.openROM(romArray,crc32.value)
                     chip8Cycle.resetROM()
                 }
