@@ -42,6 +42,14 @@ internal class LastFrame(arr2D: Array<IntArray>, hires: Boolean, colorArr: Array
         System.arraycopy(colorArr, 0, prevColors, 0, prevColors.size)
     }
 
+    fun update(arr2D: Array<IntArray>, hires: Boolean, colorArr: Array<Color>){
+        System.arraycopy(arr2D[0], 0, prevFrame[0], 0, arr2D[0].size)
+        System.arraycopy(arr2D[1], 0, prevFrame[1], 0, arr2D[1].size)
+        System.arraycopy(arr2D[2], 0, prevFrame[2], 0, arr2D[2].size)
+        System.arraycopy(arr2D[3], 0, prevFrame[3], 0, arr2D[3].size)
+        this.hires = hires
+        System.arraycopy(colorArr, 0, prevColors, 0, prevColors.size)
+    }
 
 }
 
@@ -338,7 +346,12 @@ class Chip8Cycle(
             }
             //chip8Canvas.postInvalidate()
             updateSurface(chip8SurfaceHolder, bitmap)
-            last = LastFrame(super.graphics, this.hiRes, planeColors)
+            if(last == null){
+                last = LastFrame(super.graphics, this.hiRes, planeColors)
+            }
+            else{
+                last?.update(super.graphics, this.hiRes, planeColors)
+            }
         }
     }
 
