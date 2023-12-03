@@ -331,19 +331,19 @@ class MainActivity : AppCompatActivity() {
             var newMachine: MachineType? = null
             val selectedId: Int = machineRgp.checkedRadioButtonId
             if(selectedId == R.id.COSMACradioButton){
-                if(!chip8Cycle.checkROMSize(chip8Cycle.romSize, MachineType.COSMAC_VIP)){
+                if(!chip8Cycle.checkROMSize(romArray.size, MachineType.COSMAC_VIP)){
                     Toast.makeText(applicationContext,"Rom is too large for ${MachineType.COSMAC_VIP.machineName}!",Toast.LENGTH_LONG).show()
                 }else{
                     newMachine = MachineType.COSMAC_VIP
                 }
             }else if(selectedId == R.id.SCHIPradioButton){
-                if(!chip8Cycle.checkROMSize(chip8Cycle.romSize, MachineType.SUPERCHIP_1_1)){
+                if(!chip8Cycle.checkROMSize(romArray.size, MachineType.SUPERCHIP_1_1)){
                     Toast.makeText(applicationContext,"Rom is too large for ${MachineType.SUPERCHIP_1_1.machineName}!",Toast.LENGTH_LONG).show()
                 }else{
                     newMachine = MachineType.SUPERCHIP_1_1
                 }
             }else if(selectedId == R.id.XOCHIPradioButton){
-                if(!chip8Cycle.checkROMSize(chip8Cycle.romSize, MachineType.XO_CHIP)){
+                if(!chip8Cycle.checkROMSize(romArray.size, MachineType.XO_CHIP)){
                     Toast.makeText(applicationContext,"Rom is too large for ${MachineType.XO_CHIP.machineName}!",Toast.LENGTH_LONG).show()
                 }else{
                     newMachine = MachineType.XO_CHIP
