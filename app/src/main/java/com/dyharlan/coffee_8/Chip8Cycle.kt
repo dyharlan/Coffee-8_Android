@@ -16,8 +16,6 @@ import android.view.WindowMetrics
 import android.widget.Toast
 import com.dyharlan.coffee_8.Backend.Chip8SOC
 import com.dyharlan.coffee_8.Backend.MachineType
-import java.io.IOException
-import java.io.InputStream
 
 /*
 * A class representing the last frame of the display where:
@@ -49,6 +47,7 @@ internal class LastFrame(arr2D: Array<IntArray>, hires: Boolean, colorArr: Array
 
 //Extends Chip8SOC and adds additional functions that help in running the emulator
 class Chip8Cycle(
+
     applicationContext: Context,
     planeColors: Array<Color>,
     chip8Surface: SurfaceView,
@@ -73,6 +72,7 @@ class Chip8Cycle(
     private var applicationContext: Context
     private var dbHandler: DatabaseHandler      //database handler for the DB that will store the contents of the RPL Flags from apps that will use it
     private var checksum: Long = 0
+    private var romArray: ArrayList<Int> = ArrayList<Int>()
 
     //primary constructor
     init {
@@ -128,7 +128,16 @@ class Chip8Cycle(
     fun resetROM() {
         if (romStatus) {
             synchronized(this) {
-                super.reset()
+                if (romArray.isEmpty()) {
+                    return
+                }
+                var offset = 0x0
+                chip8Init()
+                for (i in romArray.indices) {
+                    //crc32.update(romArray.get(i) & 0xFF);
+                    mem[0x200 + offset] = romArray[i] and 0xFF
+                    offset += 0x1
+                }
                 nullifyLastFrame = true
                 startEmulation()
             }
@@ -138,22 +147,25 @@ class Chip8Cycle(
         }
     }
 
-    //check if the rom size is greater than the specified values. Return false, otherwise true.
-    fun checkROMSize(fileDescriptor: AssetFileDescriptor?): Boolean {
-        var rightSize = true
-        if (fileDescriptor == null) {
-            return false
-        }
-        if ((currentMachine === MachineType.COSMAC_VIP) && (fileDescriptor.length > 3232L)) {
-            rightSize = false
-        } else if ((currentMachine === MachineType.SUPERCHIP_1_1) && (fileDescriptor.length > 3583L)) {
-            rightSize = false
-        } else if ((currentMachine === MachineType.XO_CHIP) && (fileDescriptor.length > 65024L)) {
-            rightSize = false
-        }
-        return rightSize
+    fun getRomSize():Int{
+        return romArray.size
     }
 
+//    fun checkROMSize(fileDescriptor: AssetFileDescriptor?): Boolean {
+//        var rightSize = true
+//        if (fileDescriptor == null) {
+//            return false
+//        }
+//        if ((currentMachine === MachineType.COSMAC_VIP) && (fileDescriptor.length > 3232L)) {
+//            rightSize = false
+//        } else if ((currentMachine === MachineType.SUPERCHIP_1_1) && (fileDescriptor.length > 3583L)) {
+//            rightSize = false
+//        } else if ((currentMachine === MachineType.XO_CHIP) && (fileDescriptor.length > 65024L)) {
+//            rightSize = false
+//        }
+//        return rightSize
+//    }
+    //check if the rom size is greater than the specified values. Return false, otherwise true.
     fun checkROMSize(size: Int, newMachine: MachineType): Boolean {
         var rightSize = true
 
@@ -170,41 +182,19 @@ class Chip8Cycle(
         var status = true
         try {
             romArray.clear()
+            checksum = 0
             romStatus = false
             chip8Init()
         } catch (ex: Exception) {
             status = false
         }
-
         return status
     }
     fun openROM(rom: ArrayList<Int>, checksum: Long) {
-        //try {
-            //synchronized(this) {
-                romStatus = super.loadROM(rom)
-                println("rom status: $romStatus")
-                this.checksum = checksum
-            //}
-//            if (romStatus) {
-//                //clear the last frame each time a new rom is loaded.
-//                nullifyLastFrame = true
-//                startEmulation()
-//
-//            } else {
-//                romStatus = false
-//                Toast.makeText(
-//                    applicationContext,
-//                    "No ROM has been loaded into the emulator! Please load a ROM and try again.",
-//                    Toast.LENGTH_LONG
-//                ).show()
-//            }
-//        } catch (ioe: IOException) {
-//            romStatus = false
-//            Toast.makeText(
-//                applicationContext, "There was a problem loading the ROM file: $ioe",
-//                Toast.LENGTH_LONG
-//            ).show()
-//        }
+        romArray = rom.clone() as ArrayList<Int>
+        romStatus = true
+        println("rom status: $romStatus")
+        this.checksum = checksum
     }
 
     fun startEmulation() {

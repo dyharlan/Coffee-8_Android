@@ -74,10 +74,10 @@ public abstract class Chip8SOC{
     private int dT; //8-bit delay timer
     public int sT; //sound timer
     protected int[] v; //cpu registers
-    public int[][] graphics; //screen grid??
+    protected int[][] graphics; //screen grid??
     public boolean[] keyPad; 
     private int interruptState;
-    private int[] mem; //4kb of ram
+    protected int[] mem; //4kb of ram
     private int plane; //graphics layer to draw on
     private final int[] charSet = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -134,7 +134,7 @@ public abstract class Chip8SOC{
     private Instruction[] _0xEInstructions;
     private Instruction[] _0xFInstructions;
 
-    protected ArrayList<Integer> romArray;
+    //protected ArrayList<Integer> romArray;
     //pitch register
     public float pitch;
     //Default machine is XO-Chip
@@ -146,7 +146,18 @@ public abstract class Chip8SOC{
         setCurrentMachine(m);
         fillInstructionTable();
         //crc32 = new CRC32();
-        romArray = new ArrayList<>();
+        //romArray = new ArrayList<>();
+    }
+
+    public Chip8SOC(Boolean sound) {
+        rand = new Random();
+        playSound = sound;
+        causeOfHalt = "";
+        hires = false;
+        //setCurrentMachine(m);
+        fillInstructionTable();
+        //crc32 = new CRC32();
+        //romArray = new ArrayList<>();
     }
     
     public void setCurrentMachine(MachineType m){
@@ -355,23 +366,23 @@ public abstract class Chip8SOC{
 //        }
 //    }
 //
-    protected void reset(){
-        if(romArray.isEmpty()){
-            return;
-        }
-        int offset = 0x0;
-        chip8Init();
-        //crc32.reset();
-        //crc32Checksum = 0;
-        for (int i = 0; i < romArray.size(); i++) {
-            //crc32.update(romArray.get(i) & 0xFF);
-            mem[0x200 + offset] = romArray.get(i) & 0xFF;
-            offset += 0x1;
-        }
-        //crc32Checksum = crc32.getValue();
-        //System.out.println(" Checksum: "+crc32Checksum);
-
-    }
+//    protected void reset(){
+//        if(romArray.isEmpty()){
+//            return;
+//        }
+//        int offset = 0x0;
+//        chip8Init();
+//        //crc32.reset();
+//        //crc32Checksum = 0;
+//        for (int i = 0; i < romArray.size(); i++) {
+//            //crc32.update(romArray.get(i) & 0xFF);
+//            mem[0x200 + offset] = romArray.get(i) & 0xFF;
+//            offset += 0x1;
+//        }
+//        //crc32Checksum = crc32.getValue();
+//        //System.out.println(" Checksum: "+crc32Checksum);
+//
+//    }
 //    public boolean loadROM(InputStream stream) throws IOException{
 //        Boolean romStatus = false;
 //        try (DataInputStream in = new DataInputStream(new BufferedInputStream(stream))){
@@ -398,19 +409,19 @@ public abstract class Chip8SOC{
 //        }
 //        return romStatus;
 //    }
-    protected boolean loadROM(ArrayList<Integer> rom){
-        boolean status = true;
-        try{
-            romArray.clear();
-            for(int i = 0; i < rom.size(); i++){
-                romArray.add(rom.get(i));
-            }
-        }catch(Exception ex){
-            ex.printStackTrace();
-            status = false;
-        }
-        return status;
-    }
+//    protected boolean loadROM(ArrayList<Integer> rom){
+//        boolean status = true;
+//        try{
+//            romArray.clear();
+//            for(int i = 0; i < rom.size(); i++){
+//                romArray.add(rom.get(i));
+//            }
+//        }catch(Exception ex){
+//            ex.printStackTrace();
+//            status = false;
+//        }
+//        return status;
+//    }
     
     public void updateTimers(){
         if(dT > 0){
@@ -1132,9 +1143,9 @@ public abstract class Chip8SOC{
         I = ((v[X]*10) +  0xA0);
     }
 
-    public int getRomSize() {
-        return romArray.size();
-    }
+//    public int getRomSize() {
+//        return romArray.size();
+//    }
 
     //FX33: Get number from vX and
     //store hundreds digit in memory point by I

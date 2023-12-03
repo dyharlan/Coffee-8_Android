@@ -76,29 +76,29 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         //set cycle count to 200 as a default
-        val cycleCount: Int = sharedPreferences.getInt("cycles", 200)
+        //val cycleCount: Int = sharedPreferences.getInt("cycles", -1)
 
         //set machine type to XO-CHIP as a default
-        val machineType: String? = sharedPreferences.getString("machineType", MachineType.XO_CHIP.machineName)
+        //val machineType: String? = sharedPreferences.getString("machineType", MachineType.XO_CHIP.machineName)
 
         //Otherwise, set to cosmac vip or super-chip if the setting exists in the shared preferences.
-        val currentMachine = if(machineType?.equals(MachineType.COSMAC_VIP.machineName) == true){
-            MachineType.COSMAC_VIP
-        }else if(machineType?.equals(MachineType.SUPERCHIP_1_1.machineName) == true){
-            MachineType.SUPERCHIP_1_1
-        }else{
-            MachineType.XO_CHIP
-        }
+//        val currentMachine = if(machineType?.equals(MachineType.COSMAC_VIP.machineName) == true){
+//            MachineType.COSMAC_VIP
+//        }else if(machineType?.equals(MachineType.SUPERCHIP_1_1.machineName) == true){
+//            MachineType.SUPERCHIP_1_1
+//        }else{
+//            MachineType.XO_CHIP
+//        }
 
         //instantiate cpu
-        chip8Cycle = Chip8Cycle(applicationContext, planeColors, chip8Surface, currentMachine)
+        chip8Cycle = Chip8Cycle(applicationContext, planeColors, chip8Surface, MachineType.NONE)
 
         //apply cycle count
-        if(cycleCount == 200){
-            chip8Cycle.cycles = 200
-        }else{
-            chip8Cycle.cycles = cycleCount
-        }
+//        if(cycleCount == 200){
+//            chip8Cycle.cycles = 200
+//        }else{
+//            chip8Cycle.cycles = cycleCount
+//        }
         /*
         * Programmatically setup the keypad dimensions and the event handling
          */
@@ -283,6 +283,8 @@ class MainActivity : AppCompatActivity() {
                         }else{
                             chip8Cycle.cycles = romConfig.cycles
                             chip8Cycle.currentMachine = romConfig.machineType
+                            if(chip8Cycle.getRomStatus())
+                                chip8Cycle.closeROM()
                             chip8Cycle.openROM(romArray,crc32.value)
                             chip8Cycle.resetROM()
 
@@ -368,6 +370,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 println("status: $status")
                 if(status){
+                    if(chip8Cycle.getRomStatus())
+                        chip8Cycle.closeROM()
                     chip8Cycle.openROM(romArray,crc32.value)
                     chip8Cycle.resetROM()
                 }
@@ -420,19 +424,19 @@ class MainActivity : AppCompatActivity() {
 
             // find the radiobutton by returned id
             if(selectedId == R.id.COSMACradioButton){
-                if(romStatus && !chip8Cycle.checkROMSize(chip8Cycle.romSize, MachineType.COSMAC_VIP)){
+                if(romStatus && !chip8Cycle.checkROMSize(chip8Cycle.getRomSize(), MachineType.COSMAC_VIP)){
                     Toast.makeText(applicationContext,"Rom is too large for ${MachineType.COSMAC_VIP.machineName}!",Toast.LENGTH_LONG).show()
                 }else{
                     newMachine = MachineType.COSMAC_VIP
                 }
             }else if(selectedId == R.id.SCHIPradioButton){
-                if(romStatus && !chip8Cycle.checkROMSize(chip8Cycle.romSize, MachineType.SUPERCHIP_1_1)){
+                if(romStatus && !chip8Cycle.checkROMSize(chip8Cycle.getRomSize(), MachineType.SUPERCHIP_1_1)){
                     Toast.makeText(applicationContext,"Rom is too large for ${MachineType.SUPERCHIP_1_1.machineName}!",Toast.LENGTH_LONG).show()
                 }else{
                     newMachine = MachineType.SUPERCHIP_1_1
                 }
             }else if(selectedId == R.id.XOCHIPradioButton){
-                if(romStatus && !chip8Cycle.checkROMSize(chip8Cycle.romSize, MachineType.XO_CHIP)){
+                if(romStatus && !chip8Cycle.checkROMSize(chip8Cycle.getRomSize(), MachineType.XO_CHIP)){
                     Toast.makeText(applicationContext,"Rom is too large for ${MachineType.XO_CHIP.machineName}!",Toast.LENGTH_LONG).show()
                 }else{
                     newMachine = MachineType.XO_CHIP
@@ -474,7 +478,7 @@ class MainActivity : AppCompatActivity() {
             val btn = dialog.findViewById<RadioButton>(R.id.XOCHIPradioButton)
             btn.isChecked = true
         }
-        val romSize = chip8Cycle.romSize
+        val romSize = chip8Cycle.getRomSize()
         if(romSize > 3232L){
             val COSMACradioButton = dialog.findViewById<RadioButton>(R.id.COSMACradioButton)
             COSMACradioButton.isEnabled = false
