@@ -1,22 +1,23 @@
 package com.dyharlan.coffee_8
 
 import android.content.Context
-import android.content.res.AssetFileDescriptor
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Point
 import android.graphics.Rect
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.SurfaceHolder
-import android.view.SurfaceView
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.WindowManager
 import android.view.WindowMetrics
 import android.widget.Toast
 import com.dyharlan.coffee_8.Backend.Chip8SOC
 import com.dyharlan.coffee_8.Backend.MachineType
+
 
 /*
 * A class representing the last frame of the display where:
@@ -59,7 +60,7 @@ class Chip8Cycle(
 
     applicationContext: Context,
     planeColors: Array<Color>,
-    chip8Surface: SurfaceView,
+    chip8Surface: Chip8SurfaceView,
 ) : Chip8SOC(true), Runnable {
     //height of the chip 8 screen
     private val BITMAP_WIDTH = 128
@@ -73,10 +74,10 @@ class Chip8Cycle(
     private var cpuCycleThread: Thread? = null  //separate thread for the cpu cycle
     private var last: LastFrame? = null         //last frame of th display
     private var bitmap: Bitmap                  //bitmap object where the framebuffer contents will be applied
-    private var chip8Surface: SurfaceView       //SurfaceView that will display the output
+    private var chip8Surface: Chip8SurfaceView       //SurfaceView that will display the output
     private var chip8SurfaceHolder: SurfaceHolder
-    private var lowResRect: Rect
-    private var hiResRect: Rect
+    private lateinit var lowResRect: Rect
+    private lateinit var hiResRect: Rect
     private var applicationContext: Context
     private var dbHandler: DatabaseHandler      //database handler for the DB that will store the contents of the RPL Flags from apps that will use it
     private var checksum: Long = 0
@@ -107,24 +108,34 @@ class Chip8Cycle(
             screenWidth = deviceWindowMetrics.bounds.width()
             screenHeight = deviceWindowMetrics.bounds.height()
         }
-        println(screenWidth)
         while (((64 * (scalingFactor + 2)) <= screenWidth)) {
             scalingFactor += 2
         }
-        println("width: $screenWidth")
-        println("height: $screenHeight")
-        println("new scaling factor $scalingFactor")
+        Log.i("init","width: $screenWidth")
+        Log.i("init","height: $screenHeight")
+        Log.i("init","new scaling factor $scalingFactor")
         val LOWRES_SCALE_FACTOR = scalingFactor
         val HIRES_SCALE_FACTOR = LOWRES_SCALE_FACTOR / 2
         val hiResViewWidth = BITMAP_WIDTH * HIRES_SCALE_FACTOR
         val hiResViewHeight = BITMAP_HEIGHT * HIRES_SCALE_FACTOR
         val lowResViewWidth = BITMAP_WIDTH * LOWRES_SCALE_FACTOR
         val lowResViewHeight = BITMAP_HEIGHT * LOWRES_SCALE_FACTOR
-        lowResRect = Rect(0, 0, lowResViewWidth, lowResViewHeight)
-        hiResRect = Rect(0, 0, hiResViewWidth, hiResViewHeight)
-        val layoutParams = chip8Surface.layoutParams
-        layoutParams.width = hiResViewWidth
-        layoutParams.height = hiResViewHeight
+
+        chip8Surface.getViewTreeObserver().addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                val width: Int = chip8Surface.getWidth()
+                val height: Int = chip8Surface.getHeight()
+                val centerOfCanvas = Point(width / 2, height / 2)
+                lowResRect = Rect(centerOfCanvas.x - (hiResViewWidth/2), centerOfCanvas.y - (hiResViewHeight/2), lowResViewWidth, lowResViewHeight)
+                hiResRect = Rect(centerOfCanvas.x - (hiResViewWidth/2), centerOfCanvas.y - (hiResViewHeight/2), centerOfCanvas.x + (hiResViewWidth/2), centerOfCanvas.y + (hiResViewHeight/2))
+                //you can add your code here on what you want to do to the height and width you can pass it as parameter or make width and height a global variable
+                chip8Surface.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+            }
+        })
+
+        //val layoutParams = chip8Surface.layoutParams
+//        layoutParams.width = hiResViewWidth
+//        layoutParams.height = hiResViewHeight
 
 
         bitmap = Bitmap.createBitmap(BITMAP_WIDTH, BITMAP_HEIGHT, Bitmap.Config.RGB_565) //Instantiate bitmap

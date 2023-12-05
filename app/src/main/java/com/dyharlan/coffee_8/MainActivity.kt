@@ -13,7 +13,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
-import android.view.SurfaceView
 import android.view.Window
 import android.widget.Button
 import android.widget.EditText
@@ -68,9 +67,9 @@ class MainActivity : AppCompatActivity() {
         //sharedPreferences = getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
 
         setContentView(R.layout.activity_main)
+        Log.i("onCreate: MainActivity", "orientation: ${applicationContext.resources.getBoolean(R.bool.is_landscape)}")
 
-
-        val chip8Surface = findViewById<SurfaceView>(R.id.chip8Surface)
+        val chip8Surface = findViewById<Chip8SurfaceView>(R.id.chip8Surface)
         //setup toolbar?
         val toolbar = findViewById<MaterialToolbar>(R.id.materialToolbar)
         setSupportActionBar(toolbar)
