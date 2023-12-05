@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var planeColors: Array<Color>
     private lateinit var chip8Cycle: Chip8Cycle
     private val sharedPrefFile = "prefFile"
-    private lateinit var sharedPreferences: SharedPreferences
+    //private lateinit var sharedPreferences: SharedPreferences
     val crc32: CRC32 = CRC32()
     init {
         planeColors = arrayOf(
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sharedPreferences = getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
+        //sharedPreferences = getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
 
         setContentView(R.layout.activity_main)
 
@@ -176,7 +176,7 @@ class MainActivity : AppCompatActivity() {
             R.id.menuSet -> showCyclesButton(chip8Cycle)
             R.id.menuChange -> showMachineTypeButton(chip8Cycle)
         }
-        this.menu = menu;
+        //this.menu = menu;
         return super.onOptionsItemSelected(item)
     }
 
