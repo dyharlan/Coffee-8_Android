@@ -120,8 +120,6 @@ class Chip8Cycle(
         val HIRES_SCALE_FACTOR = LOWRES_SCALE_FACTOR / 2
         val hiResViewWidth = HIRES_BITMAP_WIDTH * HIRES_SCALE_FACTOR
         val hiResViewHeight = HIRES_BITMAP_HEIGHT * HIRES_SCALE_FACTOR
-        val lowResViewWidth = HIRES_BITMAP_WIDTH * LOWRES_SCALE_FACTOR
-        val lowResViewHeight = HIRES_BITMAP_HEIGHT * LOWRES_SCALE_FACTOR
 
         chip8Surface.getViewTreeObserver().addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
             override fun onGlobalLayout() {
