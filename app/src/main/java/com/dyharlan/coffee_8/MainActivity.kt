@@ -2,8 +2,6 @@ package com.dyharlan.coffee_8
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.Context
-import android.content.SharedPreferences
 import android.database.sqlite.SQLiteException
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -29,7 +27,6 @@ import com.google.android.material.appbar.MaterialToolbar
 import java.io.BufferedInputStream
 import java.io.DataInputStream
 import java.io.IOException
-import java.io.InputStream
 import java.util.zip.CRC32
 
 
