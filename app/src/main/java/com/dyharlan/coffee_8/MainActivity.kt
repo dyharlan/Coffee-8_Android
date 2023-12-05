@@ -36,31 +36,29 @@ import java.util.zip.CRC32
 class MainActivity : AppCompatActivity() {
     //global variables representing the color palette, backend cpu, shared preferences
     private var menu: Menu? = null
-    private var planeColors: Array<Color>
+    private var planeColors: Array<Color> = arrayOf(
+        Color.valueOf(0x000000),
+        Color.valueOf(0xAA0000),
+        Color.valueOf(0x00AA00),
+        Color.valueOf(0x0000AA),
+        Color.valueOf(0x00AAAA),
+        Color.valueOf(0xAA00AA),
+        Color.valueOf(0xAA5500),
+        Color.valueOf(0xAAAAAA),
+        Color.valueOf(0x555555),
+        Color.valueOf(0xFF5555), //LR
+        Color.valueOf(0x55FF55), //LG
+        Color.valueOf(0x5555FF), //LB
+        Color.valueOf(0x55FFFF), //LC
+        Color.valueOf(0xFF55FF),
+        Color.valueOf(0xFFFF55),
+        Color.valueOf(0xFFFFFF)
+    )
     private lateinit var chip8Cycle: Chip8Cycle
     private val sharedPrefFile = "prefFile"
     //private lateinit var sharedPreferences: SharedPreferences
-    val crc32: CRC32 = CRC32()
-    init {
-        planeColors = arrayOf(
-            Color.valueOf(0x000000),
-            Color.valueOf(0xAA0000),
-            Color.valueOf(0x00AA00),
-            Color.valueOf(0x0000AA),
-            Color.valueOf(0x00AAAA),
-            Color.valueOf(0xAA00AA),
-            Color.valueOf(0xAA5500),
-            Color.valueOf(0xAAAAAA),
-            Color.valueOf(0x555555),
-            Color.valueOf(0xFF5555), //LR
-            Color.valueOf(0x55FF55), //LG
-            Color.valueOf(0x5555FF), //LB
-            Color.valueOf(0x55FFFF), //LC
-            Color.valueOf(0xFF55FF),
-            Color.valueOf(0xFFFF55),
-            Color.valueOf(0xFFFFFF)
-        )
-    }
+    private val crc32: CRC32 = CRC32()
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,7 +135,6 @@ class MainActivity : AppCompatActivity() {
             key.text = keyLabels[currentKey]
             key.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1f)
             key.setOnTouchListener { _, event ->
-
                 when(event.action){
                     MotionEvent.ACTION_DOWN -> {
                         chip8Cycle.keyPress(currentKey)
@@ -152,10 +149,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     else -> false
                 }
-
             }
-
-
         }
         //Log.i("onCreate","density: "+applicationContext.getResources().getDisplayMetrics().density)
     }
@@ -179,19 +173,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     //helper functions for various settings related to the emulated machine
-    fun showCyclesButton(chip8Cycle: Chip8Cycle){
+    private fun showCyclesButton(chip8Cycle: Chip8Cycle){
         if(chip8Cycle.getRomStatus())
             showCyclesDialog(chip8Cycle)
         else
             Toast.makeText(this, "Machine is not running!", Toast.LENGTH_SHORT).show()
     }
-    fun showMachineTypeButton(chip8Cycle: Chip8Cycle){
+    private fun showMachineTypeButton(chip8Cycle: Chip8Cycle){
         if(chip8Cycle.getRomStatus())
             showMachineTypeSelectorDialog(chip8Cycle)
         else
             Toast.makeText(this, "Machine is not running!", Toast.LENGTH_SHORT).show()
     }
-    fun resetButton(chip8Cycle: Chip8Cycle){
+    private fun resetButton(chip8Cycle: Chip8Cycle){
         chip8Cycle.resetROM()
     }
     /*
@@ -212,7 +206,7 @@ class MainActivity : AppCompatActivity() {
 
         btnYes.setOnClickListener {
             //retrieve value from the text box
-            var newCycles = 0
+            val newCycles: Int
             try{
                 newCycles = editText.text.toString().toInt()
             }catch(nfe: NumberFormatException){
@@ -320,7 +314,7 @@ class MainActivity : AppCompatActivity() {
 
         btnStart.setOnClickListener {
             //retrieve value from the text box
-            var newCycles = 0
+            var newCycles: Int
             try{
                 newCycles = editText.text.toString().toInt()
             }catch(nfe: NumberFormatException){
@@ -357,7 +351,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Cycles: $newCycles", Toast.LENGTH_SHORT).show()
                 Toast.makeText(this, "Machine Type: $newMachine", Toast.LENGTH_SHORT).show()
                 val dbHandler: DatabaseHandler = DatabaseHandler(this)
-                var status: Boolean = try{
+                val status: Boolean = try{
                     dbHandler.saveConfigs(RomConfigClass(crc32.value, newMachine, newCycles))
                 }catch (sqle: SQLiteException){
                     Toast.makeText(this, "An error occurred while loading the ROM: $sqle", Toast.LENGTH_SHORT).show()
@@ -510,8 +504,8 @@ class MainActivity : AppCompatActivity() {
         chip8Cycle.closeSound()
     }
 
-    fun pauseEmulation(chip8Cycle: Chip8Cycle){
-        var status = menu?.findItem(R.id.menuPause)
+    private fun pauseEmulation(chip8Cycle: Chip8Cycle){
+        val status = menu?.findItem(R.id.menuPause)
         if(chip8Cycle.getRomStatus() && chip8Cycle.getIsRunning()){
             chip8Cycle.stopEmulation()
             status?.setTitle("Resume")
