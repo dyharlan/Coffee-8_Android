@@ -290,11 +290,11 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-    fun openLoadROMIntent(){
+    private fun openLoadROMIntent(){
         getContent.launch("*/*")
     }
 
-    fun showInitialSetupDialog(romArray: ArrayList<Int>){
+    private fun showInitialSetupDialog(romArray: ArrayList<Int>){
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
@@ -314,7 +314,7 @@ class MainActivity : AppCompatActivity() {
 
         btnStart.setOnClickListener {
             //retrieve value from the text box
-            var newCycles: Int
+            val newCycles: Int
             try{
                 newCycles = editText.text.toString().toInt()
             }catch(nfe: NumberFormatException){
@@ -483,6 +483,7 @@ class MainActivity : AppCompatActivity() {
             val XOCHIPradioButton = dialog.findViewById<RadioButton>(R.id.XOCHIPradioButton)
             XOCHIPradioButton.isEnabled = false
         }
+
 
     }
 
