@@ -9,6 +9,7 @@ import android.graphics.Rect
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.WindowManager
@@ -344,7 +345,7 @@ class Chip8Cycle(
                     }
                 }
             }
-            //chip8Canvas.postInvalidate()
+            chip8Surface.postInvalidate()
             updateSurface(chip8SurfaceHolder, bitmap)
             if(last == null){
                 last = LastFrame(super.graphics, this.hiRes, planeColors)
@@ -366,7 +367,6 @@ class Chip8Cycle(
 
             holder.unlockCanvasAndPost(canvas)
         }
-
     }
 
     fun getRomStatus(): Boolean {
