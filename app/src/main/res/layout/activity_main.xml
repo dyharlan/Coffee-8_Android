@@ -27,11 +27,6 @@
             android:theme="?attr/actionBarTheme"
             app:titleTextColor="#FFFFFF" />
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_weight="0" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -46,18 +41,6 @@
                 android:layout_weight="0" />
 
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0"
-            android:orientation="horizontal"/>
 
         <TableLayout
             android:id="@+id/keyPad"
