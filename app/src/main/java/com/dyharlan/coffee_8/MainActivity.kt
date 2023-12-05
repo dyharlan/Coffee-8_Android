@@ -67,7 +67,6 @@ class MainActivity : AppCompatActivity() {
         //sharedPreferences = getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
 
         setContentView(R.layout.activity_main)
-        Log.i("onCreate: MainActivity", "orientation: ${applicationContext.resources.getBoolean(R.bool.is_landscape)}")
 
         val chip8Surface = findViewById<Chip8SurfaceView>(R.id.chip8Surface)
         //setup toolbar?
