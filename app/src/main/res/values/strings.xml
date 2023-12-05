@@ -7,4 +7,22 @@
         <item>SuperChip 1.1</item>
         <item>XO-CHIP</item>
     </string-array>
+    <string-array name="chip8_keys">
+        <item>Key 0</item>
+        <item>Key 1</item>
+        <item>Key 2</item>
+        <item>Key 3</item>
+        <item>Key 4</item>
+        <item>Key 5</item>
+        <item>Key 6</item>
+        <item>Key 7</item>
+        <item>Key 8</item>
+        <item>Key 9</item>
+        <item>Key A</item>
+        <item>Key B</item>
+        <item>Key C</item>
+        <item>Key D</item>
+        <item>Key E</item>
+        <item>Key F</item>
+    </string-array>
 </resources>

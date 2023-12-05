@@ -24,4 +24,8 @@
         android:title="Change Machine Type"
         android:id="@+id/menuChange"
         app:showAsAction="never"/>
+    <item android:title="Change Key Binds"
+        android:id="@+id/menuKeyBind"
+        app:showAsAction="never"
+        />
 </menu>
