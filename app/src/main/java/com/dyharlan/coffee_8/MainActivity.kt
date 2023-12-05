@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -50,6 +51,24 @@ class MainActivity : AppCompatActivity() {
         Color.valueOf(0xFF55FF),
         Color.valueOf(0xFFFF55),
         Color.valueOf(0xFFFFFF)
+    )
+    private var physicalKeys: Array<Int> = arrayOf(
+        KeyEvent.KEYCODE_X,
+        KeyEvent.KEYCODE_1,
+        KeyEvent.KEYCODE_2,
+        KeyEvent.KEYCODE_3,
+        KeyEvent.KEYCODE_Q,
+        KeyEvent.KEYCODE_W,
+        KeyEvent.KEYCODE_E,
+        KeyEvent.KEYCODE_A,
+        KeyEvent.KEYCODE_S,
+        KeyEvent.KEYCODE_D,
+        KeyEvent.KEYCODE_Z,
+        KeyEvent.KEYCODE_C,
+        KeyEvent.KEYCODE_4,
+        KeyEvent.KEYCODE_R,
+        KeyEvent.KEYCODE_F,
+        KeyEvent.KEYCODE_V
     )
     private lateinit var chip8Cycle: Chip8Cycle
     private val sharedPrefFile = "prefFile"
@@ -151,6 +170,149 @@ class MainActivity : AppCompatActivity() {
         //Log.i("onCreate","density: "+applicationContext.getResources().getDisplayMetrics().density)
     }
 
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (event != null) {
+            if(event.repeatCount == 0){
+                when(keyCode){
+                    physicalKeys[0] -> {
+                        chip8Cycle.keyPress(0)
+                        return true
+                    }
+                    physicalKeys[1] -> {
+                        chip8Cycle.keyPress(1)
+                        return true
+                    }
+                    physicalKeys[2] -> {
+                        chip8Cycle.keyPress(2)
+                        return true
+                    }
+                    physicalKeys[3] -> {
+                        chip8Cycle.keyPress(3)
+                        return true
+                    }
+                    physicalKeys[4] -> {
+                        chip8Cycle.keyPress(4)
+                        return true
+                    }
+                    physicalKeys[5] -> {
+                        chip8Cycle.keyPress(5)
+                        return true
+                    }
+                    physicalKeys[6] -> {
+                        chip8Cycle.keyPress(6)
+                        return true
+                    }
+                    physicalKeys[7] -> {
+                        chip8Cycle.keyPress(7)
+                        return true
+                    }
+                    physicalKeys[8] -> {
+                        chip8Cycle.keyPress(8)
+                        return true
+                    }
+                    physicalKeys[9] -> {
+                        chip8Cycle.keyPress(9)
+                        return true
+                    }
+                    physicalKeys[10] -> {
+                        chip8Cycle.keyPress(10)
+                        return true
+                    }
+                    physicalKeys[11] -> {
+                        chip8Cycle.keyPress(11)
+                        return true
+                    }
+                    physicalKeys[12] -> {
+                        chip8Cycle.keyPress(12)
+                        return true
+                    }
+                    physicalKeys[13] -> {
+                        chip8Cycle.keyPress(13)
+                        return true
+                    }
+                    physicalKeys[14] -> {
+                        chip8Cycle.keyPress(14)
+                        return true
+                    }
+                    physicalKeys[15] -> {
+                        chip8Cycle.keyPress(15)
+                        return true
+                    }
+                    else -> return super.onKeyDown(keyCode, event)
+                }
+            }
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        when(keyCode){
+            physicalKeys[0] -> {
+                chip8Cycle.keyRelease(0)
+                return true
+            }
+            physicalKeys[1] -> {
+                chip8Cycle.keyRelease(1)
+                return true
+            }
+            physicalKeys[2] -> {
+                chip8Cycle.keyRelease(2)
+                return true
+            }
+            physicalKeys[3] -> {
+                chip8Cycle.keyRelease(3)
+                return true
+            }
+            physicalKeys[4] -> {
+                chip8Cycle.keyRelease(4)
+                return true
+            }
+            physicalKeys[5] -> {
+                chip8Cycle.keyRelease(5)
+                return true
+            }
+            physicalKeys[6] -> {
+                chip8Cycle.keyRelease(6)
+                return true
+            }
+            physicalKeys[7] -> {
+                chip8Cycle.keyRelease(7)
+                return true
+            }
+            physicalKeys[8] -> {
+                chip8Cycle.keyRelease(8)
+                return true
+            }
+            physicalKeys[9] -> {
+                chip8Cycle.keyRelease(9)
+                return true
+            }
+            physicalKeys[10] -> {
+                chip8Cycle.keyRelease(10)
+                return true
+            }
+            physicalKeys[11] -> {
+                chip8Cycle.keyRelease(11)
+                return true
+            }
+            physicalKeys[12] -> {
+                chip8Cycle.keyRelease(12)
+                return true
+            }
+            physicalKeys[13] -> {
+                chip8Cycle.keyRelease(13)
+                return true
+            }
+            physicalKeys[14] -> {
+                chip8Cycle.keyRelease(14)
+                return true
+            }
+            physicalKeys[15] -> {
+                chip8Cycle.keyRelease(15)
+                return true
+            }
+            else -> return super.onKeyUp(keyCode, event)
+        }
+    }
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activitybar, menu)
         this.menu = menu;
