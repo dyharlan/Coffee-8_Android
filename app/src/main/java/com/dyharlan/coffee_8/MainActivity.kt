@@ -37,7 +37,7 @@ import java.util.zip.CRC32
 class MainActivity : AppCompatActivity() {
     //global variables representing the color palette, backend cpu, shared preferences
     private var menu: Menu? = null
-    private lateinit var planeColors: Array<Color>
+    private var planeColors: Array<Color>
     private lateinit var chip8Cycle: Chip8Cycle
     private val sharedPrefFile = "prefFile"
     //private lateinit var sharedPreferences: SharedPreferences
