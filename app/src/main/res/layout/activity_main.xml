@@ -38,7 +38,7 @@
                 android:id="@+id/chip8Surface"
                 android:layout_width="match_parent"
                 android:layout_height="325dp"
-                android:layout_weight="0" />
+                 />
 
         </LinearLayout>
 
