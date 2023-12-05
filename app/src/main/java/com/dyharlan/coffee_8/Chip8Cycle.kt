@@ -95,8 +95,8 @@ class Chip8Cycle(
         //val callback: Chip8SurfaceCallBack = Chip8SurfaceCallBack()
         //chip8SurfaceHolder.addCallback(callback)
         var scalingFactor: Int = 2
-        var screenWidth = 0
-        var screenHeight = 0
+        val screenWidth: Int
+        val screenHeight: Int
 
         //automatically resize the SurfaceView with integer scaling
         if (Build.VERSION.SDK_INT < 30) {
@@ -121,14 +121,14 @@ class Chip8Cycle(
         val hiResViewWidth = HIRES_BITMAP_WIDTH * HIRES_SCALE_FACTOR
         val hiResViewHeight = HIRES_BITMAP_HEIGHT * HIRES_SCALE_FACTOR
 
-        chip8Surface.getViewTreeObserver().addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
+        chip8Surface.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                val width: Int = chip8Surface.getWidth()
-                val height: Int = chip8Surface.getHeight()
+                val width: Int = chip8Surface.width
+                val height: Int = chip8Surface.height
                 val centerOfCanvas = Point(width / 2, height / 2)
                 bitmapRect = Rect(centerOfCanvas.x - (hiResViewWidth/2), centerOfCanvas.y - (hiResViewHeight/2), centerOfCanvas.x + (hiResViewWidth/2), centerOfCanvas.y + (hiResViewHeight/2))
                 //you can add your code here on what you want to do to the height and width you can pass it as parameter or make width and height a global variable
-                chip8Surface.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+                chip8Surface.viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
         })
 
