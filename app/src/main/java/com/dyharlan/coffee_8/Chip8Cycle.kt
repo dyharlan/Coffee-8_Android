@@ -63,8 +63,10 @@ class Chip8Cycle(
     chip8Surface: Chip8SurfaceView,
 ) : Chip8SOC(true), Runnable {
     //height of the chip 8 screen
-    private val BITMAP_WIDTH = 128
-    private val BITMAP_HEIGHT = 64
+    private val HIRES_BITMAP_WIDTH = 128
+    private val HIRES_BITMAP_HEIGHT = 64
+    private val LORES_BITMAP_WIDTH = 64
+    private val LORES_BITMAP_HEIGHT = 32
     private var isRunning: Boolean = false      //is the machine running?
 
     private var romStatus: Boolean = false      //is there a rom loaded?
@@ -73,11 +75,11 @@ class Chip8Cycle(
     private var planeColors: Array<Color>       //color palette
     private var cpuCycleThread: Thread? = null  //separate thread for the cpu cycle
     private var last: LastFrame? = null         //last frame of th display
-    private var bitmap: Bitmap                  //bitmap object where the framebuffer contents will be applied
+    private var hiResBitmap: Bitmap                  //bitmap object where the framebuffer contents will be applied
+    private var lowResBitmap: Bitmap                  //bitmap object where the framebuffer contents will be applied
     private var chip8Surface: Chip8SurfaceView       //SurfaceView that will display the output
     private var chip8SurfaceHolder: SurfaceHolder
-    private lateinit var lowResRect: Rect
-    private lateinit var hiResRect: Rect
+    private lateinit var bitmapRect: Rect
     private var applicationContext: Context
     private var dbHandler: DatabaseHandler      //database handler for the DB that will store the contents of the RPL Flags from apps that will use it
     private var checksum: Long = 0
@@ -116,18 +118,17 @@ class Chip8Cycle(
         Log.i("init","new scaling factor $scalingFactor")
         val LOWRES_SCALE_FACTOR = scalingFactor
         val HIRES_SCALE_FACTOR = LOWRES_SCALE_FACTOR / 2
-        val hiResViewWidth = BITMAP_WIDTH * HIRES_SCALE_FACTOR
-        val hiResViewHeight = BITMAP_HEIGHT * HIRES_SCALE_FACTOR
-        val lowResViewWidth = BITMAP_WIDTH * LOWRES_SCALE_FACTOR
-        val lowResViewHeight = BITMAP_HEIGHT * LOWRES_SCALE_FACTOR
+        val hiResViewWidth = HIRES_BITMAP_WIDTH * HIRES_SCALE_FACTOR
+        val hiResViewHeight = HIRES_BITMAP_HEIGHT * HIRES_SCALE_FACTOR
+        val lowResViewWidth = HIRES_BITMAP_WIDTH * LOWRES_SCALE_FACTOR
+        val lowResViewHeight = HIRES_BITMAP_HEIGHT * LOWRES_SCALE_FACTOR
 
         chip8Surface.getViewTreeObserver().addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 val width: Int = chip8Surface.getWidth()
                 val height: Int = chip8Surface.getHeight()
                 val centerOfCanvas = Point(width / 2, height / 2)
-                lowResRect = Rect(centerOfCanvas.x - (hiResViewWidth/2), centerOfCanvas.y - (hiResViewHeight/2), lowResViewWidth, lowResViewHeight)
-                hiResRect = Rect(centerOfCanvas.x - (hiResViewWidth/2), centerOfCanvas.y - (hiResViewHeight/2), centerOfCanvas.x + (hiResViewWidth/2), centerOfCanvas.y + (hiResViewHeight/2))
+                bitmapRect = Rect(centerOfCanvas.x - (hiResViewWidth/2), centerOfCanvas.y - (hiResViewHeight/2), centerOfCanvas.x + (hiResViewWidth/2), centerOfCanvas.y + (hiResViewHeight/2))
                 //you can add your code here on what you want to do to the height and width you can pass it as parameter or make width and height a global variable
                 chip8Surface.getViewTreeObserver().removeOnGlobalLayoutListener(this)
             }
@@ -138,8 +139,8 @@ class Chip8Cycle(
 //        layoutParams.height = hiResViewHeight
 
 
-        bitmap = Bitmap.createBitmap(BITMAP_WIDTH, BITMAP_HEIGHT, Bitmap.Config.RGB_565) //Instantiate bitmap
-
+        hiResBitmap = Bitmap.createBitmap(HIRES_BITMAP_WIDTH, HIRES_BITMAP_HEIGHT, Bitmap.Config.RGB_565) //Instantiate bitmap
+        lowResBitmap = Bitmap.createBitmap(LORES_BITMAP_WIDTH, LORES_BITMAP_HEIGHT, Bitmap.Config.RGB_565) //Instantiate bitmap
         dbHandler = DatabaseHandler(applicationContext) //instantiate db handler
     }
 
@@ -257,7 +258,7 @@ class Chip8Cycle(
     }
 
     fun getBitmap(): Bitmap {
-        return bitmap
+        return hiResBitmap
     }
 
     override fun run() {
@@ -323,6 +324,8 @@ class Chip8Cycle(
                 //clear last frame if we've switched from hi res to lowres or vice versa. Also clear it if the color palette has changed
                 if (last?.hires != super.getHiRes() || nullifyLastFrame || !arrayEqual(last?.prevColors, planeColors)){
                     last = null;
+                    hiResBitmap.eraseColor(0x000000)
+                    lowResBitmap.eraseColor(0x000000)
                     if(nullifyLastFrame){
                         nullifyLastFrame = false
                     }
@@ -346,18 +349,26 @@ class Chip8Cycle(
                             val oldPlane =
                                 (lastPixels[3][x + y * this.machineWidth] shl 3) or (lastPixels[2][x + y * this.machineWidth] shl 2) or (lastPixels[1][x + y * this.machineWidth] shl 1) or lastPixels[0][x + y * this.machineWidth] and 0xF
                             if (oldPlane != newPlane) {
-                                bitmap.setPixel(x, y, planeColors[newPlane].toArgb())
-
+                                when(hiRes){
+                                    true -> hiResBitmap.setPixel(x, y, planeColors[newPlane].toArgb())
+                                    false -> lowResBitmap.setPixel(x, y, planeColors[newPlane].toArgb())
+                                }
                             }
                         } else {
                             //full rewrite of the screen
-                            bitmap.setPixel(x, y, planeColors[newPlane].toArgb())
+                            when(hiRes){
+                                true -> hiResBitmap.setPixel(x, y, planeColors[newPlane].toArgb())
+                                false -> lowResBitmap.setPixel(x, y, planeColors[newPlane].toArgb())
+                            }
                         }
                     }
                 }
             }
             chip8Surface.postInvalidate()
-            updateSurface(chip8SurfaceHolder, bitmap)
+            when(hiRes){
+                true-> updateSurface(chip8SurfaceHolder, hiResBitmap, bitmapRect)
+                false-> updateSurface(chip8SurfaceHolder, lowResBitmap, bitmapRect)
+            }
             if(last == null){
                 last = LastFrame(super.graphics, this.hiRes, planeColors)
             }
@@ -367,15 +378,10 @@ class Chip8Cycle(
         }
     }
 
-    private fun updateSurface(holder: SurfaceHolder, bitmap: Bitmap) {
+    private fun updateSurface(holder: SurfaceHolder, bitmap: Bitmap, rect:Rect) {
         if (holder.surface.isValid) {
             val canvas: Canvas = holder.lockHardwareCanvas()
-            if (this.hiRes) {
-                canvas.drawBitmap(bitmap, null, hiResRect, null)
-            } else if (!this.hiRes) {
-                canvas.drawBitmap(bitmap, null, lowResRect, null)
-            }
-
+            canvas.drawBitmap(bitmap, null, rect, null)
             holder.unlockCanvasAndPost(canvas)
         }
     }
