@@ -47,14 +47,12 @@ import java.util.zip.CRC32;
 
 @FunctionalInterface
 interface Instruction {
-
     public void execute();
 }
 public abstract class Chip8SOC{
     private int DISPLAY_WIDTH;
     private int DISPLAY_HEIGHT;
     private boolean cpuHalted;
-
     private String causeOfHalt;
     //protected long crc32Checksum;
     private Boolean vfOrderQuirks;
@@ -629,7 +627,7 @@ public abstract class Chip8SOC{
     //00CN: Scroll display N pixels down; in low resolution mode, N/2 pixels
     private void C8INST_00CN(){
         //System.out.println("scroll down");
-        int height = opcode & 0xF;
+        final int height = opcode & 0xF;
         for (int currBitPlane = 0; currBitPlane < 4; currBitPlane++) {
             if ((plane & (1 << currBitPlane)) == 0) {
                 continue;
@@ -642,7 +640,7 @@ public abstract class Chip8SOC{
     //00CN: Scroll display N pixels up; in low resolution mode, N/2 pixels
     private void C8INST_00DN(){
         //System.out.println("scroll up");
-        int height = opcode & 0xF;
+        final int height = opcode & 0xF;
         int bufSize = DISPLAY_WIDTH * DISPLAY_HEIGHT;
         for (int currBitPlane = 0; currBitPlane < 4; currBitPlane++) {
             if ((plane & (1 << currBitPlane)) == 0) {
