@@ -8,8 +8,10 @@ import android.database.sqlite.SQLiteException
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -31,29 +33,30 @@ import com.google.android.material.appbar.MaterialToolbar
 import java.io.BufferedInputStream
 import java.io.DataInputStream
 import java.io.IOException
+import java.lang.reflect.InvocationTargetException
 import java.util.zip.CRC32
 
 
 class MainActivity : AppCompatActivity() {
     //global variables representing the color palette, backend cpu, shared preferences
     private var menu: Menu? = null
-    private var planeColors: Array<Color> = arrayOf(
-        Color.valueOf(0x000000),
-        Color.valueOf(0xAA0000),
-        Color.valueOf(0x00AA00),
-        Color.valueOf(0x0000AA),
-        Color.valueOf(0x00AAAA),
-        Color.valueOf(0xAA00AA),
-        Color.valueOf(0xAA5500),
-        Color.valueOf(0xAAAAAA),
-        Color.valueOf(0x555555),
-        Color.valueOf(0xFF5555), //LR
-        Color.valueOf(0x55FF55), //LG
-        Color.valueOf(0x5555FF), //LB
-        Color.valueOf(0x55FFFF), //LC
-        Color.valueOf(0xFF55FF),
-        Color.valueOf(0xFFFF55),
-        Color.valueOf(0xFFFFFF)
+    private var planeColors: IntArray = intArrayOf(
+        0x000000,
+        0xAA0000,
+        0x00AA00,
+        0x0000AA,
+        0x00AAAA,
+        0xAA00AA,
+        0xAA5500,
+        0xAAAAAA,
+        0x555555,
+        0xFF5555, //LR
+        0x55FF55, //LG
+        0x5555FF, //LB
+        0x55FFFF, //LC
+        0xFF55FF,
+        0xFFFF55,
+        0xFFFFFF
     )
     private var physicalKeys: IntArray = intArrayOf(
         KeyEvent.KEYCODE_X,
@@ -172,10 +175,29 @@ class MainActivity : AppCompatActivity() {
         }
         //Log.i("onCreate","density: "+applicationContext.getResources().getDisplayMetrics().density)
     }
-
+    companion object {
+        fun isExternal(inputDevice: InputDevice): Boolean {
+            if(Build.VERSION.SDK_INT >= 29){
+                return inputDevice.isExternal
+            }
+            return try {
+                val m = InputDevice::class.java.getMethod("isExternal")
+                m.invoke(inputDevice) as Boolean
+            } catch (e: NoSuchMethodException) {
+                e.printStackTrace()
+                false
+            } catch (e: IllegalAccessException) {
+                e.printStackTrace()
+                false
+            } catch (e: InvocationTargetException) {
+                e.printStackTrace()
+                false
+            }
+        }
+    }
     override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
         if (event != null) {
-            if(event.action == KeyEvent.ACTION_DOWN){
+            if(event.action == KeyEvent.ACTION_DOWN && isExternal(event.device)){
                 if(event.repeatCount == 0){
                     when(event.keyCode){
                         physicalKeys[0] -> {
@@ -247,7 +269,7 @@ class MainActivity : AppCompatActivity() {
                 }else{
                     return true
                 }
-            }else if(event.action == KeyEvent.ACTION_UP){
+            }else if(event.action == KeyEvent.ACTION_UP && isExternal(event.device)){
                 when(event.keyCode){
                     physicalKeys[0] -> {
                         chip8Cycle.keyRelease(0)
@@ -313,11 +335,10 @@ class MainActivity : AppCompatActivity() {
                         chip8Cycle.keyRelease(15)
                         return true
                     }
-                    else -> return true
                 }
             }
         }
-        return true
+        return super.dispatchKeyEvent(event)
     }
 //    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
 //        if (event != null) {
