@@ -21,10 +21,7 @@ class KeyControllerActivity : AppCompatActivity() {
         this.onBackPressedDispatcher.addCallback(this) {
             val i = Intent(applicationContext, MainActivity::class.java)
             i.putExtra("bindableKeys",bindableKeys)
-            setResult(
-                RESULT_OK,
-                i
-            )
+            setResult(RESULT_OK, i)
             finish()
         }
 
