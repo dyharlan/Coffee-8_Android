@@ -40,21 +40,20 @@ class BindableKeyListAdapter(private val context: Context, private val keys: Arr
         // Create a new view, which defines the UI of the list item
         val view = LayoutInflater.from(viewGroup.context)
             .inflate(R.layout.bindable_key_item, viewGroup, false)
-
         return ViewHolder(view)
     }
     // Replace the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        viewHolder.chip8Key.text = keys[position]
-        viewHolder.boundTo.text = currentKeyBindings?.get(position)?.toString()
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
+        viewHolder.chip8Key.text = keys[position]
+        viewHolder.boundTo.text = currentKeyBindings?.get(position)?.toString()
+
         viewHolder.aKey.setOnClickListener {
             val dialog = object: Dialog(context) {
                 override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
                     var isKeyInUse:Boolean = false
-
-                    if(currentKeyBindings!= null){
+                    if(currentKeyBindings!= null && MainActivity.isExternal(event.device)){
                         var indexOfKey = 0
                         for(i in currentKeyBindings.indices){
                             if(currentKeyBindings[i] == keyCode){
@@ -73,7 +72,7 @@ class BindableKeyListAdapter(private val context: Context, private val keys: Arr
                     }
 
 
-                    return true
+                    return isKeyInUse
                 }
             }
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)

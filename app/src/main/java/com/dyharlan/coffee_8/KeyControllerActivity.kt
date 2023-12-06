@@ -24,7 +24,6 @@ class KeyControllerActivity : AppCompatActivity() {
             setResult(RESULT_OK, i)
             finish()
         }
-
     }
 
 }
