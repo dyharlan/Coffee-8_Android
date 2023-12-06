@@ -1,19 +1,15 @@
 package com.dyharlan.coffee_8
 
-import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -43,7 +39,7 @@ class BindableKeyListAdapter(private val context: Context, private val keys: Arr
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
         // Create a new view, which defines the UI of the list item
         val view = LayoutInflater.from(viewGroup.context)
-            .inflate(R.layout.bindable_key, viewGroup, false)
+            .inflate(R.layout.bindable_key_item, viewGroup, false)
 
         return ViewHolder(view)
     }
