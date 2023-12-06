@@ -242,8 +242,10 @@ class MainActivity : AppCompatActivity() {
                             chip8Cycle.keyPress(15)
                             return true
                         }
-                        else -> return super.dispatchKeyEvent(event)
+                        else -> return true
                     }
+                }else{
+                    return true
                 }
             }else if(event.action == KeyEvent.ACTION_UP){
                 when(event.keyCode){
@@ -311,11 +313,11 @@ class MainActivity : AppCompatActivity() {
                         chip8Cycle.keyRelease(15)
                         return true
                     }
-                    else -> return super.dispatchKeyEvent(event)
+                    else -> return true
                 }
             }
         }
-        return super.dispatchKeyEvent(event)
+        return true
     }
 //    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
 //        if (event != null) {
@@ -479,7 +481,7 @@ class MainActivity : AppCompatActivity() {
             val newKeys = data?.getIntArrayExtra("bindableKeys")
 
             if (newKeys != null) {
-                for((index, x) in newKeys.withIndex()){
+                for((index) in newKeys.withIndex()){
                     physicalKeys[index] = newKeys[index]
                 }
             }
