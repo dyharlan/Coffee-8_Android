@@ -26,16 +26,13 @@ package com.dyharlan.coffee_8.Backend;
  *
  * @author dyharlan
  */
-import android.os.Environment;
 
-import java.nio.file.Files;
 import java.util.*;
 import java.io.*;
-import java.util.zip.CRC32;
 
 
 
- /*
+/*
     * An interface that represents an instruction to execute. Lambda statements are used, but when unrolled,
     * they look like this:
     * public void execute(){
@@ -312,7 +309,6 @@ public abstract class Chip8SOC{
             pattern[i] = defaultPattern[i];
         }
 
-        hires = false;
         if(v == null){
             v = new int[16];
         }else{
@@ -455,22 +451,24 @@ public abstract class Chip8SOC{
     }
     
     public void setHiRes(Boolean flag){
-        if(flag){
+        if(flag == true){
             hires = true;
             DISPLAY_WIDTH = 128;
             DISPLAY_HEIGHT = 64;
             //graphics = new int[2][DISPLAY_WIDTH*DISPLAY_HEIGHT];
-        }else if(!flag){
+        }else if(flag == false){
             hires = false;
             DISPLAY_WIDTH = 64;
             DISPLAY_HEIGHT = 32;
             //graphics = new int[2][DISPLAY_WIDTH*DISPLAY_HEIGHT];
         }
-        for (int x = 0; x < graphics.length; x++) {
-                for (int y = 0; y < graphics[x].length; y++) {
-                    graphics[x][y] = 0;
-                }
-        }
+       if(graphics!= null){
+           for (int x = 0; x < graphics.length; x++) {
+               for (int y = 0; y < graphics[x].length; y++) {
+                   graphics[x][y] = 0;
+               }
+           }
+       }
     }    
     
     /*
@@ -1028,13 +1026,11 @@ public abstract class Chip8SOC{
              C8INST_UNKNOWN();
          }else{
              _0xFInstructions[inst].execute();
-
          }
     }
     //F000 NNNN Load the index register I with a 16-bit address
     private void C8INST_F000_NNNN(){
-        int NNNN = (mem[pc] << 8 | mem[pc+1]);
-        I = NNNN;
+        I = (mem[pc] << 8 | mem[pc+1]);
         pc+=2;
     }
     //Set the current plane to draw, where 0 <= X <= F
@@ -1159,6 +1155,11 @@ public abstract class Chip8SOC{
     //in successive memory locations
     private void C8INST_FX55(){
         for (int i = 0; i <= X; i++) {
+            if(I+i > mem.length){
+                cpuHalted = true;
+                setCauseOfHalt("Program tried to access a memory location that is out of bounds!");
+                return;
+            }
             mem[I + i] = (v[i] & 0xFF);
         }
         if (!loadStoreQuirks) {
@@ -1169,6 +1170,11 @@ public abstract class Chip8SOC{
     //in i registers from v0 to vi
     private void C8INST_FX65(){
         for (int i = 0; i <= X; i++) {
+            if(I+i > mem.length){
+                cpuHalted = true;
+                setCauseOfHalt("Program tried to access a memory location that is out of bounds!");
+                return;
+            }
             v[i] = (mem[I + i] & 0xFF);
         }
         if (!loadStoreQuirks) {
@@ -1200,6 +1206,7 @@ public abstract class Chip8SOC{
     public boolean isCpuHalted() {
         return cpuHalted;
     }
+    public void setCpuHalted(boolean bool){cpuHalted = bool;}
     public int getSoundTimer(){
         return sT;
     }
