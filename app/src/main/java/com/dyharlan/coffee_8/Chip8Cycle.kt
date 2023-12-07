@@ -3,6 +3,7 @@ package com.dyharlan.coffee_8
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Point
 import android.graphics.Rect
 import android.os.Build
@@ -25,10 +26,10 @@ import com.dyharlan.coffee_8.Backend.MachineType
 * prevColors: the colors in the previous frame
 * Original implementation from: https://github.com/JohnEarnest/Octo/
 */
-internal class LastFrame(arr2D: Array<IntArray>, hires: Boolean, colorArr: IntArray) {
+internal class LastFrame(arr2D: Array<IntArray>, hires: Boolean, colorArr: Array<Color>) {
     var prevFrame: Array<IntArray>
     var hires: Boolean
-    var prevColors: IntArray
+    var prevColors: Array<Color>
 
     //constructor
     init {
@@ -39,11 +40,11 @@ internal class LastFrame(arr2D: Array<IntArray>, hires: Boolean, colorArr: IntAr
             arr2D[3].clone()
         )
         this.hires = hires
-        prevColors = IntArray(16) { 0xFFFFFF }
+        prevColors = Array(16) { Color.valueOf(0xFFFFFF) }
         System.arraycopy(colorArr, 0, prevColors, 0, prevColors.size)
     }
 
-    fun update(arr2D: Array<IntArray>, hires: Boolean, colorArr: IntArray){
+    fun update(arr2D: Array<IntArray>, hires: Boolean, colorArr: Array<Color>){
         System.arraycopy(arr2D[0], 0, prevFrame[0], 0, arr2D[0].size)
         System.arraycopy(arr2D[1], 0, prevFrame[1], 0, arr2D[1].size)
         System.arraycopy(arr2D[2], 0, prevFrame[2], 0, arr2D[2].size)
@@ -58,7 +59,7 @@ internal class LastFrame(arr2D: Array<IntArray>, hires: Boolean, colorArr: IntAr
 class Chip8Cycle(
 
     applicationContext: Context,
-    planeColors: IntArray,
+    planeColors: Array<Color>,
     chip8Surface: Chip8SurfaceView,
 ) : Chip8SOC(true), Runnable {
     //height of the chip 8 screen
@@ -71,7 +72,7 @@ class Chip8Cycle(
     private var romStatus: Boolean = false      //is there a rom loaded?
 
     private var nullifyLastFrame: Boolean = false
-    private var planeColors: IntArray       //color palette
+    private var planeColors: Array<Color>       //color palette
     private var cpuCycleThread: Thread? = null  //separate thread for the cpu cycle
     private var last: LastFrame? = null         //last frame of th display
     private var hiResBitmap: Bitmap                  //bitmap object where the framebuffer contents will be applied
@@ -83,8 +84,6 @@ class Chip8Cycle(
     private var dbHandler: DatabaseHandler      //database handler for the DB that will store the contents of the RPL Flags from apps that will use it
     private var checksum: Long = 0
     private var romArray: ArrayList<Int> = ArrayList<Int>()
-    var lowResPixels: IntArray = IntArray(64*32){0}
-    var hiResPixels: IntArray = IntArray(128*64){0}
 
     //primary constructor
     init {
@@ -237,18 +236,18 @@ class Chip8Cycle(
         return true
     }
 
-//    private fun arrayEqual(a: Array<Color>?, b: Array<Color>): Boolean {
-//        val length = a?.size
-//        if (length != b.size) {
-//            return false
-//        }
-//        for (i in 0 until length) {
-//            if (a[i] !== b[i]) {
-//                return false
-//            }
-//        }
-//        return true
-//    }
+    private fun arrayEqual(a: Array<Color>?, b: Array<Color>): Boolean {
+        val length = a?.size
+        if (length != b.size) {
+            return false
+        }
+        for (i in 0 until length) {
+            if (a[i] !== b[i]) {
+                return false
+            }
+        }
+        return true
+    }
 
     fun stopEmulation() {
         isRunning = false
@@ -346,24 +345,24 @@ class Chip8Cycle(
                                 (lastPixels[3][x + y * this.machineWidth] shl 3) or (lastPixels[2][x + y * this.machineWidth] shl 2) or (lastPixels[1][x + y * this.machineWidth] shl 1) or lastPixels[0][x + y * this.machineWidth] and 0xF
                             if (oldPlane != newPlane) {
                                 when(hiRes){
-                                    true -> hiResPixels[x + y * this.machineWidth] = planeColors[newPlane]
-                                    false -> lowResPixels[x + y * this.machineWidth] = planeColors[newPlane]
+                                    true -> hiResBitmap.setPixel(x, y, planeColors[newPlane].toArgb())
+                                    false -> lowResBitmap.setPixel(x, y, planeColors[newPlane].toArgb())
                                 }
-                            }
+                        }
                         } else {
                             //full rewrite of the screen
                             when(hiRes){
-                                true -> hiResPixels[x + y * this.machineWidth] = planeColors[newPlane]
-                                false -> lowResPixels[x + y * this.machineWidth] = planeColors[newPlane]
+                                true -> hiResBitmap.setPixel(x, y, planeColors[newPlane].toArgb())
+                                false -> lowResBitmap.setPixel(x, y, planeColors[newPlane].toArgb())
                             }
                         }
                     }
                 }
             }
-            //chip8Surface.postInvalidate()
+            chip8Surface.postInvalidate()
             when(hiRes){
-                true-> updateSurface(chip8SurfaceHolder, hiResBitmap,hiResPixels, HIRES_BITMAP_WIDTH,HIRES_BITMAP_HEIGHT, bitmapRect)
-                false-> updateSurface(chip8SurfaceHolder, lowResBitmap,lowResPixels,LORES_BITMAP_WIDTH,LORES_BITMAP_HEIGHT, bitmapRect)
+                true-> updateSurface(chip8SurfaceHolder, hiResBitmap, bitmapRect)
+                false-> updateSurface(chip8SurfaceHolder, lowResBitmap, bitmapRect)
             }
             if(last == null){
                 last = LastFrame(super.graphics, this.hiRes, planeColors)
@@ -374,12 +373,10 @@ class Chip8Cycle(
         }
     }
 
-    private fun updateSurface(holder: SurfaceHolder, bitmap: Bitmap, pixelArray: IntArray, width:Int, height:Int, rect:Rect) {
+    private fun updateSurface(holder: SurfaceHolder, bitmap: Bitmap, rect:Rect) {
         if (holder.surface.isValid) {
             val canvas: Canvas = holder.lockHardwareCanvas()
-            bitmap.setPixels(pixelArray,0,bitmap.width, 0,0,width,height)
             canvas.drawBitmap(bitmap, null, rect, null)
-            //canvas.drawBitmap(bitmap,0f,0f,null)
             holder.unlockCanvasAndPost(canvas)
         }
     }
