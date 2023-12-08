@@ -496,6 +496,7 @@ class MainActivity : AppCompatActivity() {
     val keyBinder = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
+
         Log.i("here", "${result.resultCode}")
         if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
@@ -614,8 +615,6 @@ class MainActivity : AppCompatActivity() {
         if(romArray.size > 65024L){
             val XOCHIPradioButton = dialog.findViewById<RadioButton>(R.id.XOCHIPradioButton)
             XOCHIPradioButton.isEnabled = false
-            val XOCHIPCompatRadioButton = dialog.findViewById<RadioButton>(R.id.XOCHIPCompatRadioButton)
-            XOCHIPCompatRadioButton.isEnabled = false
         }
     }
     private fun showMachineTypeSelectorDialog(chip8Cycle: Chip8Cycle){
@@ -718,8 +717,6 @@ class MainActivity : AppCompatActivity() {
         if(romSize > 65024L){
             val XOCHIPradioButton = dialog.findViewById<RadioButton>(R.id.XOCHIPradioButton)
             XOCHIPradioButton.isEnabled = false
-            val XOCHIPCompatRadioButton = dialog.findViewById<RadioButton>(R.id.XOCHIPCompatRadioButton)
-            XOCHIPCompatRadioButton.isEnabled = false
         }
 
 
