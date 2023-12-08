@@ -12,7 +12,7 @@ import com.dyharlan.coffee_8.Backend.MachineType
 
 class DatabaseHandler(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     companion object{
-        private val DATABASE_VERSION = 5
+        private val DATABASE_VERSION = 6
         private val DATABASE_NAME = "data.db"
         private val TABLE_FLAGS = "rpl_flags"
         private val KEY_ID = "crc32Checksum"
@@ -74,13 +74,13 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context, DATABASE_NAME
         contentValues.put(KEY_MACHINENAME, MachineType.SUPERCHIP_1_1.machineName)
         db?.insert(TABLE_MACHINE_TYPES, null, contentValues)
 
-        contentValues.clear()
-        contentValues.put(KEY_MACHINECODE, 2)
-        contentValues.put(KEY_MACHINENAME, MachineType.SUPERCHIP_1_1_COMPAT.machineName)
-        db?.insert(TABLE_MACHINE_TYPES, null, contentValues)
+//        contentValues.clear()
+//        contentValues.put(KEY_MACHINECODE, 2)
+//        contentValues.put(KEY_MACHINENAME, MachineType.SUPERCHIP_1_1_COMPAT.machineName)
+//        db?.insert(TABLE_MACHINE_TYPES, null, contentValues)
 
         contentValues.clear()
-        contentValues.put(KEY_MACHINECODE, 3)
+        contentValues.put(KEY_MACHINECODE, 2)
         contentValues.put(KEY_MACHINENAME, MachineType.XO_CHIP.machineName)
         db?.insert(TABLE_MACHINE_TYPES, null, contentValues)
 
@@ -116,9 +116,9 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context, DATABASE_NAME
         when(config.machineType){
             MachineType.COSMAC_VIP -> contentValues.put(KEY_MACHINECODE, 0)
             MachineType.SUPERCHIP_1_1 -> contentValues.put(KEY_MACHINECODE, 1)
-            MachineType.SUPERCHIP_1_1_COMPAT -> contentValues.put(KEY_MACHINECODE, 2)
-            MachineType.XO_CHIP -> contentValues.put(KEY_MACHINECODE, 3)
-            else -> contentValues.put(KEY_MACHINECODE, 3)
+            //MachineType.SUPERCHIP_1_1_COMPAT -> contentValues.put(KEY_MACHINECODE, 2)
+            MachineType.XO_CHIP -> contentValues.put(KEY_MACHINECODE, 2)
+            else -> contentValues.put(KEY_MACHINECODE, 2)
         }
 
         contentValues.put(KEY_CYCLES, config.cycles)
@@ -151,8 +151,8 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context, DATABASE_NAME
             val machineType:MachineType = when(cursor.getInt(cursor.getColumnIndex(KEY_MACHINECODE))){
                 0 -> MachineType.COSMAC_VIP
                 1 -> MachineType.SUPERCHIP_1_1
-                2 -> MachineType.SUPERCHIP_1_1_COMPAT
-                3 -> MachineType.XO_CHIP
+                //2 -> MachineType.SUPERCHIP_1_1_COMPAT
+                2 -> MachineType.XO_CHIP
                 else -> MachineType.XO_CHIP
             }
             val cycles = cursor.getInt(cursor.getColumnIndex(KEY_CYCLES))

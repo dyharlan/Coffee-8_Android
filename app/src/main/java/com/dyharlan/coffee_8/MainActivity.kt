@@ -557,13 +557,15 @@ class MainActivity : AppCompatActivity() {
                 }else{
                     newMachine = MachineType.XO_CHIP
                 }
-            }else if(selectedId == R.id.SCHIPCompatRadioButton){
-                if(!chip8Cycle.checkROMSize(romArray.size, MachineType.SUPERCHIP_1_1)){
-                    Toast.makeText(applicationContext,"Rom is too large for ${MachineType.SUPERCHIP_1_1_COMPAT.machineName}!",Toast.LENGTH_LONG).show()
-                }else{
-                    newMachine = MachineType.SUPERCHIP_1_1_COMPAT
-                }
-            }else if(selectedId == -1){
+            }
+//            else if(selectedId == R.id.SCHIPCompatRadioButton){
+//                if(!chip8Cycle.checkROMSize(romArray.size, MachineType.SUPERCHIP_1_1)){
+//                    Toast.makeText(applicationContext,"Rom is too large for ${MachineType.SUPERCHIP_1_1_COMPAT.machineName}!",Toast.LENGTH_LONG).show()
+//                }else{
+//                    newMachine = MachineType.SUPERCHIP_1_1_COMPAT
+//                }
+//            }
+            else if(selectedId == -1){
                 newMachine = null
             }
             if(newCycles >= 0 && newMachine != null){
@@ -609,8 +611,8 @@ class MainActivity : AppCompatActivity() {
         if(romArray.size > 3583L){
             val SCHIPradioButton = dialog.findViewById<RadioButton>(R.id.SCHIPradioButton)
             SCHIPradioButton.isEnabled = false
-            val SCHIPCompatRadioButton = dialog.findViewById<RadioButton>(R.id.SCHIPCompatRadioButton)
-            SCHIPCompatRadioButton.isEnabled = false
+//            val SCHIPCompatRadioButton = dialog.findViewById<RadioButton>(R.id.SCHIPCompatRadioButton)
+//            SCHIPCompatRadioButton.isEnabled = false
         }
         if(romArray.size > 65024L){
             val XOCHIPradioButton = dialog.findViewById<RadioButton>(R.id.XOCHIPradioButton)
@@ -656,13 +658,14 @@ class MainActivity : AppCompatActivity() {
                 }else{
                     newMachine = MachineType.XO_CHIP
                 }
-            }else if(selectedId == R.id.SCHIPCompatRadioButton){
-                if(!chip8Cycle.checkROMSize(chip8Cycle.getRomSize(), MachineType.SUPERCHIP_1_1)){
-                    Toast.makeText(applicationContext,"Rom is too large for ${MachineType.SUPERCHIP_1_1_COMPAT.machineName}!",Toast.LENGTH_LONG).show()
-                }else{
-                    newMachine = MachineType.SUPERCHIP_1_1_COMPAT
-                }
             }
+//            else if(selectedId == R.id.SCHIPCompatRadioButton){
+//                if(!chip8Cycle.checkROMSize(chip8Cycle.getRomSize(), MachineType.SUPERCHIP_1_1)){
+//                    Toast.makeText(applicationContext,"Rom is too large for ${MachineType.SUPERCHIP_1_1_COMPAT.machineName}!",Toast.LENGTH_LONG).show()
+//                }else{
+//                    newMachine = MachineType.SUPERCHIP_1_1_COMPAT
+//                }
+//            }
             Log.i("showMachineTypeSelectorDialog","is new machine null? ${newMachine == null}")
             if(newMachine != null && (chip8Cycle.currentMachine == newMachine)){
                 Toast.makeText(this, "Machine: ${chip8Cycle.currentMachine.machineName}", Toast.LENGTH_SHORT).show()
@@ -698,10 +701,11 @@ class MainActivity : AppCompatActivity() {
         }else if(chip8Cycle.currentMachine == MachineType.XO_CHIP){
             val btn = dialog.findViewById<RadioButton>(R.id.XOCHIPradioButton)
             btn.isChecked = true
-        }else if(chip8Cycle.currentMachine == MachineType.SUPERCHIP_1_1_COMPAT){
-            val btn = dialog.findViewById<RadioButton>(R.id.SCHIPCompatRadioButton)
-            btn.isChecked = true
         }
+//        else if(chip8Cycle.currentMachine == MachineType.SUPERCHIP_1_1_COMPAT){
+//            val btn = dialog.findViewById<RadioButton>(R.id.SCHIPCompatRadioButton)
+//            btn.isChecked = true
+//        }
         val romSize = chip8Cycle.getRomSize()
 
         if(romSize > 3232L){
@@ -711,8 +715,8 @@ class MainActivity : AppCompatActivity() {
         if(romSize > 3583L){
             val SCHIPradioButton = dialog.findViewById<RadioButton>(R.id.SCHIPradioButton)
             SCHIPradioButton.isEnabled = false
-            val SCHIPCompatRadioButton = dialog.findViewById<RadioButton>(R.id.SCHIPCompatRadioButton)
-            SCHIPCompatRadioButton.isEnabled = false
+//            val SCHIPCompatRadioButton = dialog.findViewById<RadioButton>(R.id.SCHIPCompatRadioButton)
+//            SCHIPCompatRadioButton.isEnabled = false
         }
         if(romSize > 65024L){
             val XOCHIPradioButton = dialog.findViewById<RadioButton>(R.id.XOCHIPradioButton)
