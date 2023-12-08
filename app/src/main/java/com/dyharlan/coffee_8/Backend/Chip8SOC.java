@@ -60,6 +60,7 @@ public abstract class Chip8SOC{
     private Boolean vBlankQuirks;
     private Boolean IOverflowQuirks;
     private Boolean jumpQuirks;
+    protected Boolean update;
     private int waitReg; //which v register should we store the keypress?
     private Boolean waitState; //is the CPU interrupted? It must be waiting for an input.
     private int cycles; //cpu cycles every 16.66667ms
@@ -300,6 +301,7 @@ public abstract class Chip8SOC{
         if(!causeOfHalt.trim().equals("")){
             causeOfHalt = "";
         }
+        update = false;
         cpuHalted = false;
         pitch = 64;
         if(pattern == null){
@@ -658,6 +660,7 @@ public abstract class Chip8SOC{
                 }
             }
         }
+        update = true;
     }
     //00DN: Scroll display N pixels up
     private void C8INST_00DN(){
@@ -679,6 +682,7 @@ public abstract class Chip8SOC{
                 graphics[currBitPlane][z] = (z < (bufSize - DISPLAY_WIDTH * height)) ? graphics[currBitPlane][z + (DISPLAY_WIDTH * height)] : 0;
             }
         }
+        update = true;
     }
     //00E0: Clear Screen
     private void C8INST_00E0(){
@@ -734,6 +738,7 @@ public abstract class Chip8SOC{
                 }
             }
         }
+        update = true;
     }
     //00FC: Scroll left by 4 pixels; in low resolution mode, 2 pixels
     private void C8INST_00FC() {
@@ -767,7 +772,7 @@ public abstract class Chip8SOC{
                 }
             }
         }
-       
+        update = true;
     }
     //00FD: Exit interpreter
     private void C8INST_00FD(){
@@ -1066,8 +1071,7 @@ public abstract class Chip8SOC{
                 i += n;
              }
          }
-
-
+        update = true;
     }
     //Execute instructions that start with 0xE as their prefix
     private void C8INSTSET_E000(){

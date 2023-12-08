@@ -26,34 +26,6 @@ import com.dyharlan.coffee_8.Backend.MachineType
 * prevColors: the colors in the previous frame
 * Original implementation from: https://github.com/JohnEarnest/Octo/
 */
-internal class LastFrame(arr2D: Array<IntArray>, hires: Boolean, colorArr: IntArray) {
-    var prevFrame: Array<IntArray>
-    var hires: Boolean
-    var prevColors: IntArray
-
-    //constructor
-    init {
-        prevFrame = arrayOf(
-            arr2D[0].clone(),
-            arr2D[1].clone(),
-            arr2D[2].clone(),
-            arr2D[3].clone()
-        )
-        this.hires = hires
-        prevColors = IntArray(16) { 0xFFFFFF }
-        System.arraycopy(colorArr, 0, prevColors, 0, prevColors.size)
-    }
-
-    fun update(arr2D: Array<IntArray>, hires: Boolean, colorArr: IntArray){
-        System.arraycopy(arr2D[0], 0, prevFrame[0], 0, arr2D[0].size)
-        System.arraycopy(arr2D[1], 0, prevFrame[1], 0, arr2D[1].size)
-        System.arraycopy(arr2D[2], 0, prevFrame[2], 0, arr2D[2].size)
-        System.arraycopy(arr2D[3], 0, prevFrame[3], 0, arr2D[3].size)
-        this.hires = hires
-        System.arraycopy(colorArr, 0, prevColors, 0, prevColors.size)
-    }
-
-}
 
 //Extends Chip8SOC and adds additional functions that help in running the emulator
 class Chip8Cycle(
@@ -67,11 +39,8 @@ class Chip8Cycle(
     private var isRunning: Boolean = false      //is the machine running?
 
     private var romStatus: Boolean = false      //is there a rom loaded?
-
-    private var nullifyLastFrame: Boolean = false
     private var planeColors: IntArray       //color palette
     private var cpuCycleThread: Thread? = null  //separate thread for the cpu cycle
-    private var last: LastFrame? = null         //last frame of th display
     private var hiResBitmap: Bitmap                  //bitmap object where the framebuffer contents will be applied
     private var chip8Surface: Chip8SurfaceView       //SurfaceView that will display the output
     private var chip8SurfaceHolder: SurfaceHolder
@@ -155,7 +124,6 @@ class Chip8Cycle(
                     mem[0x200 + offset] = romArray[i] and 0xFF
                     offset += 0x1
                 }
-                nullifyLastFrame = true
                 startEmulation()
             }
         } else {
@@ -280,11 +248,7 @@ class Chip8Cycle(
                             }
                             break
                         }
-                        //} catch (ex: Exception) {
-                        //    stopEmulation()
-                        //    ex.printStackTrace()
-                        //    break
-                        //}
+
                         j++
                     }
                     super.updateTimers()
@@ -300,50 +264,26 @@ class Chip8Cycle(
                     this.vbLankInterrupt = 2
                 }
             }
-            //if there is a last frame
-            if (last != null) {
-                //check if the previous frame and the previous palette is the same as the current frame in both planes.
-                if (arrayEqual(
-                        last?.prevFrame?.get(0),
-                        super.graphics[0]
-                    ) && arrayEqual(last?.prevFrame?.get(1), super.graphics[1]) && arrayEqual(
-                        last?.prevFrame?.get(2), super.graphics[2]
-                    ) && arrayEqual(last?.prevFrame?.get(3), super.graphics[3]) && arrayEqual(
-                        last?.prevColors, planeColors
-                    )
-                ) {
-                    //exit early if it is the same.
-                    continue;
-                }
-                //clear last frame if we've switched from hi res to lowres or vice versa. Also clear it if the color palette has changed
-                if (last?.hires != super.getHiRes() || nullifyLastFrame || !arrayEqual(last?.prevColors, planeColors)){
-                    last = null;
-                    hiResBitmap.eraseColor(0x000000)
-                    if(nullifyLastFrame){
-                        nullifyLastFrame = false
-                    }
-                }
-
-            }
-            val lastPixels: Array<IntArray> = last?.prevFrame ?: Array<IntArray>(4) {
-                IntArray(this.machineWidth * this.machineHeight)
+            if(!update){
+                continue;
             }
             if (this.graphics != null) {
                 for (y in 0 until this.machineHeight) {
                     for (x in 0 until this.machineWidth) {
-                        val newPlane: Int =
-                            super.graphics[3][x + y * this.machineWidth] shl 3 or (super.graphics[2][x + y * this.machineWidth] shl 2) or (super.graphics[1][x + y * this.machineWidth] shl 1) or super.graphics[0][x + y * this.machineWidth] and 0xF
-                        //selectively update each pixel if the last frame exists
-                        if (last != null) {
-                            val oldPlane =
-                                (lastPixels[3][x + y * this.machineWidth] shl 3) or (lastPixels[2][x + y * this.machineWidth] shl 2) or (lastPixels[1][x + y * this.machineWidth] shl 1) or lastPixels[0][x + y * this.machineWidth] and 0xF
-                            if (oldPlane != newPlane) {
-                                hiResBitmap.setPixel(x, y, planeColors[newPlane])
-                            }
-                        } else {
-                            //full rewrite of the screen
+                        val newPlane: Int = super.graphics[3][x + y * this.machineWidth] shl 3 or (super.graphics[2][x + y * this.machineWidth] shl 2) or (super.graphics[1][x + y * this.machineWidth] shl 1) or super.graphics[0][x + y * this.machineWidth] and 0xF
                             hiResBitmap.setPixel(x, y, planeColors[newPlane])
-                        }
+                        //selectively update each pixel if the last frame exists
+                        //if (last != null) {
+
+//                            val oldPlane =
+//                                (lastPixels[3][x + y * this.machineWidth] shl 3) or (lastPixels[2][x + y * this.machineWidth] shl 2) or (lastPixels[1][x + y * this.machineWidth] shl 1) or lastPixels[0][x + y * this.machineWidth] and 0xF
+//                            if (oldPlane != newPlane) {
+//                                hiResBitmap.setPixel(x, y, planeColors[newPlane])
+//                            }
+//                        } else {
+//                            //full rewrite of the screen
+//                            hiResBitmap.setPixel(x, y, planeColors[newPlane])
+                        //}
                     }
                 }
             }
@@ -351,12 +291,7 @@ class Chip8Cycle(
                 true-> updateSurface(chip8SurfaceHolder, hiResBitmap, bitmapRect)
                 false-> updateSurface(chip8SurfaceHolder, hiResBitmap, subsetRect, bitmapRect)
             }
-            if(last == null){
-                last = LastFrame(super.graphics, this.hiRes, planeColors)
-            }
-            else{
-                last?.update(super.graphics, this.hiRes, planeColors)
-            }
+            update = false
         }
     }
 
