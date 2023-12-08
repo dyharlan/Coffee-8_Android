@@ -221,22 +221,29 @@ class Chip8Cycle(
 
     }
 
+    var i: Long = 0
+    var j: Long = 0
+
     override fun run() {
         cpuCycleThread?.priority = Thread.MAX_PRIORITY
         val frameTime = (1000 / 60).toDouble()
         var elapsedTimeFromEpoch = System.currentTimeMillis()
         var origin = elapsedTimeFromEpoch + frameTime / 2
+
+        /*
+    * COSMAC VIP vBlank Quirk derived from: https://github.com/lesharris/dorito
+    */
         while (isRunning) {
-            //println("running...")
-            //println( cpuCycleThread!!.isAlive)
             synchronized(this) {
                 val diff = System.currentTimeMillis() - elapsedTimeFromEpoch
                 elapsedTimeFromEpoch += diff
-                var i: Long = 0
+                i = 0
                 while (origin < elapsedTimeFromEpoch - frameTime && i < 2) {
-                    var j = 0
+                    j = 0
                     while (j < this.cycles && !this.waitState) {
-                        //try {
+                        if( (mem[pc] and 0xF0 == 0xD0) && vBlankQuirks && !hiRes){
+                            j = this.cycles.toLong()
+                        }
                         if(!isCpuHalted)
                             super.cpuExec()
                         else{
@@ -248,7 +255,6 @@ class Chip8Cycle(
                             }
                             break
                         }
-
                         j++
                     }
                     super.updateTimers()
@@ -260,9 +266,7 @@ class Chip8Cycle(
                 } catch (ex: InterruptedException) {
                     ex.printStackTrace()
                 }
-                if (this.vbLankInterrupt == 1) {
-                    this.vbLankInterrupt = 2
-                }
+
             }
             if(!update){
                 continue;
@@ -271,25 +275,14 @@ class Chip8Cycle(
                 for (y in 0 until this.machineHeight) {
                     for (x in 0 until this.machineWidth) {
                         val newPlane: Int = super.graphics[3][x + y * this.machineWidth] shl 3 or (super.graphics[2][x + y * this.machineWidth] shl 2) or (super.graphics[1][x + y * this.machineWidth] shl 1) or super.graphics[0][x + y * this.machineWidth] and 0xF
-                            hiResBitmap.setPixel(x, y, planeColors[newPlane])
-                        //selectively update each pixel if the last frame exists
-                        //if (last != null) {
-
-//                            val oldPlane =
-//                                (lastPixels[3][x + y * this.machineWidth] shl 3) or (lastPixels[2][x + y * this.machineWidth] shl 2) or (lastPixels[1][x + y * this.machineWidth] shl 1) or lastPixels[0][x + y * this.machineWidth] and 0xF
-//                            if (oldPlane != newPlane) {
-//                                hiResBitmap.setPixel(x, y, planeColors[newPlane])
-//                            }
-//                        } else {
-//                            //full rewrite of the screen
-//                            hiResBitmap.setPixel(x, y, planeColors[newPlane])
-                        //}
+                        hiResBitmap.setPixel(x, y, planeColors[newPlane])
                     }
                 }
             }
             when(hiRes){
                 true-> updateSurface(chip8SurfaceHolder, hiResBitmap, bitmapRect)
                 false-> updateSurface(chip8SurfaceHolder, hiResBitmap, subsetRect, bitmapRect)
+                //(false && currentMachine == MachineType.SUPERCHIP_1_1_COMPAT) -> updateSurface(chip8SurfaceHolder, hiResBitmap, bitmapRect)
             }
             update = false
         }
