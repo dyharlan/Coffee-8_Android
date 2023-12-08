@@ -696,16 +696,16 @@ public abstract class Chip8SOC{
         }
 
         //if(currentMachine == MachineType.SUPERCHIP_1_1_COMPAT && !hires){
-            for (int currBitPlane = 0; currBitPlane < 4; currBitPlane++) {
-                if ((plane & (1 << currBitPlane)) == 0) {
-                    continue;
-                }
-                for (int y = 0; y < graphics[currBitPlane].length; y += DISPLAY_WIDTH) {
-                    for (int x = DISPLAY_WIDTH - 1; x >= 0; x--) {
-                        graphics[currBitPlane][y + x] = (x > 3) ? graphics[currBitPlane][y + x - 2] : 0;
-                    }
-                }
-            }
+//            for (int currBitPlane = 0; currBitPlane < 4; currBitPlane++) {
+//                if ((plane & (1 << currBitPlane)) == 0) {
+//                    continue;
+//                }
+//                for (int y = 0; y < graphics[currBitPlane].length; y += DISPLAY_WIDTH) {
+//                    for (int x = DISPLAY_WIDTH - 1; x >= 0; x--) {
+//                        graphics[currBitPlane][y + x] = (x > 3) ? graphics[currBitPlane][y + x - 2] : 0;
+//                    }
+//                }
+//            }
         //}else{
             for (int currBitPlane = 0; currBitPlane < 4; currBitPlane++) {
                 if ((plane & (1 << currBitPlane)) == 0) {
@@ -970,9 +970,7 @@ public abstract class Chip8SOC{
     * COSMAC VIP vBlank Quirk derived from: https://github.com/lesharris/dorito   
     */
      private void C8INST_DXYN() {
-        if(vBlankQuirks){
 
-        }
         //Grab the screen coordinate from the vX and vY registers
         int x = v[X];
         int y = v[Y];
@@ -992,7 +990,6 @@ public abstract class Chip8SOC{
                      for (byte xLine = 0; xLine < 16; xLine++) {
                          currPixel = ((mem[i + (yLine * 2) + (xLine > 7 ? 1 : 0)] >> (7 - (xLine % 8))) & 0x1);
                          targetPixel = ((x + xLine) % DISPLAY_WIDTH) + ((y + yLine) % DISPLAY_HEIGHT) * DISPLAY_WIDTH;
-
                          if (clipQuirks) {
                              if ((x % DISPLAY_WIDTH) + xLine >= DISPLAY_WIDTH || (y % DISPLAY_HEIGHT) + yLine >= DISPLAY_HEIGHT) {
                                  currPixel = 0;
