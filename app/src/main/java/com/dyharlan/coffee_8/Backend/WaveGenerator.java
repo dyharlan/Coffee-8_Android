@@ -44,9 +44,9 @@ public class WaveGenerator {
     byte[] muteBuffer;
     static int systemFreq = 48000;
     static int frameRate = 60;
-    static float sampleFreq;
-    static int bufferCap = (int)(systemFreq * 0.13f);
-    static int channels = 1;
+    static float sampleFreq = 4000;;
+    //static int bufferCap = (int)(systemFreq * 0.13f);
+    //static int channels = 1;
     float pitch;
 //    public WaveGenerator(Boolean sound,float pitch, int[] pattern, int systemFreq, int frameRate) throws IOException{
 //        this(sound, pitch, pattern);
@@ -57,7 +57,6 @@ public class WaveGenerator {
     public WaveGenerator(Boolean sound, float pitch, int[] pattern){
         buffer = new byte[128];
         this.pitch = pitch;
-        this.sampleFreq = 4000;
         audio = new AudioTrack.Builder()
                 .setTransferMode(AudioTrack.MODE_STREAM)
                 .setAudioAttributes(new AudioAttributes.Builder()
@@ -74,7 +73,7 @@ public class WaveGenerator {
         isEnabled = sound;
         setPitch(pitch);
         setBuffer(pattern);
-        System.out.println("Max Buffer Size: " + audio.getBufferCapacityInFrames());
+        //System.out.println("Max Buffer Size: " + audio.getBufferCapacityInFrames());
 //        System.out.println(sourceDataLine.available()-(sourceDataLine.getBufferSize()-bufferCap));
         int amount = systemFreq / frameRate;
         muteBuffer = new byte[amount];
