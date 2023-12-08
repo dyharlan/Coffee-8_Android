@@ -476,7 +476,7 @@ public abstract class Chip8SOC{
     */
 
     public Boolean WaitForInterrupt() {
-        if (!vBlankQuirks) {
+        if (!vBlankQuirks || hires) {
             return false;
         }
 
@@ -601,6 +601,11 @@ public abstract class Chip8SOC{
         //throw new IllegalInstructionException();
         //System.err.println();
     }
+    private void C8INST_UNKNOWN(String causeOfHalt){
+        cpuHalted = true;
+        this.causeOfHalt = causeOfHalt;
+        System.err.println(this.causeOfHalt);
+    }
 
     public String getCauseOfHalt() {
         if(cpuHalted)
@@ -625,18 +630,44 @@ public abstract class Chip8SOC{
     //00CN: Scroll display N pixels down; in low resolution mode, N/2 pixels
     private void C8INST_00CN(){
         //System.out.println("scroll down");
-        final int height = opcode & 0xF;
-        for (int currBitPlane = 0; currBitPlane < 4; currBitPlane++) {
-            if ((plane & (1 << currBitPlane)) == 0) {
-                continue;
+        if(currentMachine == MachineType.COSMAC_VIP){
+            C8INST_UNKNOWN(MachineType.COSMAC_VIP.getMachineName() + "Does not support scroll instructions!");
+            return;
+        }
+        if (WaitForInterrupt()) {
+            return;
+        }
+        if(currentMachine == MachineType.SUPERCHIP_1_1_COMPAT && !hires){
+            final int height = ((opcode)/2) & 0xF;
+            for (int currBitPlane = 0; currBitPlane < 4; currBitPlane++) {
+                if ((plane & (1 << currBitPlane)) == 0) {
+                    continue;
+                }
+                for (int z = graphics[currBitPlane].length - 1; z >= 0; z--) {
+                    graphics[currBitPlane][z] = (z >= DISPLAY_WIDTH * height) ? graphics[currBitPlane][z - (DISPLAY_WIDTH * height)] : 0;
+                }
             }
-            for (int z = graphics[currBitPlane].length - 1; z >= 0; z--) {
-                graphics[currBitPlane][z] = (z >= DISPLAY_WIDTH * height) ? graphics[currBitPlane][z - (DISPLAY_WIDTH * height)] : 0;
+        }else{
+            final int height = opcode & 0xF;
+            for (int currBitPlane = 0; currBitPlane < 4; currBitPlane++) {
+                if ((plane & (1 << currBitPlane)) == 0) {
+                    continue;
+                }
+                for (int z = graphics[currBitPlane].length - 1; z >= 0; z--) {
+                    graphics[currBitPlane][z] = (z >= DISPLAY_WIDTH * height) ? graphics[currBitPlane][z - (DISPLAY_WIDTH * height)] : 0;
+                }
             }
         }
     }
-    //00CN: Scroll display N pixels up; in low resolution mode, N/2 pixels
+    //00DN: Scroll display N pixels up
     private void C8INST_00DN(){
+        if(currentMachine == MachineType.COSMAC_VIP){
+            C8INST_UNKNOWN(MachineType.COSMAC_VIP.getMachineName() + "Does not support scroll instructions!");
+            return;
+        }
+        if (WaitForInterrupt()) {
+            return;
+        }
         //System.out.println("scroll up");
         final int height = opcode & 0xF;
         int bufSize = DISPLAY_WIDTH * DISPLAY_HEIGHT;
@@ -673,26 +704,66 @@ public abstract class Chip8SOC{
     }
     //00FB: Scroll right by 4 pixels; in low resolution mode, 2 pixels
     private void C8INST_00FB() {
-        for (int currBitPlane = 0; currBitPlane < 4; currBitPlane++) {
-            if ((plane & (1 << currBitPlane)) == 0) {
-                continue;
+        if(currentMachine == MachineType.COSMAC_VIP){
+            C8INST_UNKNOWN(MachineType.COSMAC_VIP.getMachineName() + "Does not support scroll instructions!");
+            return;
+        }
+        if (WaitForInterrupt()) {
+            return;
+        }
+        if(currentMachine == MachineType.SUPERCHIP_1_1_COMPAT && !hires){
+            for (int currBitPlane = 0; currBitPlane < 4; currBitPlane++) {
+                if ((plane & (1 << currBitPlane)) == 0) {
+                    continue;
+                }
+                for (int y = 0; y < graphics[currBitPlane].length; y += DISPLAY_WIDTH) {
+                    for (int x = DISPLAY_WIDTH - 1; x >= 0; x--) {
+                        graphics[currBitPlane][y + x] = (x > 3) ? graphics[currBitPlane][y + x - 2] : 0;
+                    }
+                }
             }
-            for (int y = 0; y < graphics[currBitPlane].length; y += DISPLAY_WIDTH) {
-                for (int x = DISPLAY_WIDTH - 1; x >= 0; x--) {
-                    graphics[currBitPlane][y + x] = (x > 3) ? graphics[currBitPlane][y + x - 4] : 0;
+        }else{
+            for (int currBitPlane = 0; currBitPlane < 4; currBitPlane++) {
+                if ((plane & (1 << currBitPlane)) == 0) {
+                    continue;
+                }
+                for (int y = 0; y < graphics[currBitPlane].length; y += DISPLAY_WIDTH) {
+                    for (int x = DISPLAY_WIDTH - 1; x >= 0; x--) {
+                        graphics[currBitPlane][y + x] = (x > 3) ? graphics[currBitPlane][y + x - 4] : 0;
+                    }
                 }
             }
         }
     }
     //00FC: Scroll left by 4 pixels; in low resolution mode, 2 pixels
     private void C8INST_00FC() {
-        for (int currBitPlane = 0; currBitPlane < 4; currBitPlane++) {
-            if ((plane & (1 << currBitPlane)) == 0) {
-                continue;
+        if(currentMachine == MachineType.COSMAC_VIP){
+            C8INST_UNKNOWN(MachineType.COSMAC_VIP.getMachineName() + "Does not support scroll instructions!");
+            return;
+        }
+        if (WaitForInterrupt()) {
+            return;
+        }
+        if(currentMachine == MachineType.SUPERCHIP_1_1_COMPAT && !hires){
+            for (int currBitPlane = 0; currBitPlane < 4; currBitPlane++) {
+                if ((plane & (1 << currBitPlane)) == 0) {
+                    continue;
+                }
+                for (int y = 0; y < graphics[currBitPlane].length; y += DISPLAY_WIDTH) {
+                    for (int x = 0; x < DISPLAY_WIDTH; x++) {
+                        graphics[currBitPlane][y + x] = (x < DISPLAY_WIDTH - 2) ? graphics[currBitPlane][y + x + 2] : 0;
+                    }
+                }
             }
-            for (int y = 0; y < graphics[currBitPlane].length; y += DISPLAY_WIDTH) {
-                for (int x = 0; x < DISPLAY_WIDTH; x++) {
-                    graphics[currBitPlane][y + x] = (x < DISPLAY_WIDTH - 4) ? graphics[currBitPlane][y + x + 4] : 0;
+        }else{
+            for (int currBitPlane = 0; currBitPlane < 4; currBitPlane++) {
+                if ((plane & (1 << currBitPlane)) == 0) {
+                    continue;
+                }
+                for (int y = 0; y < graphics[currBitPlane].length; y += DISPLAY_WIDTH) {
+                    for (int x = 0; x < DISPLAY_WIDTH; x++) {
+                        graphics[currBitPlane][y + x] = (x < DISPLAY_WIDTH - 4) ? graphics[currBitPlane][y + x + 4] : 0;
+                    }
                 }
             }
         }

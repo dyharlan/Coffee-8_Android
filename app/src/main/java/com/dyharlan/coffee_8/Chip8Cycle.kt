@@ -327,8 +327,7 @@ class Chip8Cycle(
             }
             val lastPixels: Array<IntArray> = last?.prevFrame ?: Array<IntArray>(4) {
                 IntArray(this.machineWidth * this.machineHeight)
-                    }
-
+            }
             if (this.graphics != null) {
                 for (y in 0 until this.machineHeight) {
                     for (x in 0 until this.machineWidth) {
