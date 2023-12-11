@@ -17,13 +17,13 @@
         android:id="@+id/menuLoad"
         app:showAsAction="never"/>
     <item
-        android:title="Set Cycles"
         android:id="@+id/menuSet"
-        app:showAsAction="never"/>
+        android:title="Set CPU Cycles"
+        app:showAsAction="never" />
     <item
-        android:title="Change Machine Type"
         android:id="@+id/menuChange"
-        app:showAsAction="never"/>
+        android:title="Change Emulated Machine"
+        app:showAsAction="never" />
     <item android:title="Change Key Binds"
         android:id="@+id/menuKeyBind"
         app:showAsAction="never"
