@@ -491,10 +491,10 @@ public abstract class Chip8SOC{
 
     //setters and getters for various global variables
     public int getMachineWidth(){
-        return DISPLAY_WIDTH;
+        return hires? 128:64;
     }
     public int getMachineHeight(){
-        return DISPLAY_HEIGHT;
+        return hires? 64:32;
     }
     
 
@@ -514,7 +514,6 @@ public abstract class Chip8SOC{
             playSound = true;
                 tg = new WaveGenerator(playSound, pitch, defaultPattern);
                 amount = tg.systemFreq / tg.frameRate;
-
         }else{
             playSound = true;
         }
