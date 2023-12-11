@@ -278,10 +278,7 @@ class Chip8Cycle(
                 for (y in 0 until this.machineHeight) {
                     for (x in 0 until this.machineWidth) {
                         val newPlane: Int = super.graphics[3][x + y * this.machineWidth] shl 3 or (super.graphics[2][x + y * this.machineWidth] shl 2) or (super.graphics[1][x + y * this.machineWidth] shl 1) or super.graphics[0][x + y * this.machineWidth] and 0xF
-                        when(hiRes){
-                            true -> pixels[x + (y*this.machineWidth)] = planeColors[newPlane]
-                            false -> pixels[x + (y*this.machineWidth*2)] = planeColors[newPlane]
-                        }
+                            pixels[x + (y*128)] = planeColors[newPlane]
                     }
                 }
                 when(hiRes){
