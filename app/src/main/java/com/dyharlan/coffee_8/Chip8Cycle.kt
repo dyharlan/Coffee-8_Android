@@ -17,6 +17,7 @@ import android.view.WindowMetrics
 import android.widget.Toast
 import com.dyharlan.coffee_8.Backend.Chip8SOC
 import com.dyharlan.coffee_8.Backend.MachineType
+import java.util.Arrays
 
 
 /*
@@ -37,7 +38,7 @@ class Chip8Cycle(
     private val HIRES_BITMAP_WIDTH = 128
     private val HIRES_BITMAP_HEIGHT = 64
     private var isRunning: Boolean = false      //is the machine running?
-
+    private var pixels: IntArray
     private var romStatus: Boolean = false      //is there a rom loaded?
     private var planeColors: IntArray       //color palette
     private var cpuCycleThread: Thread? = null  //separate thread for the cpu cycle
@@ -58,6 +59,7 @@ class Chip8Cycle(
         this.planeColors = planeColors
         this.chip8Surface = chip8Surface
         this.chip8SurfaceHolder = chip8Surface.holder
+        pixels = IntArray(128*64){0}
         //val callback: Chip8SurfaceCallBack = Chip8SurfaceCallBack()
         //chip8SurfaceHolder.addCallback(callback)
         var scalingFactor: Int = 2
@@ -124,6 +126,7 @@ class Chip8Cycle(
                     mem[0x200 + offset] = romArray[i] and 0xFF
                     offset += 0x1
                 }
+                Arrays.fill(pixels, 0)
                 startEmulation()
             }
         } else {
@@ -275,29 +278,34 @@ class Chip8Cycle(
                 for (y in 0 until this.machineHeight) {
                     for (x in 0 until this.machineWidth) {
                         val newPlane: Int = super.graphics[3][x + y * this.machineWidth] shl 3 or (super.graphics[2][x + y * this.machineWidth] shl 2) or (super.graphics[1][x + y * this.machineWidth] shl 1) or super.graphics[0][x + y * this.machineWidth] and 0xF
-                        hiResBitmap.setPixel(x, y, planeColors[newPlane])
+                        when(hiRes){
+                            true -> pixels[x + (y*this.machineWidth)] = planeColors[newPlane]
+                            false -> pixels[x + (y*this.machineWidth*2)] = planeColors[newPlane]
+                        }
                     }
                 }
+                when(hiRes){
+                    true-> updateSurface(chip8SurfaceHolder, pixels, hiResBitmap, bitmapRect)
+                    false-> updateSurface(chip8SurfaceHolder, pixels, hiResBitmap, subsetRect, bitmapRect)
+                }
             }
-            when(hiRes){
-                true-> updateSurface(chip8SurfaceHolder, hiResBitmap, bitmapRect)
-                false-> updateSurface(chip8SurfaceHolder, hiResBitmap, subsetRect, bitmapRect)
-                //(false && currentMachine == MachineType.SUPERCHIP_1_1_COMPAT) -> updateSurface(chip8SurfaceHolder, hiResBitmap, bitmapRect)
-            }
+
             update = false
         }
     }
 
-    private fun updateSurface(holder: SurfaceHolder, bitmap: Bitmap, rect:Rect) {
+    private fun updateSurface(holder: SurfaceHolder,pixels: IntArray, bitmap: Bitmap, rect:Rect) {
         if (holder.surface.isValid) {
             val canvas: Canvas = holder.lockHardwareCanvas()
+            bitmap.setPixels(pixels,0,bitmap.width,0,0,128,64)
             canvas.drawBitmap(bitmap, null, rect, null)
             holder.unlockCanvasAndPost(canvas)
         }
     }
-    private fun updateSurface(holder: SurfaceHolder, bitmap: Bitmap, subsetRect: Rect, rect:Rect) {
+    private fun updateSurface(holder: SurfaceHolder,pixels: IntArray, bitmap: Bitmap, subsetRect: Rect, rect:Rect) {
         if (holder.surface.isValid) {
             val canvas: Canvas = holder.lockHardwareCanvas()
+            bitmap.setPixels(pixels,0,bitmap.width,0,0,64,32)
             canvas.drawBitmap(bitmap, subsetRect, rect, null)
             holder.unlockCanvasAndPost(canvas)
         }
