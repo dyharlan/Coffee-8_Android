@@ -148,6 +148,13 @@ public class WaveGenerator {
 
         
     }
+    public boolean isPaused(){
+        return audio.getPlayState() == AudioTrack.PLAYSTATE_PAUSED;
+    }
+
+    public boolean isPlaying(){
+       return audio.getPlayState() == AudioTrack.PLAYSTATE_PLAYING;
+    }
     public void play(){
         audio.play();
     }
