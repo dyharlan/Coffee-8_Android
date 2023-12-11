@@ -731,6 +731,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         if(chip8Cycle.getRomStatus()){
             chip8Cycle.startEmulation()
+
         }
     }
     override fun onPause() {
@@ -744,6 +745,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         chip8Cycle.stopEmulation()
         chip8Cycle.closeSound()
+        chip8Cycle.closeDbHandler()
     }
 
     private fun pauseEmulation(chip8Cycle: Chip8Cycle){

@@ -165,6 +165,10 @@ class Chip8Cycle(
         }
         return rightSize
     }
+
+    fun closeDbHandler(){
+        dbHandler.close()
+    }
     fun closeROM(): Boolean {
         var status = true
         try {
