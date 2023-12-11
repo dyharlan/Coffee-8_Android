@@ -6,12 +6,17 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.appbar.MaterialToolbar
 
 
 class KeyControllerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_keycontroller)
+        val toolbar = findViewById<MaterialToolbar>(R.id.materialToolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false);
+        toolbar.title = "Setup Physical Controls"
         val bindableKeys: IntArray? = intent.getIntArrayExtra("bindableKeys")
         val keyAdapter = BindableKeyListAdapter(this,resources.getStringArray(R.array.chip8_keys),bindableKeys)
         val bindableKeysLayout = findViewById<RecyclerView>(R.id.bindableKeyListView)
