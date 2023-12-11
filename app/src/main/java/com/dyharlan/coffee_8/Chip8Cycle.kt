@@ -320,7 +320,7 @@ class Chip8Cycle(
     //android implementation of FX75 and FX85
     override fun C8INST_FX75() {
         val flags = ArrayList<Int>()
-        for (n in 0..(if (super.X > 0x7) 0x7 else super.X)) {
+        for (n in 0..0xF) {
             flags.add(super.v[n] and 0xFF)
         }
         dbHandler.saveFlags(checksum, flags.toTypedArray())
@@ -328,7 +328,7 @@ class Chip8Cycle(
 
     override fun C8INST_FX85() {
         val flags = dbHandler.loadFlags(checksum)
-        for (n in 0..(if (super.X > 0x7) 0x7 else super.X)) {
+        for (n in 0..0xF) {
             super.v[n] = flags[n] and 0xFF
         }
     }

@@ -12,7 +12,7 @@ import com.dyharlan.coffee_8.Backend.MachineType
 
 class DatabaseHandler(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     companion object{
-        private val DATABASE_VERSION = 6
+        private val DATABASE_VERSION = 7
         private val DATABASE_NAME = "data.db"
         private val TABLE_FLAGS = "rpl_flags"
         private val KEY_ID = "crc32Checksum"
@@ -24,14 +24,14 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context, DATABASE_NAME
         private val KEY_FLAG5 = "flag5"
         private val KEY_FLAG6 = "flag6"
         private val KEY_FLAG7 = "flag7"
-//        private val KEY_FLAG8 = "flag8"
-//        private val KEY_FLAG9 = "flag9"
-//        private val KEY_FLAG10 = "flag10"
-//        private val KEY_FLAG11 = "flag11"
-//        private val KEY_FLAG12 = "flag12"
-//        private val KEY_FLAG13 = "flag13"
-//        private val KEY_FLAG14 = "flag14"
-//        private val KEY_FLAG15 = "flag15"
+        private val KEY_FLAG8 = "flag8"
+        private val KEY_FLAG9 = "flag9"
+        private val KEY_FLAG10 = "flag10"
+        private val KEY_FLAG11 = "flag11"
+        private val KEY_FLAG12 = "flag12"
+        private val KEY_FLAG13 = "flag13"
+        private val KEY_FLAG14 = "flag14"
+        private val KEY_FLAG15 = "flag15"
 
         private val TABLE_ROM_CONFIGS = "rom_configs"
 
@@ -54,6 +54,14 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context, DATABASE_NAME
                 "$KEY_FLAG5 INT DEFAULT 0 NOT NULL," +
                 "$KEY_FLAG6 INT DEFAULT 0 NOT NULL," +
                 "$KEY_FLAG7 INT DEFAULT 0 NOT NULL," +
+                "$KEY_FLAG8 INT DEFAULT 0 NOT NULL," +
+                "$KEY_FLAG9 INT DEFAULT 0 NOT NULL," +
+                "$KEY_FLAG10 INT DEFAULT 0 NOT NULL," +
+                "$KEY_FLAG11 INT DEFAULT 0 NOT NULL," +
+                "$KEY_FLAG12 INT DEFAULT 0 NOT NULL," +
+                "$KEY_FLAG13 INT DEFAULT 0 NOT NULL," +
+                "$KEY_FLAG14 INT DEFAULT 0 NOT NULL," +
+                "$KEY_FLAG15 INT DEFAULT 0 NOT NULL," +
                 "PRIMARY KEY($KEY_ID)" +
                 ");")
         db?.execSQL(CREATE_FLAGS_TABLE)
@@ -196,6 +204,14 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context, DATABASE_NAME
             KEY_FLAG5,
             KEY_FLAG6,
             KEY_FLAG7,
+            KEY_FLAG8,
+            KEY_FLAG9,
+            KEY_FLAG10,
+            KEY_FLAG11,
+            KEY_FLAG12,
+            KEY_FLAG13,
+            KEY_FLAG14,
+            KEY_FLAG15,
             ),
             "$KEY_ID=?",
             Array<String>(1){checksum.toString()},
@@ -214,11 +230,19 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context, DATABASE_NAME
                     cursor.getInt(cursor.getColumnIndex(KEY_FLAG4)),
                     cursor.getInt(cursor.getColumnIndex(KEY_FLAG5)),
                     cursor.getInt(cursor.getColumnIndex(KEY_FLAG6)),
-                    cursor.getInt(cursor.getColumnIndex(KEY_FLAG7))
+                    cursor.getInt(cursor.getColumnIndex(KEY_FLAG7)),
+                    cursor.getInt(cursor.getColumnIndex(KEY_FLAG8)),
+                    cursor.getInt(cursor.getColumnIndex(KEY_FLAG9)),
+                    cursor.getInt(cursor.getColumnIndex(KEY_FLAG10)),
+                    cursor.getInt(cursor.getColumnIndex(KEY_FLAG11)),
+                    cursor.getInt(cursor.getColumnIndex(KEY_FLAG12)),
+                    cursor.getInt(cursor.getColumnIndex(KEY_FLAG13)),
+                    cursor.getInt(cursor.getColumnIndex(KEY_FLAG14)),
+                    cursor.getInt(cursor.getColumnIndex(KEY_FLAG15)),
                 )
             }while(cursor.moveToNext())
         }else{
-            flags = intArrayOf(0,0,0,0,0,0,0,0)
+            flags = intArrayOf(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
         }
         cursor.close()
         readableDb.close()
