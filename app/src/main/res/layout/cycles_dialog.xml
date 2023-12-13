@@ -14,15 +14,15 @@
         android:gravity="center"
         android:padding="20dp"
         >
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/dialogTitle"
-        android:text="App Notification"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        />
+
+        <TextView
+            android:id="@+id/dialogTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/cycles_dialog_title_text_en"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/newCycles"
@@ -36,6 +36,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
+            style="?android:attr/buttonBarStyle"
             android:padding="20dp"
         >
 
@@ -44,6 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
+                style="?android:attr/buttonBarButtonStyle"
                 android:text="Set"
                 android:textSize="14sp" />
 
@@ -52,6 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
+                style="?android:attr/buttonBarButtonStyle"
                 android:text="Cancel"
                 android:textSize="14sp" />
         </LinearLayout>
