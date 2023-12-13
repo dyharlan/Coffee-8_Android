@@ -1,5 +1,4 @@
 package com.dyharlan.coffee_8
-
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
@@ -10,12 +9,10 @@ import android.database.sqlite.SQLiteException
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.util.Log
-import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -28,7 +25,6 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TableLayout
 import android.widget.TableRow
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,7 +36,6 @@ import com.google.android.material.appbar.MaterialToolbar
 import java.io.BufferedInputStream
 import java.io.DataInputStream
 import java.io.IOException
-import java.lang.reflect.InvocationTargetException
 import java.util.zip.CRC32
 
 
@@ -106,22 +101,6 @@ class MainActivity : AppCompatActivity() {
         chip8Cycle = Chip8Cycle(applicationContext, planeColors, chip8Surface)
 
         val keys = resources.getStringArray(R.array.chip8_keys)
-//        KeyEvent.KEYCODE_X,
-//        KeyEvent.KEYCODE_1,
-//        KeyEvent.KEYCODE_2,
-//        KeyEvent.KEYCODE_3,
-//        KeyEvent.KEYCODE_Q,
-//        KeyEvent.KEYCODE_W,
-//        KeyEvent.KEYCODE_E,
-//        KeyEvent.KEYCODE_A,
-//        KeyEvent.KEYCODE_S,
-//        KeyEvent.KEYCODE_D,
-//        KeyEvent.KEYCODE_Z,
-//        KeyEvent.KEYCODE_C,
-//        KeyEvent.KEYCODE_4,
-//        KeyEvent.KEYCODE_R,
-//        KeyEvent.KEYCODE_F,
-//        KeyEvent.KEYCODE_V
 
         physicalKeys[0] = sharedPreferences.getInt(keys[0], KeyEvent.KEYCODE_X)
         physicalKeys[1] = sharedPreferences.getInt(keys[1], KeyEvent.KEYCODE_1)
@@ -316,151 +295,154 @@ class MainActivity : AppCompatActivity() {
 //            }
 //        }
 //    }
-    override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
-        if (event != null) {
-            if(event.action == KeyEvent.ACTION_DOWN && !event.isSystem){
-                if(event.repeatCount == 0){
-                    when(event.keyCode){
-                        physicalKeys[0] -> {
-                            chip8Cycle.keyPress(0)
-                            return true
-                        }
-                        physicalKeys[1] -> {
-                            chip8Cycle.keyPress(1)
-                            return true
-                        }
-                        physicalKeys[2] -> {
-                            chip8Cycle.keyPress(2)
-                            return true
-                        }
-                        physicalKeys[3] -> {
-                            chip8Cycle.keyPress(3)
-                            return true
-                        }
-                        physicalKeys[4] -> {
-                            chip8Cycle.keyPress(4)
-                            return true
-                        }
-                        physicalKeys[5] -> {
-                            chip8Cycle.keyPress(5)
-                            return true
-                        }
-                        physicalKeys[6] -> {
-                            chip8Cycle.keyPress(6)
-                            return true
-                        }
-                        physicalKeys[7] -> {
-                            chip8Cycle.keyPress(7)
-                            return true
-                        }
-                        physicalKeys[8] -> {
-                            chip8Cycle.keyPress(8)
-                            return true
-                        }
-                        physicalKeys[9] -> {
-                            chip8Cycle.keyPress(9)
-                            return true
-                        }
-                        physicalKeys[10] -> {
-                            chip8Cycle.keyPress(10)
-                            return true
-                        }
-                        physicalKeys[11] -> {
-                            chip8Cycle.keyPress(11)
-                            return true
-                        }
-                        physicalKeys[12] -> {
-                            chip8Cycle.keyPress(12)
-                            return true
-                        }
-                        physicalKeys[13] -> {
-                            chip8Cycle.keyPress(13)
-                            return true
-                        }
-                        physicalKeys[14] -> {
-                            chip8Cycle.keyPress(14)
-                            return true
-                        }
-                        physicalKeys[15] -> {
-                            chip8Cycle.keyPress(15)
-                            return true
-                        }
-                        else -> return true
-                    }
-                }else{
-                    return true
-                }
-            }else if(event.action == KeyEvent.ACTION_UP && !event.isSystem){
-                when(event.keyCode){
-                    physicalKeys[0] -> {
-                        chip8Cycle.keyRelease(0)
-                        return true
-                    }
-                    physicalKeys[1] -> {
-                        chip8Cycle.keyRelease(1)
-                        return true
-                    }
-                    physicalKeys[2] -> {
-                        chip8Cycle.keyRelease(2)
-                        return true
-                    }
-                    physicalKeys[3] -> {
-                        chip8Cycle.keyRelease(3)
-                        return true
-                    }
-                    physicalKeys[4] -> {
-                        chip8Cycle.keyRelease(4)
-                        return true
-                    }
-                    physicalKeys[5] -> {
-                        chip8Cycle.keyRelease(5)
-                        return true
-                    }
-                    physicalKeys[6] -> {
-                        chip8Cycle.keyRelease(6)
-                        return true
-                    }
-                    physicalKeys[7] -> {
-                        chip8Cycle.keyRelease(7)
-                        return true
-                    }
-                    physicalKeys[8] -> {
-                        chip8Cycle.keyRelease(8)
-                        return true
-                    }
-                    physicalKeys[9] -> {
-                        chip8Cycle.keyRelease(9)
-                        return true
-                    }
-                    physicalKeys[10] -> {
-                        chip8Cycle.keyRelease(10)
-                        return true
-                    }
-                    physicalKeys[11] -> {
-                        chip8Cycle.keyRelease(11)
-                        return true
-                    }
-                    physicalKeys[12] -> {
-                        chip8Cycle.keyRelease(12)
-                        return true
-                    }
-                    physicalKeys[13] -> {
-                        chip8Cycle.keyRelease(13)
-                        return true
-                    }
-                    physicalKeys[14] -> {
-                        chip8Cycle.keyRelease(14)
-                        return true
-                    }
-                    physicalKeys[15] -> {
-                        chip8Cycle.keyRelease(15)
-                        return true
-                    }
-                }
+override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
+    var isHandled = false
+    if(event == null){
+        return isHandled
+    }
+
+    if(event.action == KeyEvent.ACTION_DOWN && !event.isSystem){
+        if(event.repeatCount != 0){
+            return true
+        }
+        when(event.keyCode){
+            physicalKeys[0] -> {
+                chip8Cycle.keyPress(0)
+                isHandled = true
+            }
+            physicalKeys[1] -> {
+                chip8Cycle.keyPress(1)
+                isHandled = true
+            }
+            physicalKeys[2] -> {
+                chip8Cycle.keyPress(2)
+                isHandled = true
+            }
+            physicalKeys[3] -> {
+                chip8Cycle.keyPress(3)
+                isHandled = true
+            }
+            physicalKeys[4] -> {
+                chip8Cycle.keyPress(4)
+                isHandled = true
+            }
+            physicalKeys[5] -> {
+                chip8Cycle.keyPress(5)
+                isHandled = true
+            }
+            physicalKeys[6] -> {
+                chip8Cycle.keyPress(6)
+                isHandled = true
+            }
+            physicalKeys[7] -> {
+                chip8Cycle.keyPress(7)
+                isHandled = true
+            }
+            physicalKeys[8] -> {
+                chip8Cycle.keyPress(8)
+                isHandled = true
+            }
+            physicalKeys[9] -> {
+                chip8Cycle.keyPress(9)
+                isHandled = true
+            }
+            physicalKeys[10] -> {
+                chip8Cycle.keyPress(10)
+                isHandled = true
+            }
+            physicalKeys[11] -> {
+                chip8Cycle.keyPress(11)
+                isHandled = true
+            }
+            physicalKeys[12] -> {
+                chip8Cycle.keyPress(12)
+                isHandled = true
+            }
+            physicalKeys[13] -> {
+                chip8Cycle.keyPress(13)
+                isHandled = true
+            }
+            physicalKeys[14] -> {
+                chip8Cycle.keyPress(14)
+                isHandled = true
+            }
+            physicalKeys[15] -> {
+                chip8Cycle.keyPress(15)
+                isHandled = true
+            }
+            else -> isHandled = true
+        }
+
+    }else if(event.action == KeyEvent.ACTION_UP && !event.isSystem){
+        when(event.keyCode){
+            physicalKeys[0] -> {
+                chip8Cycle.keyRelease(0)
+                isHandled = true
+            }
+            physicalKeys[1] -> {
+                chip8Cycle.keyRelease(1)
+                isHandled = true
+            }
+            physicalKeys[2] -> {
+                chip8Cycle.keyRelease(2)
+                isHandled = true
+            }
+            physicalKeys[3] -> {
+                chip8Cycle.keyRelease(3)
+                isHandled = true
+            }
+            physicalKeys[4] -> {
+                chip8Cycle.keyRelease(4)
+                isHandled = true
+            }
+            physicalKeys[5] -> {
+                chip8Cycle.keyRelease(5)
+                isHandled = true
+            }
+            physicalKeys[6] -> {
+                chip8Cycle.keyRelease(6)
+                isHandled = true
+            }
+            physicalKeys[7] -> {
+                chip8Cycle.keyRelease(7)
+                isHandled = true
+            }
+            physicalKeys[8] -> {
+                chip8Cycle.keyRelease(8)
+                isHandled = true
+            }
+            physicalKeys[9] -> {
+                chip8Cycle.keyRelease(9)
+                isHandled = true
+            }
+            physicalKeys[10] -> {
+                chip8Cycle.keyRelease(10)
+                isHandled = true
+            }
+            physicalKeys[11] -> {
+                chip8Cycle.keyRelease(11)
+                isHandled = true
+            }
+            physicalKeys[12] -> {
+                chip8Cycle.keyRelease(12)
+                isHandled = true
+            }
+            physicalKeys[13] -> {
+                chip8Cycle.keyRelease(13)
+                isHandled = true
+            }
+            physicalKeys[14] -> {
+                chip8Cycle.keyRelease(14)
+                isHandled = true
+            }
+            physicalKeys[15] -> {
+                chip8Cycle.keyRelease(15)
+                isHandled = true
             }
         }
-        return super.dispatchKeyEvent(event)
     }
+    return isHandled
+}
 //    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
 //        if (event != null) {
 //
@@ -712,7 +694,7 @@ class MainActivity : AppCompatActivity() {
                 }finally {
                     dbHandler.close()
                 }
-                println("status: $status")
+                Log.i("status","status: $status")
                 if(status){
 //                    if(chip8Cycle.getRomStatus())
 //                        chip8Cycle.closeROM()
