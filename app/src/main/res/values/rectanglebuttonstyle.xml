@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="RectangleButtonStyle">
+        <item name="android:background">@drawable/rectangle_button_background</item>
+        <!-- Add any other styling attributes you need -->
+    </style>
+</resources>

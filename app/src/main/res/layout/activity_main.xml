@@ -45,12 +45,15 @@
         <TableLayout
             android:id="@+id/keyPad"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:paddingHorizontal="10sp"
+            android:paddingTop="15dp"
+            android:paddingBottom="10dp">
 
             <TableRow
                 android:id="@+id/keyRow1"
                 android:layout_width="match_parent"
-                android:layout_height="88dp"
+                android:layout_height="wrap_content"
                 android:gravity="center_horizontal">
 
                 <Button
@@ -59,28 +62,36 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0"
                     android:text="Button"
-                    style="?android:attr/buttonBarButtonStyle" />
+                    android:textSize="@dimen/button_size"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:textStyle="bold"/>
 
                 <Button
                     android:id="@+id/keyPad2"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="Button"
+                    android:textSize="@dimen/button_size"
+                    android:textStyle="bold"/>
 
                 <Button
                     android:id="@+id/keyPad3"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="Button"
+                    android:textSize="@dimen/button_size"
+                    android:textStyle="bold"/>
 
                 <Button
                     android:id="@+id/keyPadC"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="Button"
+                    android:textSize="@dimen/button_size"
+                    android:textStyle="bold"/>
 
             </TableRow>
 
@@ -95,28 +106,36 @@
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="Button"
+                    android:textSize="@dimen/button_size"
+                    android:textStyle="bold"/>
 
                 <Button
                     android:id="@+id/keyPad5"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="Button"
+                    android:textSize="@dimen/button_size"
+                    android:textStyle="bold"/>
 
                 <Button
                     android:id="@+id/keyPad6"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="Button"
+                    android:textSize="@dimen/button_size"
+                    android:textStyle="bold"/>
 
                 <Button
                     android:id="@+id/keyPadD"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="Button"
+                    android:textSize="@dimen/button_size"
+                    android:textStyle="bold"/>
 
             </TableRow>
 
@@ -131,28 +150,36 @@
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="Button"
+                    android:textSize="@dimen/button_size"
+                    android:textStyle="bold"/>
 
                 <Button
                     android:id="@+id/keyPad8"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="Button"
+                    android:textSize="@dimen/button_size"
+                    android:textStyle="bold"/>
 
                 <Button
                     android:id="@+id/keyPad9"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="Button"
+                    android:textSize="@dimen/button_size"
+                    android:textStyle="bold"/>
 
                 <Button
                     android:id="@+id/keyPadE"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="Button"
+                    android:textSize="@dimen/button_size"
+                    android:textStyle="bold"/>
 
             </TableRow>
 
@@ -167,28 +194,36 @@
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="Button"
+                    android:textSize="@dimen/button_size"
+                    android:textStyle="bold"/>
 
                 <Button
                     android:id="@+id/keyPad0"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="Button"
+                    android:textSize="@dimen/button_size"
+                    android:textStyle="bold"/>
 
                 <Button
                     android:id="@+id/keyPadB"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="Button"
+                    android:textSize="@dimen/button_size"
+                    android:textStyle="bold"/>
 
                 <Button
                     android:id="@+id/keyPadF"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="Button"
+                    android:textSize="@dimen/button_size"
+                    android:textStyle="bold"/>
             </TableRow>
         </TableLayout>
 
