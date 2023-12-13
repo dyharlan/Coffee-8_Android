@@ -3,7 +3,9 @@ package com.dyharlan.coffee_8
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.database.sqlite.SQLiteException
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -63,34 +65,35 @@ class MainActivity : AppCompatActivity() {
         0xFFFF55,
         0xFFFFFF
     )
-    private var physicalKeys: IntArray = intArrayOf(
-        KeyEvent.KEYCODE_X,
-        KeyEvent.KEYCODE_1,
-        KeyEvent.KEYCODE_2,
-        KeyEvent.KEYCODE_3,
-        KeyEvent.KEYCODE_Q,
-        KeyEvent.KEYCODE_W,
-        KeyEvent.KEYCODE_E,
-        KeyEvent.KEYCODE_A,
-        KeyEvent.KEYCODE_S,
-        KeyEvent.KEYCODE_D,
-        KeyEvent.KEYCODE_Z,
-        KeyEvent.KEYCODE_C,
-        KeyEvent.KEYCODE_4,
-        KeyEvent.KEYCODE_R,
-        KeyEvent.KEYCODE_F,
-        KeyEvent.KEYCODE_V
-    )
+//    private var physicalKeys: IntArray = intArrayOf(
+//        KeyEvent.KEYCODE_X,
+//        KeyEvent.KEYCODE_1,
+//        KeyEvent.KEYCODE_2,
+//        KeyEvent.KEYCODE_3,
+//        KeyEvent.KEYCODE_Q,
+//        KeyEvent.KEYCODE_W,
+//        KeyEvent.KEYCODE_E,
+//        KeyEvent.KEYCODE_A,
+//        KeyEvent.KEYCODE_S,
+//        KeyEvent.KEYCODE_D,
+//        KeyEvent.KEYCODE_Z,
+//        KeyEvent.KEYCODE_C,
+//        KeyEvent.KEYCODE_4,
+//        KeyEvent.KEYCODE_R,
+//        KeyEvent.KEYCODE_F,
+//        KeyEvent.KEYCODE_V
+//    )
+    private var physicalKeys: IntArray = IntArray(16){0}
     private lateinit var chip8Cycle: Chip8Cycle
     private lateinit var keyPad: Array<Button>
     private val sharedPrefFile = "prefFile"
-    //private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var sharedPreferences: SharedPreferences
     private val crc32: CRC32 = CRC32()
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //sharedPreferences = getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
 
         setContentView(R.layout.activity_main)
 
@@ -99,30 +102,49 @@ class MainActivity : AppCompatActivity() {
         val toolbar = findViewById<MaterialToolbar>(R.id.materialToolbar)
         setSupportActionBar(toolbar)
 
-        //set cycle count to 200 as a default
-        //val cycleCount: Int = sharedPreferences.getInt("cycles", -1)
-
-        //set machine type to XO-CHIP as a default
-        //val machineType: String? = sharedPreferences.getString("machineType", MachineType.XO_CHIP.machineName)
-
-        //Otherwise, set to cosmac vip or super-chip if the setting exists in the shared preferences.
-//        val currentMachine = if(machineType?.equals(MachineType.COSMAC_VIP.machineName) == true){
-//            MachineType.COSMAC_VIP
-//        }else if(machineType?.equals(MachineType.SUPERCHIP_1_1.machineName) == true){
-//            MachineType.SUPERCHIP_1_1
-//        }else{
-//            MachineType.XO_CHIP
-//        }
-
         //instantiate cpu
         chip8Cycle = Chip8Cycle(applicationContext, planeColors, chip8Surface)
 
-        //apply cycle count
-//        if(cycleCount == 200){
-//            chip8Cycle.cycles = 200
-//        }else{
-//            chip8Cycle.cycles = cycleCount
-//        }
+        val keys = resources.getStringArray(R.array.chip8_keys)
+//        KeyEvent.KEYCODE_X,
+//        KeyEvent.KEYCODE_1,
+//        KeyEvent.KEYCODE_2,
+//        KeyEvent.KEYCODE_3,
+//        KeyEvent.KEYCODE_Q,
+//        KeyEvent.KEYCODE_W,
+//        KeyEvent.KEYCODE_E,
+//        KeyEvent.KEYCODE_A,
+//        KeyEvent.KEYCODE_S,
+//        KeyEvent.KEYCODE_D,
+//        KeyEvent.KEYCODE_Z,
+//        KeyEvent.KEYCODE_C,
+//        KeyEvent.KEYCODE_4,
+//        KeyEvent.KEYCODE_R,
+//        KeyEvent.KEYCODE_F,
+//        KeyEvent.KEYCODE_V
+
+        physicalKeys[0] = sharedPreferences.getInt(keys[0], KeyEvent.KEYCODE_X)
+        physicalKeys[1] = sharedPreferences.getInt(keys[1], KeyEvent.KEYCODE_1)
+        physicalKeys[2] = sharedPreferences.getInt(keys[2], KeyEvent.KEYCODE_2)
+        physicalKeys[3] = sharedPreferences.getInt(keys[3], KeyEvent.KEYCODE_3)
+
+        physicalKeys[4] = sharedPreferences.getInt(keys[4], KeyEvent.KEYCODE_Q)
+        physicalKeys[5] = sharedPreferences.getInt(keys[5], KeyEvent.KEYCODE_W)
+        physicalKeys[6] = sharedPreferences.getInt(keys[6], KeyEvent.KEYCODE_E)
+        physicalKeys[7] = sharedPreferences.getInt(keys[7], KeyEvent.KEYCODE_A)
+
+        physicalKeys[8] = sharedPreferences.getInt(keys[8], KeyEvent.KEYCODE_S)
+        physicalKeys[9] = sharedPreferences.getInt(keys[9], KeyEvent.KEYCODE_D)
+        physicalKeys[10] = sharedPreferences.getInt(keys[10], KeyEvent.KEYCODE_Z)
+        physicalKeys[11] = sharedPreferences.getInt(keys[11], KeyEvent.KEYCODE_C)
+
+        physicalKeys[12] = sharedPreferences.getInt(keys[12], KeyEvent.KEYCODE_4)
+        physicalKeys[13] = sharedPreferences.getInt(keys[13], KeyEvent.KEYCODE_R)
+        physicalKeys[14] = sharedPreferences.getInt(keys[14], KeyEvent.KEYCODE_F)
+        physicalKeys[15] = sharedPreferences.getInt(keys[15], KeyEvent.KEYCODE_V)
+
+
+
         /*
         * Programmatically setup the keypad dimensions and the event handling
          */
@@ -274,29 +296,29 @@ class MainActivity : AppCompatActivity() {
         }
         count = 0
     }
-    companion object {
-        fun isExternal(inputDevice: InputDevice): Boolean {
-            if(Build.VERSION.SDK_INT >= 29){
-                return inputDevice.isExternal
-            }
-            return try {
-                val m = InputDevice::class.java.getMethod("isExternal")
-                m.invoke(inputDevice) as Boolean
-            } catch (e: NoSuchMethodException) {
-                e.printStackTrace()
-                false
-            } catch (e: IllegalAccessException) {
-                e.printStackTrace()
-                false
-            } catch (e: InvocationTargetException) {
-                e.printStackTrace()
-                false
-            }
-        }
-    }
+//    companion object {
+//        fun isExternal(inputDevice: InputDevice): Boolean {
+//            if(Build.VERSION.SDK_INT >= 29){
+//                return inputDevice.isExternal
+//            }
+//            return try {
+//                val m = InputDevice::class.java.getMethod("isExternal")
+//                m.invoke(inputDevice) as Boolean
+//            } catch (e: NoSuchMethodException) {
+//                e.printStackTrace()
+//                false
+//            } catch (e: IllegalAccessException) {
+//                e.printStackTrace()
+//                false
+//            } catch (e: InvocationTargetException) {
+//                e.printStackTrace()
+//                false
+//            }
+//        }
+//    }
     override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
         if (event != null) {
-            if(event.action == KeyEvent.ACTION_DOWN && isExternal(event.device)){
+            if(event.action == KeyEvent.ACTION_DOWN && !event.isSystem){
                 if(event.repeatCount == 0){
                     when(event.keyCode){
                         physicalKeys[0] -> {
@@ -368,7 +390,7 @@ class MainActivity : AppCompatActivity() {
                 }else{
                     return true
                 }
-            }else if(event.action == KeyEvent.ACTION_UP && isExternal(event.device)){
+            }else if(event.action == KeyEvent.ACTION_UP && !event.isSystem){
                 when(event.keyCode){
                     physicalKeys[0] -> {
                         chip8Cycle.keyRelease(0)
@@ -497,8 +519,8 @@ class MainActivity : AppCompatActivity() {
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.cycles_dialog)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val dialogTitle = dialog.findViewById<TextView>(R.id.dialogTitle)
-        dialogTitle.text = resources.getString(R.string.cycles_dialog_title_text_en)
+//        val dialogTitle = dialog.findViewById<TextView>(R.id.dialogTitle)
+//        dialogTitle.text = resources.getString(R.string.cycles_dialog_title_text_en)
 
         val editText = dialog.findViewById<EditText>(R.id.newCycles)
         val btnYes = dialog.findViewById<Button>(R.id.btnYes)
@@ -601,12 +623,18 @@ class MainActivity : AppCompatActivity() {
         if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
             val newKeys = data?.getIntArrayExtra("bindableKeys")
+            val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
+            val keys = resources.getStringArray(R.array.chip8_keys)
             if (newKeys != null) {
                 for((index) in newKeys.withIndex()){
+                    editor.putInt(keys[index], newKeys[index])
                     physicalKeys[index] = newKeys[index]
                 }
             }
+
+            editor.apply()
+            editor.commit()
         }
     }
     private fun showInitialSetupDialog(romArray: ArrayList<Int>){
@@ -615,10 +643,10 @@ class MainActivity : AppCompatActivity() {
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.initial_setup_dialog)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val dialogTitle = dialog.findViewById<TextView>(R.id.dialogTitle)
-        dialogTitle.text = resources.getString(R.string.machine_type_dialog_title_text_en)
-        val dialogSubTitle = dialog.findViewById<TextView>(R.id.dialogSubTitle)
-        dialogSubTitle.text = resources.getString(R.string.cycles_dialog_title_text_en)
+//        val dialogTitle = dialog.findViewById<TextView>(R.id.dialogTitle)
+//        dialogTitle.text = resources.getString(R.string.machine_type_dialog_title_text_en)
+//        val dialogSubTitle = dialog.findViewById<TextView>(R.id.dialogSubTitle)
+//        dialogSubTitle.text = resources.getString(R.string.cycles_dialog_title_text_en)
 
 
 
@@ -725,8 +753,8 @@ class MainActivity : AppCompatActivity() {
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.machinetype_dialog)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val dialogTitle = dialog.findViewById<TextView>(R.id.dialogTitle)
-        dialogTitle.text = resources.getString(R.string.machine_type_dialog_title_text_en)
+//        val dialogTitle = dialog.findViewById<TextView>(R.id.dialogTitle)
+//        dialogTitle.text = resources.getString(R.string.machine_type_dialog_title_text_en)
 
         val romStatus = chip8Cycle.getRomStatus()
 

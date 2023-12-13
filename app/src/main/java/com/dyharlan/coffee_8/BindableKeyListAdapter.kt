@@ -53,7 +53,7 @@ class BindableKeyListAdapter(private val context: Context, private val keys: Arr
             val dialog = object: Dialog(context) {
                 override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
                     var isKeyInUse:Boolean = false
-                    if(currentKeyBindings!= null && MainActivity.isExternal(event.device)){
+                    if(currentKeyBindings!= null && !event.isSystem){
                         var indexOfKey = 0
                         for(i in currentKeyBindings.indices){
                             if(currentKeyBindings[i] == keyCode){
