@@ -523,6 +523,7 @@ class MainActivity : AppCompatActivity() {
 //        dialogTitle.text = resources.getString(R.string.cycles_dialog_title_text_en)
 
         val editText = dialog.findViewById<EditText>(R.id.newCycles)
+        editText.setText(chip8Cycle.cycles.toString())
         val btnYes = dialog.findViewById<Button>(R.id.btnYes)
         val btnNo = dialog.findViewById<Button>(R.id.btnNo)
 
