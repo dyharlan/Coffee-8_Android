@@ -260,11 +260,18 @@ class MainActivity : AppCompatActivity() {
             val colorRes = R.color.night_keypad_background
             val bgColor = ContextCompat.getColor(this, colorRes)
             tableLayout.setBackgroundColor(bgColor)
+<<<<<<< HEAD
             Log.d("COUNT", count.toString())
             for (button in buttons) {
                 if(count == 5 || count == 8 || count == 7 || count == 9){
                     button.setBackgroundResource(R.drawable.night_rectangle_wasdbutton_background)
                     Log.d("TEST2", "BLUE RUN")
+=======
+
+            for (button in buttons) {
+                if(count == 5 || count == 8 || count == 7 || count == 9){
+                    button.setBackgroundResource(R.drawable.night_rectangle_wasdbutton_background)
+>>>>>>> 2033cfc884541f52a6c1700a9bdd9e9a6998ea06
                 }
                 else{
                     button.setBackgroundResource(R.drawable.night_rectangle_button_background)
