@@ -216,7 +216,7 @@ class MainActivity : AppCompatActivity() {
 
             Log.d("Status: ", dayTheme.toString())
             theme?.title = "Set Night Mode"
-            supportActionBar?.setBackgroundDrawable(resources.getDrawable(R.color.day_keypad_background))
+            supportActionBar?.setBackgroundDrawable(ContextCompat.getDrawable(this,R.color.day_keypad_background))
             actionBar?.title?.let {
                 val spannableTitle = SpannableString(it)
                 spannableTitle.setSpan(
@@ -243,11 +243,11 @@ class MainActivity : AppCompatActivity() {
             dayTheme = true
             theme?.setTitle("Set Day Mode")
             Log.d("Status: ", dayTheme.toString())
-            supportActionBar?.setBackgroundDrawable(resources.getDrawable(R.color.night_keypad_background))
+            supportActionBar?.setBackgroundDrawable(ContextCompat.getDrawable(this,R.color.night_keypad_background))
             actionBar?.title?.let {
                 val spannableTitle = SpannableString(it)
                 spannableTitle.setSpan(
-                    ForegroundColorSpan(getResources().getColor(R.color.night_title)), // Set the desired text color
+                    ForegroundColorSpan(ContextCompat.getColor(this,R.color.night_title)), // Set the desired text color
                     0, // Start index
                     it.length, // End index
                     0 // No flags
