@@ -82,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         KeyEvent.KEYCODE_V
     )
     private lateinit var chip8Cycle: Chip8Cycle
+    private lateinit var keyPad: Array<Button>
     private val sharedPrefFile = "prefFile"
     //private lateinit var sharedPreferences: SharedPreferences
     private val crc32: CRC32 = CRC32()
@@ -133,7 +134,7 @@ class MainActivity : AppCompatActivity() {
             keyRow3.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
         val keyRow4 = findViewById<TableRow>(R.id.keyRow4)
             keyRow4.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
-        val keyPad: Array<Button> = arrayOf(
+        keyPad = arrayOf(
             findViewById(R.id.keyPad0),
             findViewById(R.id.keyPad1),
             findViewById(R.id.keyPad2),
@@ -181,7 +182,7 @@ class MainActivity : AppCompatActivity() {
         setButtonDayNightStyle(keyPad)
         //Log.i("onCreate","density: "+applicationContext.getResources().getDisplayMetrics().density)
     }
-    var keyPad: Array<Button> = emptyArray()
+    //var keyPad: Array<Button> = emptyArray()
     var dayTheme = true
     private fun setButtonLayout(buttons: Array<Button>) {
         for (button in buttons) {
@@ -860,6 +861,4 @@ class MainActivity : AppCompatActivity() {
             status?.setTitle("Pause")
         }
     }
-
-
 }
