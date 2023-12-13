@@ -2,7 +2,6 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-
     <item
         android:title="Reset"
         android:id="@+id/menuReset"
@@ -17,19 +16,15 @@
         android:id="@+id/menuLoad"
         app:showAsAction="never"/>
     <item
+        android:title="Set Cycles"
         android:id="@+id/menuSet"
-        android:title="Set CPU Cycles"
-        app:showAsAction="never" />
+        app:showAsAction="never"/>
     <item
+        android:title="Change Machine Type"
         android:id="@+id/menuChange"
-        android:title="Change Emulated Machine"
-        app:showAsAction="never" />
+        app:showAsAction="never"/>
     <item android:title="Change Key Binds"
         android:id="@+id/menuKeyBind"
-        app:showAsAction="never"
-        />
-    <item android:title="Set Night Mode"
-        android:id="@+id/menuTheme"
         app:showAsAction="never"
         />
 </menu>
