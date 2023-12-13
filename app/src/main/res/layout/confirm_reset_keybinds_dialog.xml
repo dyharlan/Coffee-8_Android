@@ -27,18 +27,21 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
+            style="?android:attr/buttonBarStyle"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btnYes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                style="?android:attr/buttonBarButtonStyle"
                 android:text="Yes" />
 
             <Button
                 android:id="@+id/btnNo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                style="?android:attr/buttonBarButtonStyle"
                 android:text="No" />
         </LinearLayout>
     </LinearLayout>

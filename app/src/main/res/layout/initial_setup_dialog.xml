@@ -61,6 +61,7 @@
             android:layout_height="48dp"
             android:ems="10"
             android:hint="ex. 250"
+            android:importantForAutofill="no"
             android:inputType="number" />
 
         <LinearLayout
