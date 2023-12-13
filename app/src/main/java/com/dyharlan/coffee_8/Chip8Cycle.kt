@@ -128,6 +128,7 @@ class Chip8Cycle(
                 }
                 Arrays.fill(pixels, 0)
                 startEmulation()
+                update = true
             }
         } else {
             Toast.makeText(applicationContext, "Machine is not running!", Toast.LENGTH_SHORT).show()
