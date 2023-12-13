@@ -134,7 +134,11 @@ class MainActivity : AppCompatActivity() {
             keyRow3.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
         val keyRow4 = findViewById<TableRow>(R.id.keyRow4)
             keyRow4.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
+<<<<<<< HEAD
+            keyPad = arrayOf(
+=======
         keyPad = arrayOf(
+>>>>>>> b4c0a9e207b591c2eb51acfcf00c72abe820211f
             findViewById(R.id.keyPad0),
             findViewById(R.id.keyPad1),
             findViewById(R.id.keyPad2),
@@ -261,10 +265,18 @@ class MainActivity : AppCompatActivity() {
             val colorRes = R.color.night_keypad_background
             val bgColor = ContextCompat.getColor(this, colorRes)
             tableLayout.setBackgroundColor(bgColor)
+<<<<<<< HEAD
+            Log.d("COUNT", count.toString())
+            for (button in buttons) {
+                if(count == 5 || count == 8 || count == 7 || count == 9){
+                    button.setBackgroundResource(R.drawable.night_rectangle_wasdbutton_background)
+                    Log.d("TEST2", "BLUE RUN")
+=======
 
             for (button in buttons) {
                 if(count == 5 || count == 8 || count == 7 || count == 9){
                     button.setBackgroundResource(R.drawable.night_rectangle_wasdbutton_background)
+>>>>>>> 2033cfc884541f52a6c1700a9bdd9e9a6998ea06
                 }
                 else{
                     button.setBackgroundResource(R.drawable.night_rectangle_button_background)
