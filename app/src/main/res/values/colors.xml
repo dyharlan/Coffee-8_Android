@@ -6,4 +6,6 @@
     <color name="day_keypad_background">#D8CFC4</color>
     <color name="night_keypad_background">#242526</color>
     <color name="night_title">#d5d8d1</color>
+    <color name="dark_theme_bg">#242526</color>
+    <color name="lighter_dark_theme_bg">#3a3b3c</color>
 </resources>

@@ -1,27 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/aKey"
-    android:background="?android:attr/selectableItemBackground"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:background="?android:attr/selectableItemBackground"
+    android:orientation="vertical"
+    android:paddingLeft="15sp"
+    style="@style/keyControllerComponent">
 
-    <TextView
-        android:id="@+id/chip8Key"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Corresponding Chip8 Key"
-        android:textColor="#000000"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:paddingTop="5sp">
 
-    <TextView
-        android:id="@+id/boundTo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Where this key is bound to" />
+        <TextView
+            android:id="@+id/chip8Key"
+            android:layout_width="206dp"
+            android:layout_height="wrap_content"
+            android:foregroundGravity="left"
+            android:gravity="left"
+            android:text="Chip8 Key"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/boundTo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:foregroundGravity="right"
+            android:gravity="right"
+            android:paddingRight="15sp"
+            android:text="Where this key is bound to" />
+    </LinearLayout>
 
     <Space
         android:layout_width="match_parent"
         android:layout_height="24dp" />
+
 </LinearLayout>

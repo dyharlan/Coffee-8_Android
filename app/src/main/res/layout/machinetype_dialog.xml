@@ -13,6 +13,7 @@
         android:orientation="vertical"
         android:gravity="center"
         android:padding="20dp"
+        style="@style/dialog"
         >
 
         <TextView
@@ -34,21 +35,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:enabled="true"
-                android:text="COSMAC VIP" />
+                android:text="COSMAC VIP"
+                style="@style/radio"/>
 
             <RadioButton
                 android:id="@+id/SCHIPradioButton"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:enabled="true"
-                android:text="SuperChip 1.1" />
+                android:text="SuperChip 1.1"
+                style="@style/radio"/>
 
             <RadioButton
                 android:id="@+id/XOCHIPradioButton"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:enabled="true"
-                android:text="XO-CHIP" />
+                android:text="XO-CHIP"
+                style="@style/radio"/>
 
         </RadioGroup>
 
