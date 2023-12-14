@@ -67,7 +67,7 @@ class KeyControllerActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.menuHelp -> TODO()
+            //R.id.menuHelp -> TODO()
             R.id.menuResetBindings -> resetBindingsDialog(bindableKeys, keyAdapter)
         }
         return super.onOptionsItemSelected(item)

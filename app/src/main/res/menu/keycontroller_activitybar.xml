@@ -7,9 +7,4 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:title="Reset to Defaults" />
-    <item
-        android:id="@+id/menuHelp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:title="Help" />
 </menu>
