@@ -2,6 +2,21 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.Coffee8" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="android:fontFamily">@font/aldrich</item>
+        <item name="android:itemBackground">@color/dark_theme_bg</item>
+        <item name="android:textColor">@color/night_title</item>
     </style>
+
+    <style name="dialog" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:background">@color/dark_theme_bg</item>
+        <item name="android:textColor">@color/night_title</item>
+    </style>
+
+    <style name="radio" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="buttonTint">#8dcbff</item>
+        <item name="android:textColor">@color/night_title</item>
+        <item name="android:backgroundTint">@color/night_title</item>
+    </style>
+
+
 </resources>
