@@ -13,7 +13,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="20dp"
+        style="@style/dialog">
 
         <TextView
             android:id="@+id/dialogTitle"
@@ -30,6 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:text="Cancel"
+            style="?android:attr/buttonBarButtonStyle"
             android:textSize="14sp" />
     </LinearLayout>
 

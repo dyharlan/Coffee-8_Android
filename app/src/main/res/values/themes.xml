@@ -12,5 +12,9 @@
         <item name="android:backgroundTint">@color/black</item>
     </style>
 
+    <style name="keyController" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:background">@color/day_keypad_background</item>
+    </style>
+
     <style name="Theme.Coffee8" parent="Base.Theme.Coffee8" />
 </resources>

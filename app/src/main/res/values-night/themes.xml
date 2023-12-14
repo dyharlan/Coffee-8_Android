@@ -18,5 +18,18 @@
         <item name="android:backgroundTint">@color/night_title</item>
     </style>
 
+    <style name="keyController" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:background">@color/lighter_dark_theme_bg    </item>
+    </style>
+
+    <style name="keyControllerBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:background">@color/dark_theme_bg</item>
+        <item name="titleTextColor">@color/night_title</item>
+        <item name="android:textColorSecondary">@color/night_title</item>
+    </style>
+
+    <style name="keyControllerComponent" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:textColor">@color/night_title</item>
+    </style>
 
 </resources>
