@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.database.sqlite.SQLiteException
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
@@ -30,6 +31,11 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.dyharlan.coffee_8.Backend.Chip8SOC
 import com.dyharlan.coffee_8.Backend.MachineType
 import com.google.android.material.appbar.MaterialToolbar
@@ -60,24 +66,7 @@ class MainActivity : AppCompatActivity() {
         0xFFFF55,
         0xFFFFFF
     )
-//    private var physicalKeys: IntArray = intArrayOf(
-//        KeyEvent.KEYCODE_X,
-//        KeyEvent.KEYCODE_1,
-//        KeyEvent.KEYCODE_2,
-//        KeyEvent.KEYCODE_3,
-//        KeyEvent.KEYCODE_Q,
-//        KeyEvent.KEYCODE_W,
-//        KeyEvent.KEYCODE_E,
-//        KeyEvent.KEYCODE_A,
-//        KeyEvent.KEYCODE_S,
-//        KeyEvent.KEYCODE_D,
-//        KeyEvent.KEYCODE_Z,
-//        KeyEvent.KEYCODE_C,
-//        KeyEvent.KEYCODE_4,
-//        KeyEvent.KEYCODE_R,
-//        KeyEvent.KEYCODE_F,
-//        KeyEvent.KEYCODE_V
-//    )
+
     private var physicalKeys: IntArray = IntArray(16){0}
     private lateinit var chip8Cycle: Chip8Cycle
     private lateinit var keyPad: Array<Button>
@@ -180,9 +169,18 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+        windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+
         setButtonDayNightStyle(keyPad)
         //Log.i("onCreate","density: "+applicationContext.getResources().getDisplayMetrics().density)
     }
+
+    var count = 0
+    var dayTheme:Boolean = false
+    var tempStatus = ""
+
     private fun saveData(){
 
         val editor = sharedPreferences.edit()
@@ -202,9 +200,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    var count = 0
-    var dayTheme:Boolean = false
-    var tempStatus = ""
+
 
     private fun setButtonLayout(buttons: Array<Button>) {
         for (button in buttons) {
@@ -221,7 +217,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setDayStyle(buttons: Array<Button>, actionBar: androidx.appcompat.app.ActionBar?){
+    private fun setDayStyle(buttons: Array<Button>){
         // Assuming you have a reference to your TableLayout
         dayTheme = true
         val tableLayout = findViewById<TableLayout>(R.id.keyPad)
@@ -229,8 +225,9 @@ class MainActivity : AppCompatActivity() {
         val colorRes = R.color.day_keypad_background
         val bgColor = ContextCompat.getColor(this, colorRes)
         tableLayout.setBackgroundColor(bgColor)
-        supportActionBar?.setBackgroundDrawable(resources.getDrawable(R.color.day_keypad_background))
-        actionBar?.title?.let {
+        supportActionBar?.setBackgroundDrawable(ContextCompat.getDrawable(this, R.color.day_keypad_background))
+
+        supportActionBar?.title?.let {
             val spannableTitle = SpannableString(it)
             spannableTitle.setSpan(
                 ForegroundColorSpan(Color.BLACK), // Set the desired text color
@@ -238,8 +235,10 @@ class MainActivity : AppCompatActivity() {
                 it.length, // End index
                 0 // No flags
             )
-            actionBar.title = spannableTitle
+            supportActionBar?.title = spannableTitle
         }
+        val toolbar = findViewById<MaterialToolbar>(R.id.materialToolbar)
+        toolbar.overflowIcon?.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(ContextCompat.getColor(this, R.color.black), BlendModeCompat.SRC_ATOP)
         for (button in buttons) {
             if(count == 5 || count == 8 || count == 7 || count == 9){
                 button.setBackgroundResource(R.drawable.rectangle_wasdbutton_background)
@@ -252,18 +251,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setNightStyle(buttons: Array<Button>,actionBar: androidx.appcompat.app.ActionBar?){
-        supportActionBar?.setBackgroundDrawable(resources.getDrawable(R.color.night_keypad_background))
-        actionBar?.title?.let {
+    private fun setNightStyle(buttons: Array<Button>){
+        supportActionBar?.setBackgroundDrawable(ContextCompat.getDrawable(this, R.color.night_keypad_background))
+        supportActionBar?.title?.let {
             val spannableTitle = SpannableString(it)
             spannableTitle.setSpan(
-                ForegroundColorSpan(getResources().getColor(R.color.night_title)), // Set the desired text color
+                ForegroundColorSpan(ContextCompat.getColor(this, R.color.night_title)), // Set the desired text color
                 0, // Start index
                 it.length, // End index
                 0 // No flags
             )
-            actionBar.title = spannableTitle
+            supportActionBar?.title = spannableTitle
         }
+        val toolbar = findViewById<MaterialToolbar>(R.id.materialToolbar)
+        toolbar.overflowIcon?.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(ContextCompat.getColor(this, R.color.white), BlendModeCompat.SRC_ATOP)
         // Assuming you have a reference to your TableLayout
         val tableLayout = findViewById<TableLayout>(R.id.keyPad)
         // Set the background color
@@ -288,21 +289,21 @@ class MainActivity : AppCompatActivity() {
         setButtonLayout(buttons)
         Log.d("STRING STATUS AFTER", tempStatus)
 
-        if(dayTheme == true){
-            setDayStyle(buttons,actionBar)
-            var toPrint = theme?.title?.asSequence()
+        if(dayTheme){
+            setDayStyle(buttons)
+            val toPrint = theme?.title?.asSequence()
             println(toPrint)
         }
         else{
-            setNightStyle(buttons,actionBar)
-            var toPrint = theme?.title?.asSequence()
+            setNightStyle(buttons)
+            val toPrint = theme?.title?.asSequence()
             println(toPrint)
         }
         count = 0
     }
 
     private fun setButtonDayNightStyleButtonListener(){
-        if(dayTheme == true){
+        if(dayTheme){
             dayTheme = false
             tempStatus = "To Day Mode"
             Log.d("STRING STATUS BEFORE", tempStatus)
