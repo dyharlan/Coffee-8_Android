@@ -46,7 +46,7 @@ class Chip8Cycle(
     private var chip8Surface: Chip8SurfaceView       //SurfaceView that will display the output
     private var chip8SurfaceHolder: SurfaceHolder
     private lateinit var bitmapRect: Rect
-    private lateinit var subsetRect: Rect
+    private var subsetRect: Rect
     private var applicationContext: Context
     private var dbHandler: DatabaseHandler      //database handler for the DB that will store the contents of the RPL Flags from apps that will use it
     private var checksum: Long = 0
