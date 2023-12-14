@@ -2,7 +2,6 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-
     <item
         android:title="Reset"
         android:id="@+id/menuReset"
@@ -28,7 +27,7 @@
         android:id="@+id/menuKeyBind"
         app:showAsAction="never"
         />
-    <item android:title="Set Night Mode"
+    <item android:title="Set Theme"
         android:id="@+id/menuTheme"
         app:showAsAction="never"
         />

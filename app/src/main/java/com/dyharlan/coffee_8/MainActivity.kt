@@ -179,28 +179,62 @@ class MainActivity : AppCompatActivity() {
 
     var count = 0
     var dayTheme:Boolean = false
-    var tempStatus = ""
+    var firstOpen:Boolean = true
 
     private fun saveData(){
 
         val editor = sharedPreferences.edit()
         editor.apply{
             putBoolean("BOOLEAN_KEY", dayTheme)
-            putString("STRING_KEY", tempStatus)
+            putBoolean("FIRST_KEY", firstOpen)
         }.apply()
-
+        Log.d("SAVED FIRSTOPEN IS: ", firstOpen.toString())
     }
 
-    private fun loadData(theme: MenuItem?){
+    private fun loadData(){
         val savedBoolean = sharedPreferences.getBoolean("BOOLEAN_KEY", true)
-        val savedString = sharedPreferences.getString("STRING_KEY", "To Night Mode")
+        val savedOpenStatus = sharedPreferences.getBoolean("FIRST_KEY", true)
+        Log.d("LOADED FIRSTOPEN IS IS: ", savedBoolean.toString())
+        firstOpen = savedOpenStatus
         dayTheme = savedBoolean
-        theme?.setTitle(savedString)
-        Log.d("tempString is: ", savedString.toString())
     }
 
-
-
+    private fun showThemeDialog(){
+        loadData()
+        val dialog = Dialog(this)
+        var selectedValue = ""
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.theme_dialog)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.show()
+        val radioGroup = dialog.findViewById<RadioGroup>(R.id.themeRadioGroup)
+        val confirmButton = dialog.findViewById<Button>(R.id.confirmTheme)
+        confirmButton.setOnClickListener(){
+            if (radioGroup.checkedRadioButtonId != -1) {
+                val selectedRadioButton = dialog.findViewById<RadioButton>(radioGroup.checkedRadioButtonId)
+                selectedValue = selectedRadioButton.getText().toString()
+                if(selectedValue.equals("Select Day Theme")){
+                    dayTheme = true
+                    setDayStyle(keyPad)
+                    Log.d("SETTING DAY THEM TRUE RUN: ", dayTheme.toString())
+                    Toast.makeText(this, "Day Theme Selected", Toast.LENGTH_SHORT).show()
+                }
+                else{
+                    dayTheme = false
+                    setNightStyle(keyPad)
+                    Log.d("SETTING DAY THEM FALSE RUN: ", dayTheme.toString())
+                    Toast.makeText(this, "Night Theme Selected", Toast.LENGTH_SHORT).show()
+                }
+                Log.d("SAVED DAYTHEME STATUS: ", dayTheme.toString())
+                firstOpen = false
+                saveData()
+                dialog.dismiss()
+            } else {
+                    Toast.makeText(this, "Select a theme before confirming", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
 
     private fun setButtonLayout(buttons: Array<Button>) {
         for (button in buttons) {
@@ -216,10 +250,8 @@ class MainActivity : AppCompatActivity() {
             button.setTextColor(Color.BLACK)
         }
     }
-
     private fun setDayStyle(buttons: Array<Button>){
-        // Assuming you have a reference to your TableLayout
-        dayTheme = true
+        setButtonLayout(buttons)
         val tableLayout = findViewById<TableLayout>(R.id.keyPad)
         // Set the background color
         val colorRes = R.color.day_keypad_background
@@ -249,9 +281,11 @@ class MainActivity : AppCompatActivity() {
             }
             count++
         }
+        count = 0
     }
 
     private fun setNightStyle(buttons: Array<Button>){
+        setButtonLayout(buttons)
         supportActionBar?.setBackgroundDrawable(ContextCompat.getDrawable(this, R.color.night_keypad_background))
         supportActionBar?.title?.let {
             val spannableTitle = SpannableString(it)
@@ -264,7 +298,7 @@ class MainActivity : AppCompatActivity() {
             supportActionBar?.title = spannableTitle
         }
         val toolbar = findViewById<MaterialToolbar>(R.id.materialToolbar)
-        toolbar.overflowIcon?.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(ContextCompat.getColor(this, R.color.white), BlendModeCompat.SRC_ATOP)
+        toolbar.overflowIcon?.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(ContextCompat.getColor(this, R.color.night_title), BlendModeCompat.SRC_ATOP)
         // Assuming you have a reference to your TableLayout
         val tableLayout = findViewById<TableLayout>(R.id.keyPad)
         // Set the background color
@@ -280,47 +314,34 @@ class MainActivity : AppCompatActivity() {
             }
             count++
         }
-    }
-    private fun setButtonDayNightStyle(buttons: Array<Button>) {
-        val theme = menu?.findItem(R.id.menuTheme)
-        val actionBar = supportActionBar
-        loadData(theme)
-        actionBar?.title = "Coffee-8"
-        setButtonLayout(buttons)
-        Log.d("STRING STATUS AFTER", tempStatus)
-
-        if(dayTheme){
-            setDayStyle(buttons)
-            val toPrint = theme?.title?.asSequence()
-            println(toPrint)
-        }
-        else{
-            setNightStyle(buttons)
-            val toPrint = theme?.title?.asSequence()
-            println(toPrint)
-        }
         count = 0
     }
-
-    private fun setButtonDayNightStyleButtonListener(){
-        if(dayTheme){
-            dayTheme = false
-            tempStatus = "To Day Mode"
-            Log.d("STRING STATUS BEFORE", tempStatus)
-            saveData()
-            // Log.d("STRING STATUS", theme?.title.toString())
-            setButtonDayNightStyle(keyPad)
-
+    private fun setButtonDayNightStyle(buttons: Array<Button>) {
+        loadData()
+        if(firstOpen == true){
+            showThemeDialog()
         }
         else{
-            dayTheme = true
-            tempStatus = "To Night Mode"
-            Log.d("STRING STATUS BEFORE", tempStatus)
-            saveData()
-            //Log.d("STRING STATUS", theme?.title.toString())
-            setButtonDayNightStyle(keyPad)
+            Log.d("DAY THEME STATUS SETBUTTON: ", dayTheme.toString())
+            val theme = menu?.findItem(R.id.menuTheme)
+            val actionBar = supportActionBar
+            firstOpen = false
+            actionBar?.title = "Coffee-8"
+            setButtonLayout(buttons)
+
+            if(dayTheme){
+                setDayStyle(buttons)
+                val toPrint = theme?.title?.asSequence()
+                println(toPrint)
+            }
+            else{
+                setNightStyle(buttons)
+                val toPrint = theme?.title?.asSequence()
+                println(toPrint)
+            }
         }
     }
+
 //    companion object {
 //        fun isExternal(inputDevice: InputDevice): Boolean {
 //            if(Build.VERSION.SDK_INT >= 29){
@@ -501,8 +522,6 @@ override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_activitybar, menu)
         this.menu = menu;
-        val theme = menu?.findItem(R.id.menuTheme)
-        loadData(theme)
         return true
 }
 
@@ -514,7 +533,7 @@ override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
             R.id.menuSet -> showCyclesButton(chip8Cycle)
             R.id.menuChange -> showMachineTypeButton(chip8Cycle)
             R.id.menuKeyBind -> showKeyBinderActivity()
-            R.id.menuTheme -> setButtonDayNightStyleButtonListener()
+            R.id.menuTheme -> showThemeDialog()
         }
         //this.menu = menu;
         return super.onOptionsItemSelected(item)
