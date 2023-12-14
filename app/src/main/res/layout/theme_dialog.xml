@@ -16,20 +16,11 @@
         style="@style/dialog">
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/themeDialogTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Select the System's "
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:text="theme"
+            android:text="Select the appearance of the app"
             android:textSize="18sp" />
 
         <RadioGroup
@@ -38,18 +29,25 @@
             android:layout_height="wrap_content">
 
             <RadioButton
-                android:id="@+id/radioButtonDay"
+                android:id="@+id/radioButtonAuto"
+                style="@style/radio"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Select Day Theme"
-                style="@style/radio"/>
+                android:layout_height="48dp"
+                android:text="Automatic (Use System Settings)" />
+
+            <RadioButton
+                android:id="@+id/radioButtonDay"
+                style="@style/radio"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Select Day Theme" />
 
             <RadioButton
                 android:id="@+id/radioButtonNight"
+                style="@style/radio"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Select Night Theme "
-                style="@style/radio"/>
+                android:layout_height="48dp"
+                android:text="Select Night Theme " />
 
         </RadioGroup>
 

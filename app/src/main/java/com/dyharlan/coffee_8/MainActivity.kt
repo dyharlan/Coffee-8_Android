@@ -2,12 +2,13 @@ package com.dyharlan.coffee_8
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
+import android.app.UiModeManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.database.sqlite.SQLiteException
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
@@ -67,7 +68,8 @@ class MainActivity : AppCompatActivity() {
         0xFFFF55,
         0xFFFFFF
     )
-
+    var firstOpen: Boolean = true
+    var appearanceSetting:Int = 0
     private var physicalKeys: IntArray = IntArray(16){0}
     private lateinit var chip8Cycle: Chip8Cycle
     private lateinit var keyPad: Array<Button>
@@ -79,9 +81,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sharedPreferences = getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
-
         setContentView(R.layout.activity_main)
-
+        appearanceSetting = sharedPreferences.getInt("currentTheme", 0)
+        firstOpen = sharedPreferences.getBoolean("firstOpen", true)
         val chip8Surface = findViewById<Chip8SurfaceView>(R.id.chip8Surface)
         //setup toolbar?
         val toolbar = findViewById<MaterialToolbar>(R.id.materialToolbar)
@@ -118,13 +120,13 @@ class MainActivity : AppCompatActivity() {
         * Programmatically setup the keypad dimensions and the event handling
          */
         val keyRow1 = findViewById<TableRow>(R.id.keyRow1)
-            keyRow1.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
+        keyRow1.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
         val keyRow2 = findViewById<TableRow>(R.id.keyRow2)
-            keyRow2.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
+        keyRow2.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
         val keyRow3 = findViewById<TableRow>(R.id.keyRow3)
-            keyRow3.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
+        keyRow3.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
         val keyRow4 = findViewById<TableRow>(R.id.keyRow4)
-            keyRow4.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
+        keyRow4.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 0, 1f)
         keyPad = arrayOf(
             findViewById(R.id.keyPad0),
             findViewById(R.id.keyPad1),
@@ -173,36 +175,23 @@ class MainActivity : AppCompatActivity() {
         val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
         windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
-
         setButtonDayNightStyle(keyPad)
         //Log.i("onCreate","density: "+applicationContext.getResources().getDisplayMetrics().density)
     }
 
-    var count = 0
-    var dayTheme:Boolean = false
-    var firstOpen:Boolean = true
-
-    private fun saveData(){
+    private fun saveThemePrefs(){
         val editor = sharedPreferences.edit()
         editor.apply{
-            putBoolean("BOOLEAN_KEY", dayTheme)
-            putBoolean("FIRST_KEY", firstOpen)
+            putInt("currentTheme", appearanceSetting)
+            putBoolean("firstOpen", firstOpen)
         }.apply()
-        Log.d("SAVED FIRSTOPEN IS: ", firstOpen.toString())
+        //Log.d("SAVED FIRSTOPEN IS: ", firstOpen.toString())
     }
 
-    private fun loadData(){
-        val savedBoolean = sharedPreferences.getBoolean("BOOLEAN_KEY", true)
-        val savedOpenStatus = sharedPreferences.getBoolean("FIRST_KEY", true)
-        Log.d("LOADED FIRSTOPEN IS IS: ", savedBoolean.toString())
-        firstOpen = savedOpenStatus
-        dayTheme = savedBoolean
-    }
+
 
     private fun showThemeDialog(){
-        loadData()
         val dialog = Dialog(this)
-        var selectedValue = ""
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.theme_dialog)
@@ -210,30 +199,57 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
         val radioGroup = dialog.findViewById<RadioGroup>(R.id.themeRadioGroup)
         val confirmButton = dialog.findViewById<Button>(R.id.confirmTheme)
+
         confirmButton.setOnClickListener(){
-            if (radioGroup.checkedRadioButtonId != -1) {
-                val selectedRadioButton = dialog.findViewById<RadioButton>(radioGroup.checkedRadioButtonId)
-                selectedValue = selectedRadioButton.getText().toString()
-                if(selectedValue.equals("Select Day Theme")){
-                    dayTheme = true
+            val currentlySelectedButton = radioGroup.checkedRadioButtonId
+            if ( currentlySelectedButton != -1) {
+                if(currentlySelectedButton == R.id.radioButtonAuto){
+                    appearanceSetting = 0
+                    //setButtonDayNightStyle(keyPad)
+                    setAutoStyle(keyPad)
+                    //Log.d("SETTING DAY THEM TRUE RUN: ", dayTheme.toString())
+                    Toast.makeText(this, "Automatic Theme Selected", Toast.LENGTH_SHORT).show()
+                }
+                else if(currentlySelectedButton == R.id.radioButtonDay){
+                    //dayTheme = true
+                    appearanceSetting = 1
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                     setDayStyle(keyPad)
-                    Log.d("SETTING DAY THEM TRUE RUN: ", dayTheme.toString())
+                    //setButtonDayNightStyle(keyPad)
+                    //Log.d("SETTING DAY THEM TRUE RUN: ", dayTheme.toString())
                     Toast.makeText(this, "Day Theme Selected", Toast.LENGTH_SHORT).show()
                 }
-                else{
-                    dayTheme = false
+                else if(currentlySelectedButton == R.id.radioButtonNight){
+                    //dayTheme = false
+                    appearanceSetting = 2
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                     setNightStyle(keyPad)
-                    Log.d("SETTING DAY THEM FALSE RUN: ", dayTheme.toString())
+                    //Log.d("SETTING DAY THEM FALSE RUN: ", dayTheme.toString())
                     Toast.makeText(this, "Night Theme Selected", Toast.LENGTH_SHORT).show()
                 }
-                Log.d("SAVED DAYTHEME STATUS: ", dayTheme.toString())
-                firstOpen = false
-                saveData()
+                //Log.d("SAVED DAYTHEME STATUS: ", dayTheme.toString())
+                //firstOpen = false
+                if(firstOpen){
+                    firstOpen = false
+                }
+                saveThemePrefs()
                 dialog.dismiss()
             } else {
-                    Toast.makeText(this, "Select a theme before confirming", Toast.LENGTH_SHORT).show()
-                }
+                Toast.makeText(this, "Select a theme before confirming", Toast.LENGTH_SHORT).show()
+            }
         }
+
+        if(appearanceSetting == 0){
+            val btn = dialog.findViewById<RadioButton>(R.id.radioButtonAuto)
+            btn.isChecked = true
+        }else if(appearanceSetting == 1){
+            val btn = dialog.findViewById<RadioButton>(R.id.radioButtonDay)
+            btn.isChecked = true
+        }else if(appearanceSetting == 2){
+            val btn = dialog.findViewById<RadioButton>(R.id.radioButtonNight)
+            btn.isChecked = true
+        }
+
     }
 
     private fun setButtonLayout(buttons: Array<Button>) {
@@ -251,7 +267,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun setDayStyle(buttons: Array<Button>){
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         setButtonLayout(buttons)
         val tableLayout = findViewById<TableLayout>(R.id.keyPad)
         // Set the background color
@@ -272,6 +288,7 @@ class MainActivity : AppCompatActivity() {
         }
         val toolbar = findViewById<MaterialToolbar>(R.id.materialToolbar)
         toolbar.overflowIcon?.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(ContextCompat.getColor(this, R.color.black), BlendModeCompat.SRC_ATOP)
+        var count = 0
         for (button in buttons) {
             if(count == 5 || count == 8 || count == 7 || count == 9){
                 button.setBackgroundResource(R.drawable.rectangle_wasdbutton_background)
@@ -282,12 +299,18 @@ class MainActivity : AppCompatActivity() {
             }
             count++
         }
-        count = 0
+
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if(appearanceSetting == 0){
+            setAutoStyle(keyPad)
+        }
+    }
     private fun setNightStyle(buttons: Array<Button>){
         setButtonLayout(buttons)
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         supportActionBar?.setBackgroundDrawable(ContextCompat.getDrawable(this, R.color.night_keypad_background))
         supportActionBar?.title?.let {
             val spannableTitle = SpannableString(it)
@@ -307,6 +330,7 @@ class MainActivity : AppCompatActivity() {
         val colorRes = R.color.night_keypad_background
         val bgColor = ContextCompat.getColor(this, colorRes)
         tableLayout.setBackgroundColor(bgColor)
+        var count = 0
         for (button in buttons) {
             if(count == 5 || count == 8 || count == 7 || count == 9){
                 button.setBackgroundResource(R.drawable.night_rectangle_wasdbutton_background)
@@ -316,35 +340,39 @@ class MainActivity : AppCompatActivity() {
             }
             count++
         }
-        count = 0
+    }
+
+    private fun setAutoStyle(buttons: Array<Button>){
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        val uiModeManager = getSystemService(UI_MODE_SERVICE) as UiModeManager
+        val mode: Int = uiModeManager.nightMode
+        if (mode == UiModeManager.MODE_NIGHT_YES) {
+            setNightStyle(buttons)
+        } else if (mode == UiModeManager.MODE_NIGHT_NO) {
+            setDayStyle(buttons)
+        }
     }
     private fun setButtonDayNightStyle(buttons: Array<Button>) {
-        loadData()
-        if(firstOpen == true){
+        if(firstOpen){
             showThemeDialog()
         }
-        else{
-            Log.d("DAY THEME STATUS SETBUTTON: ", dayTheme.toString())
-            val theme = menu?.findItem(R.id.menuTheme)
-            val actionBar = supportActionBar
-            firstOpen = false
-            actionBar?.title = "Coffee-8"
-            setButtonLayout(buttons)
-
-            if(dayTheme){
-                setDayStyle(buttons)
-                val toPrint = theme?.title?.asSequence()
-                println(toPrint)
-            }
-            else{
-                setNightStyle(buttons)
-                val toPrint = theme?.title?.asSequence()
-                println(toPrint)
-            }
+        setButtonLayout(buttons)
+        if(appearanceSetting == 0){
+           setAutoStyle(buttons)
+        }else if(appearanceSetting == 1){
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            setDayStyle(buttons)
         }
+        else if(appearanceSetting == 2){
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            setNightStyle(buttons)
+        }
+
     }
 
-//    companion object {
+
+
+    //    companion object {
 //        fun isExternal(inputDevice: InputDevice): Boolean {
 //            if(Build.VERSION.SDK_INT >= 29){
 //                return inputDevice.isExternal
@@ -364,155 +392,155 @@ class MainActivity : AppCompatActivity() {
 //            }
 //        }
 //    }
-override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
-    var isHandled = false
-    if(event == null){
+    override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
+        var isHandled = false
+        if(event == null){
+            return isHandled
+        }
+
+        if(event.action == KeyEvent.ACTION_DOWN && !event.isSystem){
+            if(event.repeatCount != 0){
+                return true
+            }
+            when(event.keyCode){
+                physicalKeys[0] -> {
+                    chip8Cycle.keyPress(0)
+                    isHandled = true
+                }
+                physicalKeys[1] -> {
+                    chip8Cycle.keyPress(1)
+                    isHandled = true
+                }
+                physicalKeys[2] -> {
+                    chip8Cycle.keyPress(2)
+                    isHandled = true
+                }
+                physicalKeys[3] -> {
+                    chip8Cycle.keyPress(3)
+                    isHandled = true
+                }
+                physicalKeys[4] -> {
+                    chip8Cycle.keyPress(4)
+                    isHandled = true
+                }
+                physicalKeys[5] -> {
+                    chip8Cycle.keyPress(5)
+                    isHandled = true
+                }
+                physicalKeys[6] -> {
+                    chip8Cycle.keyPress(6)
+                    isHandled = true
+                }
+                physicalKeys[7] -> {
+                    chip8Cycle.keyPress(7)
+                    isHandled = true
+                }
+                physicalKeys[8] -> {
+                    chip8Cycle.keyPress(8)
+                    isHandled = true
+                }
+                physicalKeys[9] -> {
+                    chip8Cycle.keyPress(9)
+                    isHandled = true
+                }
+                physicalKeys[10] -> {
+                    chip8Cycle.keyPress(10)
+                    isHandled = true
+                }
+                physicalKeys[11] -> {
+                    chip8Cycle.keyPress(11)
+                    isHandled = true
+                }
+                physicalKeys[12] -> {
+                    chip8Cycle.keyPress(12)
+                    isHandled = true
+                }
+                physicalKeys[13] -> {
+                    chip8Cycle.keyPress(13)
+                    isHandled = true
+                }
+                physicalKeys[14] -> {
+                    chip8Cycle.keyPress(14)
+                    isHandled = true
+                }
+                physicalKeys[15] -> {
+                    chip8Cycle.keyPress(15)
+                    isHandled = true
+                }
+                else -> isHandled = true
+            }
+
+        }else if(event.action == KeyEvent.ACTION_UP && !event.isSystem){
+            when(event.keyCode){
+                physicalKeys[0] -> {
+                    chip8Cycle.keyRelease(0)
+                    isHandled = true
+                }
+                physicalKeys[1] -> {
+                    chip8Cycle.keyRelease(1)
+                    isHandled = true
+                }
+                physicalKeys[2] -> {
+                    chip8Cycle.keyRelease(2)
+                    isHandled = true
+                }
+                physicalKeys[3] -> {
+                    chip8Cycle.keyRelease(3)
+                    isHandled = true
+                }
+                physicalKeys[4] -> {
+                    chip8Cycle.keyRelease(4)
+                    isHandled = true
+                }
+                physicalKeys[5] -> {
+                    chip8Cycle.keyRelease(5)
+                    isHandled = true
+                }
+                physicalKeys[6] -> {
+                    chip8Cycle.keyRelease(6)
+                    isHandled = true
+                }
+                physicalKeys[7] -> {
+                    chip8Cycle.keyRelease(7)
+                    isHandled = true
+                }
+                physicalKeys[8] -> {
+                    chip8Cycle.keyRelease(8)
+                    isHandled = true
+                }
+                physicalKeys[9] -> {
+                    chip8Cycle.keyRelease(9)
+                    isHandled = true
+                }
+                physicalKeys[10] -> {
+                    chip8Cycle.keyRelease(10)
+                    isHandled = true
+                }
+                physicalKeys[11] -> {
+                    chip8Cycle.keyRelease(11)
+                    isHandled = true
+                }
+                physicalKeys[12] -> {
+                    chip8Cycle.keyRelease(12)
+                    isHandled = true
+                }
+                physicalKeys[13] -> {
+                    chip8Cycle.keyRelease(13)
+                    isHandled = true
+                }
+                physicalKeys[14] -> {
+                    chip8Cycle.keyRelease(14)
+                    isHandled = true
+                }
+                physicalKeys[15] -> {
+                    chip8Cycle.keyRelease(15)
+                    isHandled = true
+                }
+            }
+        }
         return isHandled
     }
-
-    if(event.action == KeyEvent.ACTION_DOWN && !event.isSystem){
-        if(event.repeatCount != 0){
-            return true
-        }
-        when(event.keyCode){
-            physicalKeys[0] -> {
-                chip8Cycle.keyPress(0)
-                isHandled = true
-            }
-            physicalKeys[1] -> {
-                chip8Cycle.keyPress(1)
-                isHandled = true
-            }
-            physicalKeys[2] -> {
-                chip8Cycle.keyPress(2)
-                isHandled = true
-            }
-            physicalKeys[3] -> {
-                chip8Cycle.keyPress(3)
-                isHandled = true
-            }
-            physicalKeys[4] -> {
-                chip8Cycle.keyPress(4)
-                isHandled = true
-            }
-            physicalKeys[5] -> {
-                chip8Cycle.keyPress(5)
-                isHandled = true
-            }
-            physicalKeys[6] -> {
-                chip8Cycle.keyPress(6)
-                isHandled = true
-            }
-            physicalKeys[7] -> {
-                chip8Cycle.keyPress(7)
-                isHandled = true
-            }
-            physicalKeys[8] -> {
-                chip8Cycle.keyPress(8)
-                isHandled = true
-            }
-            physicalKeys[9] -> {
-                chip8Cycle.keyPress(9)
-                isHandled = true
-            }
-            physicalKeys[10] -> {
-                chip8Cycle.keyPress(10)
-                isHandled = true
-            }
-            physicalKeys[11] -> {
-                chip8Cycle.keyPress(11)
-                isHandled = true
-            }
-            physicalKeys[12] -> {
-                chip8Cycle.keyPress(12)
-                isHandled = true
-            }
-            physicalKeys[13] -> {
-                chip8Cycle.keyPress(13)
-                isHandled = true
-            }
-            physicalKeys[14] -> {
-                chip8Cycle.keyPress(14)
-                isHandled = true
-            }
-            physicalKeys[15] -> {
-                chip8Cycle.keyPress(15)
-                isHandled = true
-            }
-            else -> isHandled = true
-        }
-
-    }else if(event.action == KeyEvent.ACTION_UP && !event.isSystem){
-        when(event.keyCode){
-            physicalKeys[0] -> {
-                chip8Cycle.keyRelease(0)
-                isHandled = true
-            }
-            physicalKeys[1] -> {
-                chip8Cycle.keyRelease(1)
-                isHandled = true
-            }
-            physicalKeys[2] -> {
-                chip8Cycle.keyRelease(2)
-                isHandled = true
-            }
-            physicalKeys[3] -> {
-                chip8Cycle.keyRelease(3)
-                isHandled = true
-            }
-            physicalKeys[4] -> {
-                chip8Cycle.keyRelease(4)
-                isHandled = true
-            }
-            physicalKeys[5] -> {
-                chip8Cycle.keyRelease(5)
-                isHandled = true
-            }
-            physicalKeys[6] -> {
-                chip8Cycle.keyRelease(6)
-                isHandled = true
-            }
-            physicalKeys[7] -> {
-                chip8Cycle.keyRelease(7)
-                isHandled = true
-            }
-            physicalKeys[8] -> {
-                chip8Cycle.keyRelease(8)
-                isHandled = true
-            }
-            physicalKeys[9] -> {
-                chip8Cycle.keyRelease(9)
-                isHandled = true
-            }
-            physicalKeys[10] -> {
-                chip8Cycle.keyRelease(10)
-                isHandled = true
-            }
-            physicalKeys[11] -> {
-                chip8Cycle.keyRelease(11)
-                isHandled = true
-            }
-            physicalKeys[12] -> {
-                chip8Cycle.keyRelease(12)
-                isHandled = true
-            }
-            physicalKeys[13] -> {
-                chip8Cycle.keyRelease(13)
-                isHandled = true
-            }
-            physicalKeys[14] -> {
-                chip8Cycle.keyRelease(14)
-                isHandled = true
-            }
-            physicalKeys[15] -> {
-                chip8Cycle.keyRelease(15)
-                isHandled = true
-            }
-        }
-    }
-    return isHandled
-}
-//    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+    //    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
 //        if (event != null) {
 //
 //        }
@@ -525,7 +553,7 @@ override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
         menuInflater.inflate(R.menu.main_activitybar, menu)
         this.menu = menu;
         return true
-}
+    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){

@@ -17,7 +17,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Coffee8"
         android:launchMode="singleTask"
-        tools:targetApi="31">
+        tools:targetApi="31"
+        >
         <activity
             android:name=".KeyControllerActivity"
             android:exported="false"
