@@ -183,8 +183,30 @@ class MainActivity : AppCompatActivity() {
         setButtonDayNightStyle(keyPad)
         //Log.i("onCreate","density: "+applicationContext.getResources().getDisplayMetrics().density)
     }
-    //var keyPad: Array<Button> = emptyArray()
-    var dayTheme = true
+    private fun saveData(){
+        val sharedPreferencesUI = getSharedPreferences("sharedPreferencesUI", Context.MODE_PRIVATE)
+        val editor = sharedPreferencesUI.edit()
+        editor.apply{
+            putBoolean("BOOLEAN_KEY", dayTheme)
+            putString("STRING_KEY", tempStatus)
+        }.apply()
+
+    }
+
+    private fun loadData(theme: MenuItem?){
+        val sharedPreferencesUI = getSharedPreferences("sharedPreferencesUI", Context.MODE_PRIVATE)
+        val savedBoolean = sharedPreferencesUI.getBoolean("BOOLEAN_KEY", true)
+        val savedString = sharedPreferencesUI.getString("STRING_KEY", "To Night Mode")
+        dayTheme = savedBoolean
+        theme?.setTitle(savedString)
+        Log.d("tempString is: ", savedString.toString())
+    }
+
+
+    var count = 0
+    var dayTheme:Boolean = false
+    var tempStatus = ""
+
     private fun setButtonLayout(buttons: Array<Button>) {
         for (button in buttons) {
             val layoutParams = button.layoutParams as ViewGroup.MarginLayoutParams
@@ -199,81 +221,105 @@ class MainActivity : AppCompatActivity() {
             button.setTextColor(Color.BLACK)
         }
     }
+
+    private fun setDayStyle(buttons: Array<Button>, actionBar: androidx.appcompat.app.ActionBar?){
+        // Assuming you have a reference to your TableLayout
+        dayTheme = true
+        val tableLayout = findViewById<TableLayout>(R.id.keyPad)
+        // Set the background color
+        val colorRes = R.color.day_keypad_background
+        val bgColor = ContextCompat.getColor(this, colorRes)
+        tableLayout.setBackgroundColor(bgColor)
+        supportActionBar?.setBackgroundDrawable(resources.getDrawable(R.color.day_keypad_background))
+        actionBar?.title?.let {
+            val spannableTitle = SpannableString(it)
+            spannableTitle.setSpan(
+                ForegroundColorSpan(Color.BLACK), // Set the desired text color
+                0, // Start index
+                it.length, // End index
+                0 // No flags
+            )
+            actionBar.title = spannableTitle
+        }
+        for (button in buttons) {
+            if(count == 5 || count == 8 || count == 7 || count == 9){
+                button.setBackgroundResource(R.drawable.rectangle_wasdbutton_background)
+                Log.d("TEST: ", "Line Executed")
+            }
+            else{
+                button.setBackgroundResource(R.drawable.rectangle_button_background)
+            }
+            count++
+        }
+    }
+
+    private fun setNightStyle(buttons: Array<Button>,actionBar: androidx.appcompat.app.ActionBar?){
+        supportActionBar?.setBackgroundDrawable(resources.getDrawable(R.color.night_keypad_background))
+        actionBar?.title?.let {
+            val spannableTitle = SpannableString(it)
+            spannableTitle.setSpan(
+                ForegroundColorSpan(getResources().getColor(R.color.night_title)), // Set the desired text color
+                0, // Start index
+                it.length, // End index
+                0 // No flags
+            )
+            actionBar.title = spannableTitle
+        }
+        // Assuming you have a reference to your TableLayout
+        val tableLayout = findViewById<TableLayout>(R.id.keyPad)
+        // Set the background color
+        val colorRes = R.color.night_keypad_background
+        val bgColor = ContextCompat.getColor(this, colorRes)
+        tableLayout.setBackgroundColor(bgColor)
+        for (button in buttons) {
+            if(count == 5 || count == 8 || count == 7 || count == 9){
+                button.setBackgroundResource(R.drawable.night_rectangle_wasdbutton_background)
+            }
+            else{
+                button.setBackgroundResource(R.drawable.night_rectangle_button_background)
+            }
+            count++
+        }
+    }
     private fun setButtonDayNightStyle(buttons: Array<Button>) {
-        var count = 0
-        val actionBar = supportActionBar
         val theme = menu?.findItem(R.id.menuTheme)
+        val actionBar = supportActionBar
+        loadData(theme)
         actionBar?.title = "Coffee-8"
         setButtonLayout(buttons)
+        Log.d("STRING STATUS AFTER", tempStatus)
+
         if(dayTheme == true){
-            dayTheme = false
-            // Assuming you have a reference to your TableLayout
-            val tableLayout = findViewById<TableLayout>(R.id.keyPad)
-
-            // Set the background color
-            val colorRes = R.color.day_keypad_background
-            val bgColor = ContextCompat.getColor(this, colorRes)
-            tableLayout.setBackgroundColor(bgColor)
-
-            Log.d("Status: ", dayTheme.toString())
-            theme?.title = "Set Night Mode"
-            supportActionBar?.setBackgroundDrawable(ContextCompat.getDrawable(this,R.color.day_keypad_background))
-            actionBar?.title?.let {
-                val spannableTitle = SpannableString(it)
-                spannableTitle.setSpan(
-                    ForegroundColorSpan(Color.BLACK), // Set the desired text color
-                    0, // Start index
-                    it.length, // End index
-                    0 // No flags
-                )
-                actionBar.title = spannableTitle
-            }
-            for (button in buttons) {
-                if(count == 5 || count == 8 || count == 7 || count == 9){
-                    button.setBackgroundResource(R.drawable.rectangle_wasdbutton_background)
-                    Log.d("TEST: ", "Line Executed")
-                }
-                else{
-                    button.setBackgroundResource(R.drawable.rectangle_button_background)
-                }
-                count++
-            }
+            setDayStyle(buttons,actionBar)
+            var toPrint = theme?.title?.asSequence()
+            println(toPrint)
         }
         else{
-
-            dayTheme = true
-            theme?.setTitle("Set Day Mode")
-            Log.d("Status: ", dayTheme.toString())
-            supportActionBar?.setBackgroundDrawable(ContextCompat.getDrawable(this,R.color.night_keypad_background))
-            actionBar?.title?.let {
-                val spannableTitle = SpannableString(it)
-                spannableTitle.setSpan(
-                    ForegroundColorSpan(ContextCompat.getColor(this,R.color.night_title)), // Set the desired text color
-                    0, // Start index
-                    it.length, // End index
-                    0 // No flags
-                )
-                actionBar.title = spannableTitle
-            }
-            // Assuming you have a reference to your TableLayout
-            val tableLayout = findViewById<TableLayout>(R.id.keyPad)
-
-            // Set the background color
-            val colorRes = R.color.night_keypad_background
-            val bgColor = ContextCompat.getColor(this, colorRes)
-            tableLayout.setBackgroundColor(bgColor)
-
-            for (button in buttons) {
-                if(count == 5 || count == 8 || count == 7 || count == 9){
-                    button.setBackgroundResource(R.drawable.night_rectangle_wasdbutton_background)
-                }
-                else{
-                    button.setBackgroundResource(R.drawable.night_rectangle_button_background)
-                }
-                count++
-            }
+            setNightStyle(buttons,actionBar)
+            var toPrint = theme?.title?.asSequence()
+            println(toPrint)
         }
         count = 0
+    }
+
+    private fun setButtonDayNightStyleButtonListener(){
+        if(dayTheme == true){
+            dayTheme = false
+            tempStatus = "To Day Mode"
+            Log.d("STRING STATUS BEFORE", tempStatus)
+            saveData()
+            // Log.d("STRING STATUS", theme?.title.toString())
+            setButtonDayNightStyle(keyPad)
+
+        }
+        else{
+            dayTheme = true
+            tempStatus = "To Night Mode"
+            Log.d("STRING STATUS BEFORE", tempStatus)
+            saveData()
+            //Log.d("STRING STATUS", theme?.title.toString())
+            setButtonDayNightStyle(keyPad)
+        }
     }
 //    companion object {
 //        fun isExternal(inputDevice: InputDevice): Boolean {
@@ -455,8 +501,10 @@ override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_activitybar, menu)
         this.menu = menu;
+        val theme = menu?.findItem(R.id.menuTheme)
+        loadData(theme)
         return true
-    }
+}
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
@@ -466,7 +514,7 @@ override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
             R.id.menuSet -> showCyclesButton(chip8Cycle)
             R.id.menuChange -> showMachineTypeButton(chip8Cycle)
             R.id.menuKeyBind -> showKeyBinderActivity()
-            R.id.menuTheme -> setButtonDayNightStyle(keyPad)
+            R.id.menuTheme -> setButtonDayNightStyleButtonListener()
         }
         //this.menu = menu;
         return super.onOptionsItemSelected(item)
