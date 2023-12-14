@@ -539,6 +539,8 @@ override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
     }
     private fun resetButton(chip8Cycle: Chip8Cycle){
         chip8Cycle.resetROM()
+        val status = menu?.findItem(R.id.menuPause)
+        status?.setTitle("Pause")
     }
     /*
      * show a dialog that allows the user to change machine cycle count
