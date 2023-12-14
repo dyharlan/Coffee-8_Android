@@ -5,43 +5,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="20dp"
-<<<<<<< HEAD
-    android:layout_marginHorizontal="20dp"
-    >
-=======
     android:layout_marginHorizontal="20dp">
->>>>>>> 2000988558c9cb1d57575f9d8180344c7e239e5f
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-<<<<<<< HEAD
-        android:padding="20dp"
-        style="@style/dialog">
-=======
         android:padding="20dp">
->>>>>>> 2000988558c9cb1d57575f9d8180344c7e239e5f
 
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-<<<<<<< HEAD
-            android:text="Select the System's "
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:text="theme"
-=======
             android:text="Select the System's theme"
->>>>>>> 2000988558c9cb1d57575f9d8180344c7e239e5f
             android:textSize="18sp" />
 
         <RadioGroup
@@ -53,23 +30,13 @@
                 android:id="@+id/radioButtonDay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-<<<<<<< HEAD
-                android:text="Select Day Theme"
-                style="@style/radio"/>
-=======
                 android:text="Select Day Theme" />
->>>>>>> 2000988558c9cb1d57575f9d8180344c7e239e5f
 
             <RadioButton
                 android:id="@+id/radioButtonNight"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-<<<<<<< HEAD
-                android:text="Select Night Theme "
-                style="@style/radio"/>
-=======
-                android:text="Select Night Theme " />
->>>>>>> 2000988558c9cb1d57575f9d8180344c7e239e5f
+                android:text="Select Night Theme" />
 
         </RadioGroup>
 
