@@ -252,7 +252,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun setDayStyle(buttons: Array<Button>){
+<<<<<<< HEAD
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+=======
+>>>>>>> 2000988558c9cb1d57575f9d8180344c7e239e5f
         setButtonLayout(buttons)
         val tableLayout = findViewById<TableLayout>(R.id.keyPad)
         // Set the background color
@@ -288,7 +291,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun setNightStyle(buttons: Array<Button>){
         setButtonLayout(buttons)
+<<<<<<< HEAD
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+=======
+>>>>>>> 2000988558c9cb1d57575f9d8180344c7e239e5f
         supportActionBar?.setBackgroundDrawable(ContextCompat.getDrawable(this, R.color.night_keypad_background))
         supportActionBar?.title?.let {
             val spannableTitle = SpannableString(it)
