@@ -184,8 +184,8 @@ class MainActivity : AppCompatActivity() {
         //Log.i("onCreate","density: "+applicationContext.getResources().getDisplayMetrics().density)
     }
     private fun saveData(){
-        val sharedPreferencesUI = getSharedPreferences("sharedPreferencesUI", Context.MODE_PRIVATE)
-        val editor = sharedPreferencesUI.edit()
+
+        val editor = sharedPreferences.edit()
         editor.apply{
             putBoolean("BOOLEAN_KEY", dayTheme)
             putString("STRING_KEY", tempStatus)
@@ -194,9 +194,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadData(theme: MenuItem?){
-        val sharedPreferencesUI = getSharedPreferences("sharedPreferencesUI", Context.MODE_PRIVATE)
-        val savedBoolean = sharedPreferencesUI.getBoolean("BOOLEAN_KEY", true)
-        val savedString = sharedPreferencesUI.getString("STRING_KEY", "To Night Mode")
+        val savedBoolean = sharedPreferences.getBoolean("BOOLEAN_KEY", true)
+        val savedString = sharedPreferences.getString("STRING_KEY", "To Night Mode")
         dayTheme = savedBoolean
         theme?.setTitle(savedString)
         Log.d("tempString is: ", savedString.toString())
