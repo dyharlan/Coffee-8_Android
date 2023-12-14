@@ -183,7 +183,6 @@ class MainActivity : AppCompatActivity() {
     var firstOpen:Boolean = true
 
     private fun saveData(){
-
         val editor = sharedPreferences.edit()
         editor.apply{
             putBoolean("BOOLEAN_KEY", dayTheme)
