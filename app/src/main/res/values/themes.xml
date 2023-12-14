@@ -4,6 +4,12 @@
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
         <item name="android:fontFamily">@font/aldrich</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="radio" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="buttonTint">#d66464</item>
+        <item name="android:backgroundTint">@color/black</item>
     </style>
 
     <style name="Theme.Coffee8" parent="Base.Theme.Coffee8" />
