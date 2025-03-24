@@ -52,20 +52,20 @@ class MainActivity : AppCompatActivity() {
     private var menu: Menu? = null
     private var planeColors: IntArray = intArrayOf(
         0x000000,
-        0xAA0000,
-        0x00AA00,
-        0x0000AA,
-        0x00AAAA,
-        0xAA00AA,
-        0xAA5500,
-        0xAAAAAA,
-        0x555555,
-        0xFF5555, //LR
-        0x55FF55, //LG
-        0x5555FF, //LB
-        0x55FFFF, //LC
-        0xFF55FF,
-        0xFFFF55,
+        0xfbf305,
+        0xDD8E00,
+        0xC22524,
+        0xf20884,
+        0x4700a5,
+        0x0000d3,
+        0x02abea,
+        0x1fb714,
+        0x006412, //LR
+        0x562c05, //LG
+        0x90713a, //LB
+        0xC0C0C0, //LC
+        0x808080,
+        0x404040,
         0xFFFFFF
     )
     var firstOpen: Boolean = true
